@@ -1,4 +1,4 @@
-name: 01.deploy-develop
+name: 01.deploy-database
 
 on:
   workflow_dispatch:
@@ -15,7 +15,16 @@ env:
 jobs: 
   deploy:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18.x]
     steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
       - name: Log in to Azure
         uses: azure/login@v1
         with:
@@ -34,7 +43,4 @@ jobs:
             az account show
       - name: Deploy
         run: |
-            sudo docker kill \"$IMAGE\"
-            sudo docker rm \"$IMAGE\"
-            sudo docker pull $USERNAME_DOCKER_HUB/$IMAGE:latest
-            sudo docker run -d -p 3000:80 --name \"$IMAGE\" $USERNAME_DOCKER_HUB/$IMAGE:latest
+            sudo docker-compose up -d
