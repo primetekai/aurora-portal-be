@@ -1,0 +1,35 @@
+name: 01.deploy-develop
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirmDeployment:
+        description: 'Confirm Deployment'
+        required: true
+env:
+  SERVER_IP: "20.249.210.27"
+  SERVER_USER: "outerxspace"
+  IMAGE: be-app
+  USERNAME_DOCKER_HUB: warjamma
+
+jobs: 
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Log in to Azure
+        uses: azure/login@v2
+        with:
+          client-id: e9de0229-e0fe-4361-b155-2139f1e2f85e
+          tenant-id: 2dff09ac-2b3b-4182-9953-2b548e0d0b39
+          subscription-id: 3a5db49d-c188-41c0-9759-c6f3794aa918
+      # - uses: azure/login@v2
+        # with:
+        #   creds: ${{ secrets.AZURE_CREDENTIALS }}
+        #   environment: 'AzureUSGovernment'
+        #   enable-AzPSSession: true
+      - name: Deploy
+        run: |
+            sudo docker kill \"$IMAGE\"
+            sudo docker rm \"$IMAGE\"
+            sudo docker pull $USERNAME_DOCKER_HUB/$IMAGE:latest
+            sudo docker run -d -p 3000:80 --name \"$IMAGE\" $USERNAME_DOCKER_HUB/$IMAGE:latest
