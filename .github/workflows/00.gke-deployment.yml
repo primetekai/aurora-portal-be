@@ -55,9 +55,6 @@ jobs:
       #   run: ./deploy/nginx.conf.sh > ./nginx/nginx.conf
 
       # Build 
-      - name: Run database
-        run: |-
-          docker-compose up
       - name: Build image
         run: |-
           docker build -t "$IMAGE" .
@@ -67,4 +64,3 @@ jobs:
         run: |-
           docker tag $IMAGE:latest $USERNAME_DOCKER_HUB/$IMAGE:latest
           docker push $USERNAME_DOCKER_HUB/$IMAGE:latest  
-          docker-compose push
