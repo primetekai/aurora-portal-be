@@ -1,6 +1,6 @@
 import 'dotenv/config';
 
-const PORT = process.env.NODE_APP_PORT ?? '3000';
+const PORT = process.env.NODE_APP_PORT ?? '8000';
 const HOST_NAME = process.env.NODE_APP_HOST_NAME ?? 'localhost';
 const DB_HOSTNAME = process.env.NODE_APP_DB_HOSTNAME ?? 'localhost';
 const DB_PORT = Number(process.env.NODE_APP_DB_PORT) ?? 5433;
