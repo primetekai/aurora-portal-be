@@ -25,18 +25,9 @@ jobs:
         with:
             creds: ${{ secrets.AZURE_CREDENTIALS }}
             allow-no-subscriptions: true
-
-      - name: Azure CLI script
-        uses: azure/CLI@v1
-        env:
-          AZURE_CORE_OUTPUT: none
-        with:
-          azcliversion: latest
-          inlineScript: |
-            az account show
       - name: Deploy
         run: |
-            sudo docker kill \"$IMAGE\"
-            sudo docker rm \"$IMAGE\"
+            # sudo docker kill \"$IMAGE\"
+            # sudo docker rm \"$IMAGE\"
             sudo docker pull $USERNAME_DOCKER_HUB/$IMAGE:latest
             sudo docker run -d -p 3000:80 --name \"$IMAGE\" $USERNAME_DOCKER_HUB/$IMAGE:latest
