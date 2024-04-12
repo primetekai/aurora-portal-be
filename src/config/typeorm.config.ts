@@ -4,7 +4,6 @@ import {
   DB_NAME,
   DB_PASSWORD,
   DB_PORT,
-  DB_TYPE,
   DB_USERNAME,
   TYPEORM_SYNC,
 } from './platform.configs';
@@ -12,7 +11,7 @@ import {
 // get từ file yml ra
 // ĐỒng thời setup connect server luôn server amazon
 export const typeOrmConfig: TypeOrmModuleOptions = {
-  type: DB_TYPE as any,
+  type: 'postgres',
   host: DB_HOSTNAME,
   port: DB_PORT,
   username: DB_USERNAME,
@@ -20,4 +19,5 @@ export const typeOrmConfig: TypeOrmModuleOptions = {
   database: DB_NAME,
   entities: [__dirname + '/../**/*.entity{.ts,.js}'],
   synchronize: TYPEORM_SYNC,
+  autoLoadEntities: true,
 };
