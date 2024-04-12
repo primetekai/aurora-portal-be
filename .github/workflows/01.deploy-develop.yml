@@ -12,6 +12,10 @@ env:
   IMAGE: be-app
   USERNAME_DOCKER_HUB: warjamma
 
+permissions:
+  id-token: write
+  contents: write
+  issues: write
 jobs: 
   deploy:
     runs-on: ubuntu-latest
@@ -19,11 +23,9 @@ jobs:
       - name: Log in to Azure
         uses: azure/login@v1
         with:
-          auth-type: IDENTITY
-          client-id: e9de0229-e0fe-4361-b155-2139f1e2f85e
-          tenant-id: 2dff09ac-2b3b-4182-9953-2b548e0d0b39
-          subscription-id: 3a5db49d-c188-41c0-9759-c6f3794aa918
-          enable-AzPSSession: true
+            creds: ${{ secrets.AZURE_CREDENTIALS }}
+            allow-no-subscriptions: true
+
       - name: Azure CLI script
         uses: azure/CLI@v1
         env:

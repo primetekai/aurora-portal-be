@@ -6,11 +6,11 @@ on:
       confirmDeployment:
         description: 'Confirm Deployment'
         required: true
-env:
-  SERVER_IP: "20.249.210.27"
-  SERVER_USER: "outerxspace"
-  IMAGE: be-app
-  USERNAME_DOCKER_HUB: warjamma
+
+permissions:
+  id-token: write
+  contents: write
+  issues: write
 
 jobs: 
   deploy:
@@ -28,19 +28,8 @@ jobs:
       - name: Log in to Azure
         uses: azure/login@v1
         with:
-          auth-type: IDENTITY
-          client-id: e9de0229-e0fe-4361-b155-2139f1e2f85e
-          tenant-id: 2dff09ac-2b3b-4182-9953-2b548e0d0b39
-          subscription-id: 3a5db49d-c188-41c0-9759-c6f3794aa918
-          enable-AzPSSession: true
-      - name: Azure CLI script
-        uses: azure/CLI@v1
-        env:
-          AZURE_CORE_OUTPUT: none
-        with:
-          azcliversion: latest
-          inlineScript: |
-            az account show
+            creds: ${{ secrets.AZURE_CREDENTIALS }}
+            allow-no-subscriptions: true
       - name: Deploy
         run: |
             sudo docker-compose up -d
