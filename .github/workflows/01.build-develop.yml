@@ -8,7 +8,7 @@ on:
 env:
   DEPLOYMENT_NAME: beapp2024
   IMAGE: beapp2024
-  INGRESS_IP: 20.249.210.27
+  INGRESS_IP: 4.230.8.218
   DOT_ENV_FILE_NAME: .env.develop
 jobs:
   variables:

@@ -7,7 +7,7 @@ on:
         description: 'Confirm Deployment'
         required: true
 env:
-  SERVER_IP: "20.249.210.27"
+  SERVER_IP: "4.230.8.218"
   SERVER_USER: "outerxspace"
   IMAGE: beapp2024
   USERNAME_DOCKER_HUB: warjamma
