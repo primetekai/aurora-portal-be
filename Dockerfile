@@ -1,12 +1,15 @@
+# Serve application with Nginx
 FROM nginx:latest
-
 WORKDIR /app
-
 COPY ./dist .
+COPY nginx/ /etc/nginx/
 
-# COPY nginx/ /etc/nginx/
-
-# RUN npm sequelize-cli db:migrate
-
-# RUN docker compose -p node-apps up -d
+# Run application with Node.js
+FROM node:21-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+EXPOSE 8000
+CMD [ "npm", "start" ]
 

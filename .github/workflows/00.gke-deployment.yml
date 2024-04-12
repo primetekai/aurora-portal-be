@@ -45,6 +45,15 @@ jobs:
         run: yarn
       - name: Build page
         run: yarn build
+      - name: Grant execute permission for nginx
+        run: chmod +x ./deploy/*
+      - name: Create nginx folder
+        run: mkdir ./nginx && mkdir ./nginx/conf.d
+      - name: Generate default nginx configuration file setting
+        run: ./deploy/nginx.default.conf.sh "$INGRESS_IP" > ./nginx/conf.d/default.conf
+      - name: Generate nginx configuration file setting
+        run: ./deploy/nginx.conf.sh > ./nginx/nginx.conf
+
       # Build 
       - name: Build image
         run: |-
