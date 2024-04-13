@@ -7,7 +7,7 @@ on:
         description: 'Confirm Deployment'
         required: true
 env:
-  IMAGE: be-app-2024
+  IMAGE: be-app-images
   USERNAME_DOCKER_HUB: warjamma
 
 permissions:
