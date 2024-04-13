@@ -6,11 +6,11 @@ const DB_HOSTNAME = process.env.NODE_APP_DB_HOSTNAME ?? 'localhost';
 const DB_PORT = Number(process.env.NODE_APP_DB_PORT) ?? 5434;
 const DB_TYPE = process.env.NODE_APP_DB_TYPE ?? 'postgres';
 const DB_USERNAME = process.env.NODE_APP_DB_USERNAME ?? 'postgres';
-const DB_PASSWORD = process.env.NODE_APP_DB_PASSWORD ?? 'root';
+const DB_PASSWORD = process.env.NODE_APP_DB_PASSWORD ?? '123123';
 const DB_NAME = process.env.NODE_APP_DB_NAME ?? 'postgres';
 const TYPEORM_SYNC = (process.env.NODE_APP_TYPEORM_SYNC || true) === true;
 const JWT_SECRET = process.env.NODE_APP_JWT_SECRET ?? 'topSecret51';
-const EX_PIRES_IN = process.env.NODE_APP_EX_PIRES_IN ?? 3600;
+const EXPIRES_IN = process.env.NODE_APP_EXPIRES_IN ?? 3600;
 
 export {
   PORT,
@@ -23,5 +23,5 @@ export {
   DB_NAME,
   TYPEORM_SYNC,
   JWT_SECRET,
-  EX_PIRES_IN,
+  EXPIRES_IN,
 };

@@ -6,8 +6,8 @@ on:
         description: 'Confirm Deployment'
         required: true
 env:
-  DEPLOYMENT_NAME: beapp2024
-  IMAGE: beapp2024
+  DEPLOYMENT_NAME: be-app-2024
+  IMAGE: be-app-2024
   INGRESS_IP: 4.230.8.218
   DOT_ENV_FILE_NAME: .env.develop
 jobs:
@@ -22,9 +22,9 @@ jobs:
     steps:
       - name: Echo
         run: echo prepare variable
-  beapp2024:
+  be-app-2024:
     needs: variables
-    name: deploy beapp2024
+    name: deploy be-app-2024
     uses: ./.github/workflows/00.gke-deployment.yml
     with:
       DEPLOYMENT_NAME: ${{ needs.variables.outputs.DEPLOYMENT_NAME }}

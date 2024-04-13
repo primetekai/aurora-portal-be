@@ -6,7 +6,7 @@ import { AuthService } from './auth.service';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './jwt.strategy';
-import { JWT_SECRET, EX_PIRES_IN } from 'src/config';
+import { JWT_SECRET, EXPIRES_IN } from 'src/config';
 
 @Module({
   imports: [
@@ -16,7 +16,7 @@ import { JWT_SECRET, EX_PIRES_IN } from 'src/config';
     JwtModule.register({
       secret: JWT_SECRET,
       signOptions: {
-        expiresIn: EX_PIRES_IN,
+        expiresIn: EXPIRES_IN,
       },
     }),
     TypeOrmModule.forFeature([UserRepository]),

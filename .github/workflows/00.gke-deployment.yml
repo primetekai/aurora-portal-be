@@ -23,6 +23,11 @@ env:
   PASSWORD_DOCKER_HUB: BWKk9q9B@Cm7!$M
   USERNAME_DOCKER_HUB: warjamma
 
+permissions:
+  id-token: write
+  contents: write
+  issues: write
+  
 jobs:
   setup-build-publish-deploy:
     name: Setup, Build, Publish, and Deploy
@@ -49,3 +54,15 @@ jobs:
         run: |-
           docker tag $IMAGE:latest $USERNAME_DOCKER_HUB/$IMAGE:latest
           docker push $USERNAME_DOCKER_HUB/$IMAGE:latest  
+      #Deploy
+      - name: Log in to Azure
+        uses: azure/login@v1
+        with:
+            creds: ${{ secrets.AZURE_CREDENTIALS }}
+            allow-no-subscriptions: true
+      - name: Deploy
+        run: |
+          sudo docker stop "$IMAGE"
+          sudo docker rm "$IMAGE"
+          sudo docker pull $USERNAME_DOCKER_HUB/$IMAGE:latest   
+          sudo docker run -d -p 8000:80 --name "$IMAGE" $USERNAME_DOCKER_HUB/$IMAGE:latest
