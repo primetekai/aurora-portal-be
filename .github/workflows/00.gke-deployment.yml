@@ -23,11 +23,6 @@ env:
   PASSWORD_DOCKER_HUB: BWKk9q9B@Cm7!$M
   USERNAME_DOCKER_HUB: warjamma
 
-permissions:
-  id-token: write
-  contents: write
-  issues: write
-  
 jobs:
   setup-build-publish-deploy:
     name: Setup, Build, Publish, and Deploy
