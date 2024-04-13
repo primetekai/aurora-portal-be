@@ -38,4 +38,4 @@ jobs:
           sudo docker stop "$IMAGE"
           sudo docker rm "$IMAGE"
           sudo docker pull $USERNAME_DOCKER_HUB/$IMAGE:latest   
-          sudo docker run -d -p 8000:80 --name "$IMAGE" $USERNAME_DOCKER_HUB/$IMAGE:latest
+          sudo docker run -d -p 3000:3000 --name "$IMAGE" $USERNAME_DOCKER_HUB/$IMAGE:latest
