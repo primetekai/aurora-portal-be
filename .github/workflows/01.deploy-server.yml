@@ -1,4 +1,4 @@
-name: 01.deploy-database
+name: 01.deploy-server
 
 on:
   workflow_dispatch:
