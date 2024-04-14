@@ -9,7 +9,7 @@ on:
 env:
   DEPLOYMENT_NAME: be-app-2024
   IMAGE: be-app-images
-  INGRESS_IP: 20.249.210.27
+  INGRESS_IP: 20.39.199.15
   DOT_ENV_FILE_NAME: .env.develop
 jobs:
   variables:
