@@ -7,7 +7,7 @@ on:
         description: 'Confirm Deployment'
         required: true
 env:
-  IMAGE: be-app-images
+  IMAGE: be-app-docker
   USERNAME_DOCKER_HUB: warjamma
 
 permissions:
