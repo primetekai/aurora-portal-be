@@ -20,6 +20,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       secretOrKey: JWT_SECRET,
     });
   }
+
   async validate(payload: JwtPayload): Promise<User> {
     const { username } = payload;
     const user = await this.userRepository.findOne({ where: { username } });
