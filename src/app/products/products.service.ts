@@ -1,4 +1,4 @@
-import { User } from './../auth/user.entity';
+import { User } from '../auth/user.entity';
 import { GetProductFilterDto } from './dto/get-products-filter.dto';
 import { CreateProductDto } from './dto/create-product.dto';
 import { ProductRepository } from './product.repository';

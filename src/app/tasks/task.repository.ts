@@ -4,7 +4,7 @@ import { CreateTaskDto } from './dto/create-task.dto';
 import { DataSource, Repository } from 'typeorm';
 import { Task } from './task.entity';
 import { TaskStatus } from './task-status.enum';
-import { User } from 'src/auth/user.entity';
+import { User } from 'src/app/auth/user.entity';
 import { Logger } from '@nestjs/common/services/logger.service';
 
 @Injectable()

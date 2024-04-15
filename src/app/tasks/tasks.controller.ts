@@ -20,8 +20,8 @@ import { TaskStatusValidationPipe } from './pipes/task-status-validation.pipe';
 import { Task } from './task.entity';
 import { TaskStatus } from './task-status.enum';
 import { AuthGuard } from '@nestjs/passport';
-import { GetUser } from 'src/auth/get-user.decorator';
-import { User } from 'src/auth/user.entity';
+import { GetUser } from 'src/app/auth/get-user.decorator';
+import { User } from 'src/app/auth/user.entity';
 
 @Controller('tasks')
 // Impor thêm xác thực đúng 1 dòng là nó sẽ yêu cầu thêm token

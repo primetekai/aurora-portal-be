@@ -16,6 +16,42 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
-    "noFallthroughCasesInSwitch": false
-  }
+    "noFallthroughCasesInSwitch": false,
+    "paths": {
+      "@app/environment": [
+        "src/environments/environment.ts"
+      ],
+      "@app/api-error-code": [
+        "src/app/api-error-code"
+      ],
+      "@app/database": [
+        "src/app/database"
+      ],
+      "@app/auth": [
+        "src/app/auth"
+      ],
+      "@nest-core/shared": [
+        "libs/shared/src"
+      ],
+      "@nest-core/shared/*": [
+        "libs/shared/src/*"
+      ],
+      "@nest-core/config": [
+        "libs/config/src"
+      ],
+      "@nest-core/config/*": [
+        "libs/config/src/*"
+      ],
+      "@nest-core/core": [
+        "libs/core/src"
+      ],
+      "@nest-core/core/*": [
+        "libs/core/src/*"
+      ]
+    }
+  },
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
 }

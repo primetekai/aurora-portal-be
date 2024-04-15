@@ -7,7 +7,7 @@ import {
 import { Product } from './product.entity';
 import { Repository } from 'typeorm';
 import { CreateProductDto } from './dto/create-product.dto';
-import { User } from 'src/auth/user.entity';
+import { User } from 'src/app/auth/user.entity';
 
 @Injectable()
 export class ProductRepository extends Repository<Product> {

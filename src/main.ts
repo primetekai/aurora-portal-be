@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { Logger } from '@nestjs/common';
-import { TransformInterceptor } from './interceptor/transform.interceptor';
+import { TransformInterceptor } from './app/interceptor/transform.interceptor';
 import { NODE_ENV, PORT, SWAGGER } from './config';
 import { setupSwagger } from './swagger';
 

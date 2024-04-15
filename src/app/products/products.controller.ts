@@ -1,6 +1,6 @@
 import { GetProductFilterDto } from './dto/get-products-filter.dto';
-import { User } from 'src/auth/user.entity';
-import { GetUser } from 'src/auth/get-user.decorator';
+import { User } from 'src/app/auth/user.entity';
+import { GetUser } from 'src/app/auth/get-user.decorator';
 import { AuthGuard } from '@nestjs/passport';
 import { ProductsService } from './products.service';
 import { Product } from './product.entity';
