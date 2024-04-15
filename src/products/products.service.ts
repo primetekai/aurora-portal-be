@@ -2,7 +2,6 @@ import { User } from './../auth/user.entity';
 import { GetProductFilterDto } from './dto/get-products-filter.dto';
 import { CreateProductDto } from './dto/create-product.dto';
 import { ProductRepository } from './product.repository';
-import { InjectRepository } from '@nestjs/typeorm';
 import {
   Injectable,
   NotFoundException,
@@ -12,10 +11,7 @@ import { Product } from './product.entity';
 
 @Injectable()
 export class ProductsService {
-  constructor(
-    @InjectRepository(ProductRepository)
-    private productRepository: ProductRepository,
-  ) {}
+  constructor(private productRepository: ProductRepository) {}
 
   async createProduct(
     createProductDto: CreateProductDto,

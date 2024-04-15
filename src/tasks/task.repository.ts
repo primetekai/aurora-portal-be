@@ -1,15 +1,20 @@
-import { InternalServerErrorException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { GetTaskFilterDto } from './dto/get-tasks-filter.dto';
 import { CreateTaskDto } from './dto/create-task.dto';
-import { EntityRepository, Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { Task } from './task.entity';
 import { TaskStatus } from './task-status.enum';
 import { User } from 'src/auth/user.entity';
 import { Logger } from '@nestjs/common/services/logger.service';
 
-@EntityRepository(Task)
+@Injectable()
 export class TaskRepository extends Repository<Task> {
+  constructor(private dataSource: DataSource) {
+    super(Task, dataSource.createEntityManager());
+  }
+
   private logger = new Logger('Tasks repository');
+
   async getTask(
     getTaskFilterDto: GetTaskFilterDto,
     user: User,
@@ -40,6 +45,7 @@ export class TaskRepository extends Repository<Task> {
       throw new InternalServerErrorException();
     }
   }
+
   async createTask(createTaskDto: CreateTaskDto, user: User): Promise<Task> {
     const { title, description } = createTaskDto;
     const task = new Task();

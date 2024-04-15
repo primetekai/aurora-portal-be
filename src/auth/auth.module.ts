@@ -26,6 +26,7 @@ import { JWT_SECRET, EXPIRES_IN } from 'src/config';
     AuthService,
     // nhớ phải cung cấp jwt-strategy ở đây nhằm định danh token
     JwtStrategy,
+    UserRepository,
   ],
   // sau khi cung cấp export JwtStategy ở đây luôn
   exports: [JwtStrategy, PassportModule],

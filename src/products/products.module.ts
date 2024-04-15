@@ -8,7 +8,7 @@ import { ProductsController } from './products.controller';
 @Module({
   // Sau khi tao entity roi moi import o day
   imports: [TypeOrmModule.forFeature([ProductRepository]), AuthModule],
-  providers: [ProductsService],
+  providers: [ProductsService, ProductRepository],
   controllers: [ProductsController],
 })
 export class ProductsModule {}

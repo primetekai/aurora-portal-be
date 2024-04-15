@@ -8,8 +8,6 @@ import {
   TYPEORM_SYNC,
 } from './platform.configs';
 
-// get từ file yml ra
-// ĐỒng thời setup connect server luôn server amazon
 export const typeOrmConfig: TypeOrmModuleOptions = {
   type: 'postgres',
   host: DB_HOSTNAME,
@@ -18,6 +16,6 @@ export const typeOrmConfig: TypeOrmModuleOptions = {
   password: DB_PASSWORD,
   database: DB_NAME,
   entities: [__dirname + '/../**/*.entity{.ts,.js}'],
-  synchronize: TYPEORM_SYNC,
+  synchronize: true,
   autoLoadEntities: true,
 };

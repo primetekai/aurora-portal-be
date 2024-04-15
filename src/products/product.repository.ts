@@ -1,14 +1,18 @@
 import { GetProductFilterDto } from './dto/get-products-filter.dto';
-import { InternalServerErrorException, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+} from '@nestjs/common';
 import { Product } from './product.entity';
-import { EntityRepository, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { CreateProductDto } from './dto/create-product.dto';
 import { User } from 'src/auth/user.entity';
 
-@EntityRepository(Product)
+@Injectable()
 export class ProductRepository extends Repository<Product> {
-  // async createProduct
   private logger = new Logger('Product repository');
+
   async createProduct(
     createProductDto: CreateProductDto,
     user: User,

@@ -34,7 +34,6 @@ export class ProductsController {
     @Body() createProductDto: CreateProductDto,
     @GetUser() user: User,
   ): Promise<Product> {
-    //console.log(user);
     this.logger.verbose(
       `User "${user.username}" create a new product. Data: ${JSON.stringify(createProductDto)}`,
     );
