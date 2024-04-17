@@ -22,14 +22,24 @@ import { TaskStatus } from './task-status.enum';
 import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from 'src/app/auth/get-user.decorator';
 import { User } from 'src/app/auth/user.entity';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 
+@ApiBearerAuth()
 @Controller('tasks')
-// Impor thêm xác thực đúng 1 dòng là nó sẽ yêu cầu thêm token
-@UseGuards(AuthGuard()) // muốn get ko xác thực token chỉ cần di chuyển cái này xuống hàm để đây nó lấy hết class
+@ApiTags('tasks')
+@UseGuards(AuthGuard())
 export class TasksController {
-  // cần xuất logger
   private loggger = new Logger('TasksController');
+
   constructor(private tasksService: TasksService) {}
+
+  @ApiOperation({ summary: 'Get all task' })
+  @ApiResponse({ status: 200, description: 'Return all task.' })
   @Get()
   getTask(
     @Query(ValidationPipe) filterDto: GetTaskFilterDto,
@@ -41,6 +51,8 @@ export class TasksController {
     return this.tasksService.getTask(filterDto, user);
   }
 
+  @ApiOperation({ summary: 'Task id' })
+  @ApiResponse({ status: 200, description: 'Task id' })
   @Get('/:id')
   getTaskById(
     @Param('id', ParseIntPipe) id: number,
@@ -49,6 +61,11 @@ export class TasksController {
     return this.tasksService.getTaskById(id, user);
   }
 
+  @ApiOperation({ summary: 'Create task' })
+  @ApiResponse({
+    status: 201,
+    description: 'The task has been successfully created.',
+  })
   @Post()
   @UsePipes()
   createTask(
@@ -61,6 +78,8 @@ export class TasksController {
     return this.tasksService.createTask(createTaskDto, user);
   }
 
+  @ApiOperation({ summary: 'Delete User' })
+  @ApiResponse({ status: 200, description: 'Delete User.' })
   @Delete('/:id')
   deleteTask(
     @Param('id', ParseIntPipe) id: number,
@@ -69,6 +88,8 @@ export class TasksController {
     return this.tasksService.deleteTask(id, user);
   }
 
+  @ApiOperation({ summary: 'Update User' })
+  @ApiResponse({ status: 200, description: 'Update User.' })
   @Patch(':id/status')
   updateTaskStatus(
     @Param('id', ParseIntPipe) id: number,
@@ -77,32 +98,4 @@ export class TasksController {
   ): Promise<Task> {
     return this.tasksService.updateTaskStatus(id, status, user);
   }
-
-  // @Get()
-  // getTask(@Query(ValidationPipe) filterDto:GetTaskFilterDto):Task[]{
-  //     console.log(filterDto);
-  //     if(Object.keys(filterDto).length){
-  //         console.log('voday');
-  //         return this.tasksService.getTasksWithFilter(filterDto);
-  //     }
-  //     else
-  //     return this.tasksService.getAllTasks();
-  // }
-  // @Get('/:id')
-  // getTaskById(@Param('id') id:string):Task{
-  //     return this.tasksService.getTaskById(id);
-  // }
-  // @Post()
-  // @UsePipes(  )
-  // createTask(@Body() createTaskDto:CreateTaskDto): Task{
-  //     return this.tasksService.createTask(createTaskDto);
-  // }
-  // @Delete('/:id')
-  // deleteTask(@Param('id') id: string): void{
-  //     this.tasksService.deleteTask(id);
-  // }
-  // @Patch(':id/status')
-  // updateTaskStatus(@Param('id') id :string, @Body('status', TaskStatusValidationPipe) status: TaskStatus):Task{
-  //     return this.tasksService.updateTaskStatus(id,status);
-  // }
 }

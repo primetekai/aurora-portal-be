@@ -1,6 +1,7 @@
 import { AuthService } from './auth.service';
 import { Controller, Body, Post, ValidationPipe } from '@nestjs/common';
 import { AuthCredentialsDto } from './dto/auth-credentials.dto';
+import { ApiBody, ApiConsumes } from '@nestjs/swagger';
 
 @Controller('auth')
 export class AuthController {
@@ -11,6 +12,11 @@ export class AuthController {
   ): Promise<void> {
     return this.authService.signUp(authCredentialsDto);
   }
+
+  @ApiBody({
+    type: AuthCredentialsDto,
+  })
+  @ApiConsumes('application/x-www-form-urlencoded')
   @Post('/signin')
   signIn(
     @Body(ValidationPipe) authCredentialsDto: AuthCredentialsDto,

@@ -7,6 +7,7 @@ export function setupSwagger(app: INestApplication) {
     .setDescription('Backend app API')
     .setVersion('1.0')
     .addTag('be-apps')
+    .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
