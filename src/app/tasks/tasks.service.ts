@@ -17,7 +17,7 @@ export class TasksService {
       where: { id, userId: user.id },
     });
     if (!found) {
-      throw new NotFoundException(`Task widh ID ${id} not found`);
+      throw new NotFoundException(`Task with ID ${id} not found`);
     }
     return found;
   }
@@ -25,12 +25,12 @@ export class TasksService {
   async createTask(createTaskDto: CreateTaskDto, user: User): Promise<Task> {
     return this.taskResponitory.createTask(createTaskDto, user);
   }
-  
+
   async deleteTask(id: number, user: User): Promise<void> {
     const result = await this.taskResponitory.delete({ id, userId: user.id });
     // console.log(result);
     if (result.affected === 0) {
-      throw new NotFoundException(`Task widh ID ${id} not found`);
+      throw new NotFoundException(`Task with ID ${id} not found`);
     }
   }
 

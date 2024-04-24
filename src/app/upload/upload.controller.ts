@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-
 import {
   Bind,
   Controller,
@@ -13,12 +11,15 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express/multer/interceptors/file.interceptor';
 import { FilesInterceptor } from '@nestjs/platform-express/multer/interceptors/files.interceptor';
+import { ApiTags } from '@nestjs/swagger';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
+import { COMMON_SERVICE } from 'src/config';
 
-@Controller('upload')
+@Controller(COMMON_SERVICE)
+@ApiTags('upload')
 export class UploadController {
-  @Post('imagess')
+  @Post('images')
   @UseInterceptors(FileInterceptor('file'))
   uploadFile22(@UploadedFile() file) {
     console.log(file);

@@ -34,7 +34,7 @@ import {
 @ApiTags('tasks')
 @UseGuards(AuthGuard())
 export class TasksController {
-  private loggger = new Logger('TasksController');
+  private logger = new Logger('TasksController');
 
   constructor(private tasksService: TasksService) {}
 
@@ -45,7 +45,7 @@ export class TasksController {
     @Query(ValidationPipe) filterDto: GetTaskFilterDto,
     @GetUser() user: User,
   ): Promise<Task[]> {
-    this.loggger.verbose(
+    this.logger.verbose(
       `User "${user.username}" retrieving all tasks. Filtes: ${JSON.stringify(filterDto)}`,
     );
     return this.tasksService.getTask(filterDto, user);
@@ -72,7 +72,7 @@ export class TasksController {
     @Body() createTaskDto: CreateTaskDto,
     @GetUser() user: User,
   ): Promise<Task> {
-    this.loggger.verbose(
+    this.logger.verbose(
       `User "${user.username}" create a new task. Data: ${JSON.stringify(createTaskDto)}`,
     );
     return this.tasksService.createTask(createTaskDto, user);
