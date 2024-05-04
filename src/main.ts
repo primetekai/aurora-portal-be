@@ -16,6 +16,11 @@ async function bootstrap() {
     app.enableCors();
   }
 
+  app.enableCors({
+    origin: ['http://20.39.199.15:4000', 'http://20.39.199.15:8080'],
+    credentials: true,
+  });
+
   if (SWAGGER) {
     setupSwagger(app);
   }
