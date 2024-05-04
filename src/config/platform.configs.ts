@@ -13,6 +13,17 @@ const TYPEORM_SYNC = Boolean(process.env?.NODE_APP_TYPEORM_SYNC || false);
 const JWT_SECRET = process.env.NODE_APP_JWT_SECRET ?? 'topSecret51';
 const EXPIRES_IN = process.env.NODE_APP_EXPIRES_IN ?? 3600;
 const SWAGGER = Boolean(process.env.NODE_APP_SWAGGER || false);
+const AZURE_STORAGE_ACCOUNT_NAME =
+  process.env.NODE_APP_AZURE_STORAGE_ACCOUNT_NAME ?? '******';
+const AZURE_STORAGE_ACCOUNT_KEY =
+  process.env.NODE_APP_AZURE_STORAGE_ACCOUNT_KEY ?? '*****';
+const TYPE_IMAGE_FILE = process.env.NODE_APP_TYPE_IMAGE_FILE ?? [
+  'image/jpeg',
+  'image/png',
+  'image/gif',
+];
+const MAX_SIZE_OF_IMAGE_FILE =
+  process.env.NODE_APP_MAX_SIZE_OF_IMAGE_FILE ?? 2097152;
 
 const APP_NAME = process.env.APP_NAME;
 const APP_ENV = process.env.APP_ENV;
@@ -96,6 +107,10 @@ export {
   JWT_SECRET,
   EXPIRES_IN,
   SWAGGER,
+  AZURE_STORAGE_ACCOUNT_NAME,
+  AZURE_STORAGE_ACCOUNT_KEY,
+  TYPE_IMAGE_FILE,
+  MAX_SIZE_OF_IMAGE_FILE,
   APP_NAME,
   APP_ENV,
   APP_DEBUG,
