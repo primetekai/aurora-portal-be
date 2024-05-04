@@ -1,6 +1,6 @@
 import { CreateLanguagesDto } from './dto/create-languages.dto';
 import { LanguagesService } from './languages.service';
-import { Logger } from '@nestjs/common';
+import { HttpStatus, Logger, Res } from '@nestjs/common';
 import {
   Body,
   Controller,
@@ -37,9 +37,13 @@ export class LanguagesController {
   @ApiOperation({ summary: 'Get all languages' })
   @ApiResponse({ status: 200, description: 'Return all languages.' })
   @Get()
-  getSections(@GetUser() user: User): Promise<Languages[]> {
-    this.logger.verbose(`User "${user.username}" retrieving all languages`);
-    return this.languagesService.getLanguages(user);
+  async getLanguages(@GetUser() user: User, @Res() res) {
+    try {
+      const data = await this.languagesService.getLanguages(user);
+      return res.status(HttpStatus.OK).json(data);
+    } catch (e) {
+      return e;
+    }
   }
 
   @ApiOperation({ summary: 'Create languages' })

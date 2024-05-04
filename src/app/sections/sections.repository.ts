@@ -15,16 +15,11 @@ export class SectionsRepository extends Repository<Sections> {
 
   async getSections(user: User, language: string): Promise<Sections[]> {
     const query = this.createQueryBuilder('sections');
-    // query.select('DISTINCT sections.section');
     query.where('sections.language = :language', { language });
 
     try {
       const sections = await query.getMany();
 
-      console.log({
-        sections,
-        language,
-      });
       return sections;
     } catch (error) {
       this.logger.error(
@@ -35,9 +30,39 @@ export class SectionsRepository extends Repository<Sections> {
     }
   }
 
-  async getMaxVersion(user: User): Promise<number> {
+  async getSectionsById(
+    user: User,
+    language: string,
+    section: string,
+    version: number,
+  ): Promise<Record<string, any>> {
+    const query = this.createQueryBuilder('sections');
+    query.where('sections.section = :section', { section });
+    query.andWhere('sections.language = :language', { language });
+    query.andWhere('sections.version = :version', { version });
+
+    try {
+      const sections = await query.getMany();
+
+      return sections[0]?.data ? JSON.parse(sections[0]?.data) : {};
+    } catch (error) {
+      this.logger.error(
+        `Failed to get sections for user "${user.username}"`,
+        error.stack,
+      );
+      throw new InternalServerErrorException();
+    }
+  }
+
+  async getMaxVersion(
+    user: User,
+    language: string,
+    section: string,
+  ): Promise<number> {
     const query = this.createQueryBuilder('sections');
     query.select('MAX(sections.version)', 'max');
+    query.where('sections.language = :language', { language });
+    query.where('sections.section = :section', { section });
 
     try {
       const version = await query.getRawOne();

@@ -1,5 +1,5 @@
 import { SectionsService } from './sections.service';
-import { Logger, Query } from '@nestjs/common';
+import { HttpStatus, Logger, Query, Res } from '@nestjs/common';
 import {
   Body,
   Controller,
@@ -22,26 +22,59 @@ import {
 } from '@nestjs/swagger';
 import { UI_CONFIG_PATH } from 'src/config';
 
-@ApiBearerAuth()
 @Controller(UI_CONFIG_PATH)
 @ApiTags('section')
-@UseGuards(AuthGuard())
 export class SectionsController {
   private logger = new Logger('SectionsController');
 
   constructor(private sectionsService: SectionsService) {}
-
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
   @ApiOperation({ summary: 'Get all sections' })
   @ApiResponse({ status: 200, description: 'Return all sections.' })
   @Get('/:language/sections')
-  getSections(
+  async getSections(
     @Param('language') language: string,
     @GetUser() user: User,
-  ): Promise<string[]> {
-    this.logger.verbose(`User "${user.username}" retrieving all sections`);
-    return this.sectionsService.getSections(user, language);
+    @Res() res,
+  ) {
+    try {
+      const data = await this.sectionsService.getSections(user, language);
+      return res.status(HttpStatus.OK).json(data);
+    } catch (e) {
+      return e;
+    }
   }
 
+  @ApiOperation({ summary: 'Get section' })
+  @ApiResponse({ status: 200, description: 'Get sections' })
+  @Get('/:language')
+  @ApiQuery({
+    name: 'section',
+    type: String,
+    description: 'Section is required',
+    required: true,
+  })
+  async getTaskById(
+    @Param('language') language: string,
+    @Query('section') section: string,
+    @GetUser() user: User,
+    @Res() res,
+  ) {
+    try {
+      const data = await this.sectionsService.getSectionsById(
+        language,
+        section,
+        user,
+      );
+      return res.status(HttpStatus.OK).json(data);
+    } catch (e) {
+      return e;
+    }
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard())
   @ApiOperation({ summary: 'Create sections' })
   @ApiResponse({
     status: 201,
@@ -57,9 +90,9 @@ export class SectionsController {
   @UsePipes()
   createSections(
     @Param('language') language: string,
-    @Query('section') section?: string,
-    @Body() data?: Record<string, any>,
-    @GetUser() user?: User,
+    @Query('section') section: string,
+    @GetUser() user: User,
+    @Body() data: Record<string, any>,
   ): Promise<Sections> {
     this.logger.verbose(
       `User "${user.username}" create a new sections. Data: ${JSON.stringify(data)}`,

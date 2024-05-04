@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { SectionsRepository } from './sections.repository';
 import { Sections } from './sections.entity';
 import { User } from 'src/app/auth/user.entity';
@@ -16,16 +16,24 @@ export class SectionsService {
     return [...new Set(sections.map((s) => s.section))];
   }
 
-  async getSectionsById(id: string, user: User): Promise<Sections> {
-    const found = await this.sectionsRepository.findOne({
-      where: { section: id, userId: user.id },
-    });
+  async getSectionsById(
+    language: string,
+    section: string,
+    user: User,
+  ): Promise<Record<string, any>> {
+    const version = await this.sectionsRepository.getMaxVersion(
+      user,
+      language,
+      section,
+    );
 
-    if (!found) {
-      throw new NotFoundException(`Sections with ID ${id} not found`);
-    }
-
-    return found;
+    const data = await this.sectionsRepository.getSectionsById(
+      user,
+      language,
+      section,
+      version,
+    );
+    return data;
   }
 
   async createSections(
@@ -34,7 +42,11 @@ export class SectionsService {
     language: string,
     section: string,
   ): Promise<Sections> {
-    const version = await this.sectionsRepository.getMaxVersion(user);
+    const version = await this.sectionsRepository.getMaxVersion(
+      user,
+      language,
+      section,
+    );
 
     return this.sectionsRepository.createSections(
       data,
