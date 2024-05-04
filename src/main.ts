@@ -2,7 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { Logger } from '@nestjs/common';
 import { TransformInterceptor } from './app/interceptor/transform.interceptor';
-import { NODE_ENV, PORT, SWAGGER } from './config';
+import { PORT, SWAGGER } from './config';
 import { setupSwagger } from './swagger';
 
 async function bootstrap() {
@@ -12,9 +12,11 @@ async function bootstrap() {
 
   app.useGlobalInterceptors(new TransformInterceptor());
 
-  if (NODE_ENV === 'development') {
-    app.enableCors();
-  }
+  // if (NODE_ENV === 'development') {
+  //   app.enableCors();
+  // }
+
+  app.enableCors();
 
   if (SWAGGER) {
     setupSwagger(app);
