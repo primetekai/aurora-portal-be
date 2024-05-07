@@ -2,7 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { Logger } from '@nestjs/common';
 import { TransformInterceptor } from './app/interceptor/transform.interceptor';
-import { NODE_ENV, PORT, SWAGGER } from './config';
+import { NODE_ENV, PORT, SWAGGER, WHITE_LIST_IP } from './config';
 import { setupSwagger } from './swagger';
 
 async function bootstrap() {
@@ -12,16 +12,14 @@ async function bootstrap() {
 
   app.useGlobalInterceptors(new TransformInterceptor());
 
-  // const whiteListIp = ['http://20.39.199.15:4000', 'http://20.39.199.15:8080'];
-
   app.enableCors({
-    origin: '*', //whiteListIp
+    allowedHeaders: '*',
+    origin: '*',
+    credentials: true,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    preflightContinue: false,
-    optionsSuccessStatus: 204,
-    // credentials: true,
   });
 
+  console.log('hack', WHITE_LIST_IP);
   if (SWAGGER) {
     setupSwagger(app);
   }
