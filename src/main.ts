@@ -15,8 +15,10 @@ async function bootstrap() {
   // const whiteListIp = ['http://20.39.199.15:4000', 'http://20.39.199.15:8080'];
 
   app.enableCors({
-    allowedHeaders: '*', //whiteListIp
-    origin: '*',
+    origin: '*', //whiteListIp
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    preflightContinue: false,
+    optionsSuccessStatus: 204,
     // credentials: true,
   });
 
