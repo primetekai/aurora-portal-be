@@ -12,18 +12,13 @@ async function bootstrap() {
 
   app.useGlobalInterceptors(new TransformInterceptor());
 
-  app.enableCors({
-    origin: [
-      'http://20.39.199.15:4000',
-      'http://20.39.199.15:8080',
-      'http://127.0.0.1:3001',
-    ],
-    credentials: true,
-  });
+  // const whiteListIp = ['http://20.39.199.15:4000', 'http://20.39.199.15:8080'];
 
-  if (NODE_ENV === 'development') {
-    app.enableCors();
-  }
+  app.enableCors({
+    allowedHeaders: '*', //whiteListIp
+    origin: '*',
+    // credentials: true,
+  });
 
   if (SWAGGER) {
     setupSwagger(app);
