@@ -12,14 +12,18 @@ async function bootstrap() {
 
   app.useGlobalInterceptors(new TransformInterceptor());
 
+  app.enableCors({
+    origin: [
+      'http://20.39.199.15:4000',
+      'http://20.39.199.15:8080',
+      'http://127.0.0.1:3001',
+    ],
+    credentials: true,
+  });
+
   if (NODE_ENV === 'development') {
     app.enableCors();
   }
-
-  app.enableCors({
-    origin: ['http://20.39.199.15:4000', 'http://20.39.199.15:8080'],
-    credentials: true,
-  });
 
   if (SWAGGER) {
     setupSwagger(app);

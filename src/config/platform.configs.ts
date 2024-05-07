@@ -11,7 +11,7 @@ const DB_PASSWORD = process.env.NODE_APP_DB_PASSWORD ?? '123123';
 const DB_NAME = process.env.NODE_APP_DB_NAME ?? 'postgres';
 const TYPEORM_SYNC = Boolean(process.env?.NODE_APP_TYPEORM_SYNC || false);
 const JWT_SECRET = process.env.NODE_APP_JWT_SECRET ?? 'topSecret51';
-const EXPIRES_IN = process.env.NODE_APP_EXPIRES_IN ?? 3600;
+const EXPIRES_IN = process.env.NODE_APP_EXPIRES_IN ?? '10d';
 const SWAGGER = Boolean(process.env.NODE_APP_SWAGGER || false);
 const AZURE_STORAGE_ACCOUNT_NAME =
   process.env.NODE_APP_AZURE_STORAGE_ACCOUNT_NAME ?? '******';
