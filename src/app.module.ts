@@ -9,6 +9,7 @@ import {
   LanguagesModule,
   SectionsModule,
 } from './app';
+import { TransactionModule } from './app/transaction';
 @Module({
   imports: [
     TypeOrmModule.forRoot(typeOrmConfig),
@@ -16,6 +17,7 @@ import {
     LanguagesModule,
     SectionsModule,
     FilesModule,
+    TransactionModule,
   ],
 
   providers: [

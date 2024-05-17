@@ -6,30 +6,28 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { User } from 'src/app/auth/user.entity';
+import { TransactionStatus } from './transaction-status.emum';
 
 @Entity()
-export class Sections extends BaseEntity {
+export class Transaction extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
-  sectionId: string;
+  id: string;
 
   @Column()
-  section: string;
+  orderId: string;
 
   @Column()
-  data: string;
+  amount: number;
+
+  @Column()
+  status: TransactionStatus;
 
   @Column()
   createAt: Date;
-
-  @Column()
-  version: number;
 
   @ManyToOne(() => User, (user) => user.section, { eager: false })
   user: User;
 
   @Column()
   userId: number;
-
-  @Column()
-  language: string;
 }
