@@ -4,6 +4,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from './jwt-payload.interface';
 import { Logger } from '@nestjs/common/services/logger.service';
+import { UserRole } from './user-role.emum';
 
 @Injectable()
 export class AuthService {
@@ -14,8 +15,11 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async signUp(authCredentialsDto: AuthCredentialsDto): Promise<void> {
-    return await this.userRepository.signUp(authCredentialsDto);
+  async signUp(
+    authCredentialsDto: AuthCredentialsDto,
+    role: UserRole,
+  ): Promise<void> {
+    return await this.userRepository.signUp(authCredentialsDto, role);
   }
 
   async signIn(

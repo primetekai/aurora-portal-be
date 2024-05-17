@@ -22,13 +22,7 @@ import { JWT_SECRET, EXPIRES_IN } from 'src/config';
     TypeOrmModule.forFeature([UserRepository]),
   ],
   controllers: [AuthController],
-  providers: [
-    AuthService,
-    // nhớ phải cung cấp jwt-strategy ở đây nhằm định danh token
-    JwtStrategy,
-    UserRepository,
-  ],
-  // sau khi cung cấp export JwtStategy ở đây luôn
+  providers: [AuthService, JwtStrategy, UserRepository],
   exports: [JwtStrategy, PassportModule],
 })
 export class AuthModule {}

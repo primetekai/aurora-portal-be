@@ -24,16 +24,21 @@ import {
 } from '@nestjs/swagger';
 import { UpdateLanguagesDto } from './dto/update-languages.dto';
 import { UI_CONFIG_PATH_LANG } from 'src/config';
+import { RolesGuard } from '../auth/role.guard';
+import { Roles } from '../auth/roles.decorator';
+import { UserRole } from '../auth/user-role.emum';
 
-@ApiBearerAuth()
 @Controller(UI_CONFIG_PATH_LANG)
 @ApiTags('languages')
-@UseGuards(AuthGuard())
+ 
 export class LanguagesController {
   private logger = new Logger('LanguagesController');
 
   constructor(private languagesService: LanguagesService) {}
 
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard(), RolesGuard)
+  @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Get all languages' })
   @ApiResponse({ status: 200, description: 'Return all languages.' })
   @Get()
@@ -46,6 +51,9 @@ export class LanguagesController {
     }
   }
 
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard(), RolesGuard)
+  @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Create languages' })
   @ApiResponse({
     status: 201,
@@ -63,6 +71,9 @@ export class LanguagesController {
     return this.languagesService.createLanguages(createLanguagesDto, user);
   }
 
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard(), RolesGuard)
+  @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Delete Languages' })
   @ApiResponse({ status: 200, description: 'Delete Languages.' })
   @Delete('/:id')
@@ -73,6 +84,9 @@ export class LanguagesController {
     return this.languagesService.deleteLanguages(id, user);
   }
 
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard(), RolesGuard)
+  @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Update Language' })
   @ApiResponse({ status: 200, description: 'Update Language.' })
   @Patch(':id')

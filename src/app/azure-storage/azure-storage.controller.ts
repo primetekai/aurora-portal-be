@@ -25,14 +25,18 @@ import {
 import { AzureStorageService } from './azure-storage.service';
 import { UploadFileDto } from './dto';
 import { AuthGuard } from '@nestjs/passport';
+import { RolesGuard } from '../auth/role.guard';
+import { Roles } from '../auth/roles.decorator';
+import { UserRole } from '../auth/user-role.emum';
 
 @Controller(COMMON_SERVICE)
 @ApiTags('upload')
-@ApiBearerAuth()
-@UseGuards(AuthGuard())
 export class FilesController {
   constructor(private readonly azureStorageService: AzureStorageService) {}
 
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard(), RolesGuard)
+  @Roles(UserRole.ADMIN)
   @Post('upload')
   @ApiOperation({ summary: 'Upload image' })
   @ApiConsumes('multipart/form-data')

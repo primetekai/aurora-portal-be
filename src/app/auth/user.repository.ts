@@ -7,6 +7,7 @@ import {
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
+import { UserRole } from './user-role.emum';
 
 @Injectable()
 export class UserRepository extends Repository<User> {
@@ -14,13 +15,18 @@ export class UserRepository extends Repository<User> {
     super(User, dataSource.createEntityManager());
   }
 
-  async signUp(authCredentialsDto: AuthCredentialsDto): Promise<void> {
+  async signUp(
+    authCredentialsDto: AuthCredentialsDto,
+    role: UserRole,
+  ): Promise<void> {
     const { username, password } = authCredentialsDto;
     const user = new User();
     user.username = username;
     user.salt = await bcrypt.genSalt();
     user.password = await this.hashPassword(password, user.salt);
+    user.role = role;
     try {
+      console.log('hack', user);
       await user.save();
     } catch (error) {
       console.log(error.code);

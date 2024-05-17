@@ -1,11 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString, Matches, MaxLength, MinLength } from 'class-validator';
 
-export class AuthCredentialsDto {
+export class AdminAuthCredentialsDto {
   @IsString()
   @MinLength(4)
   @MaxLength(20)
-  @ApiProperty({ default: 'user123', required: true })
+  @ApiProperty({ default: 'mao123', required: true })
   username: string;
 
   @IsString()
@@ -14,6 +14,6 @@ export class AuthCredentialsDto {
   @Matches(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
     message: 'Password to weak',
   })
-  @ApiProperty({ default: 'User@123', required: true })
+  @ApiProperty({ default: 'Mao@123', required: true })
   password: string;
 }
