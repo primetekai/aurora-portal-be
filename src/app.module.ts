@@ -5,11 +5,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import {
   AuthModule,
+  EmailConfirmModule,
   FilesModule,
   LanguagesModule,
   SectionsModule,
 } from './app';
 import { TransactionModule } from './app/transaction';
+
 @Module({
   imports: [
     TypeOrmModule.forRoot(typeOrmConfig),
@@ -18,6 +20,7 @@ import { TransactionModule } from './app/transaction';
     SectionsModule,
     FilesModule,
     TransactionModule,
+    EmailConfirmModule,
   ],
 
   providers: [

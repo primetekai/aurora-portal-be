@@ -2,7 +2,14 @@ import { DynamicModule, Global, Module } from '@nestjs/common';
 import { EmailService } from './email.service';
 
 import { EmailModuleOptions } from './interfaces/email-options.interface';
-import { MAIL_HOST, MAIL_PORT, MAIL_SECURE, MAIL_USERNAME, MAIL_PASSWORD, MAIL_TEMPLATE_DIR } from 'src/config';
+import {
+  MAIL_HOST,
+  MAIL_PORT,
+  MAIL_SECURE,
+  MAIL_USERNAME,
+  MAIL_PASSWORD,
+  MAIL_TEMPLATE_DIR,
+} from 'src/config';
 
 const defaultConfig = {
   transport: {
@@ -11,8 +18,8 @@ const defaultConfig = {
     secure: MAIL_SECURE,
     auth: {
       user: MAIL_USERNAME,
-      pass: MAIL_PASSWORD
-    }
+      pass: MAIL_PASSWORD,
+    },
   },
   defaults: {
     forceEmbeddedImages: false,

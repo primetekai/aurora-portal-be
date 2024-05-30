@@ -5,3 +5,4 @@ export * from './languages';
 export * from './sections';
 export * from './upload';
 export * from './azure-storage';
+export * from './email-confirm';
