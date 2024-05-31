@@ -6,33 +6,39 @@ import {
   GOOGLE_APP_CLIENT_SECRET,
   GOOGLE_APP_REDIRECT_LOGIN,
 } from 'src/config';
-import { Strategy, VerifyCallback } from 'passport-google-oauth20';
+import { Profile, Strategy, VerifyCallback } from 'passport-google-oauth20';
 
 @Injectable()
-export class GoogleStrategy extends PassportStrategy(Strategy, 'facebook') {
+export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
   constructor(private authService: AuthService) {
     super({
       clientID: GOOGLE_APP_CLIENT_ID,
       clientSecret: GOOGLE_APP_CLIENT_SECRET,
       callbackURL: GOOGLE_APP_REDIRECT_LOGIN,
-      passReqToCallback: true,
       scope: ['email', 'profile'],
     });
   }
 
   async validate(
-    request: any,
     accessToken: string,
     refreshToken: string,
-    profile: any,
+    profile: Profile,
     done: VerifyCallback,
   ): Promise<any> {
-    const { email, name, picture } = profile._json;
+    const { name, emails, photos } = profile;
+
     const user = {
-      email,
-      name,
-      picture,
+      email: emails?.[0]?.value,
+      firstName: name?.givenName,
+      lastName: name?.familyName,
+      picture: photos?.[0]?.value,
     };
-    done(null, user);
+
+    const payload = {
+      user,
+      accessToken,
+    };
+
+    done(null, payload);
   }
 }

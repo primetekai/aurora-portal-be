@@ -65,10 +65,9 @@ export class AuthController {
 
   // 3RD LOGIN
 
-  @Get('auth/facebook')
+  @Get('signin/facebook')
   @UseGuards(AuthGuard('facebook'))
   async facebookLogin(): Promise<any> {
-    console.log('hack_call_fb');
     return HttpStatus.OK;
   }
 
@@ -77,14 +76,14 @@ export class AuthController {
   async facebookLoginCallback(
     @Req() req: Record<string, any>,
   ): Promise<{ accessToken: string }> {
-    console.log('hack_call_redirect', req);
-    return this.authService.signIn3rd(req);
+    const userData = req?.user?.user;
+    console.log('data_facebook', userData);
+    return this.authService.signIn3rd(userData);
   }
 
-  @Get('auth/google')
+  @Get('signin/google')
   @UseGuards(AuthGuard('google'))
   async googleLogin(): Promise<any> {
-    console.log('hack_call_fb');
     return HttpStatus.OK;
   }
 
@@ -93,7 +92,8 @@ export class AuthController {
   async googleLoginCallback(
     @Req() req: Record<string, any>,
   ): Promise<{ accessToken: string }> {
-    console.log('hack_call_redirect', req);
-    return this.authService.signIn3rd(req);
+    const userData = req?.user?.user;
+    console.log('data_google', userData);
+    return this.authService.signIn3rd(userData);
   }
 }

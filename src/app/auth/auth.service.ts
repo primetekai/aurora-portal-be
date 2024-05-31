@@ -50,12 +50,10 @@ export class AuthService {
   async signIn3rd(data: Record<string, any>): Promise<{ accessToken: string }> {
     const authCredentialsDto: AuthCredentialsDto = {
       password: generatePassword(),
-      username: data?.user?.email?.split('@')[0],
+      username: data?.email?.split('@')[0],
     };
 
     let accessToken = null;
-
-    console.log('hack_call_redirect', authCredentialsDto);
 
     const username =
       await this.userRepository.validateUserPassword(authCredentialsDto);

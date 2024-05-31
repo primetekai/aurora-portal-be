@@ -1,44 +1,44 @@
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
-import { AuthService } from '../auth.service';
 import {
   FACEBOOK_APP_CLIENT_ID,
   FACEBOOK_APP_CLIENT_SECRET,
   FACEBOOK_APP_REDIRECT_LOGIN,
 } from 'src/config';
-import { Strategy, VerifyCallback } from 'passport-facebook';
+import { Profile, Strategy } from 'passport-facebook';
+import { AuthService } from '../auth.service';
 
 @Injectable()
 export class FacebookStrategy extends PassportStrategy(Strategy, 'facebook') {
-  constructor(private authService: AuthService) {
+  constructor(private _: AuthService) {
     super({
       clientID: FACEBOOK_APP_CLIENT_ID,
       clientSecret: FACEBOOK_APP_CLIENT_SECRET,
       callbackURL: FACEBOOK_APP_REDIRECT_LOGIN,
-      passReqToCallback: true,
-      profileFields: ['id', 'emails', 'name'],
+      profileFields: ['name', 'emails'],
+      scope: 'email',
     });
   }
 
   async validate(
     accessToken: string,
     refreshToken: string,
-    profile: any,
-    done: VerifyCallback,
+    profile: Profile,
+    done: (error: any, user?: any, info?: any) => void,
   ): Promise<any> {
-    const { name, emails } = profile;
+    const { name, emails, photos } = profile;
+
     const user = {
-      email: emails[0].value,
-      firstName: name.givenName,
-      lastName: name.familyName,
-      profile,
+      email: emails?.[0]?.value,
+      firstName: name?.givenName,
+      lastName: name?.familyName,
+      picture: photos?.[0]?.value,
     };
+
     const payload = {
       user,
       accessToken,
     };
-
-    console.log('hack_call_fb', profile);
 
     done(null, payload);
   }
