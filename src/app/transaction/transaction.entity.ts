@@ -5,8 +5,8 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { User } from 'src/app/auth/user.entity';
 import { TransactionStatus } from './transaction-status.emum';
+import { User } from '@app/auth';
 
 @Entity()
 export class Transaction extends BaseEntity {

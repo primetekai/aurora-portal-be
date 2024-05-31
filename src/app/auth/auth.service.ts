@@ -1,10 +1,10 @@
-import { AuthCredentialsDto } from './dto/auth-credentials.dto';
-import { UserRepository } from './user.repository';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { JwtPayload } from './jwt-payload.interface';
 import { Logger } from '@nestjs/common/services/logger.service';
-import { UserRole } from './user-role.emum';
+import { UserRepository, UserRole } from './user';
+import { generatePassword } from 'src/utils';
+import { JwtPayload } from './jwt';
+import { AuthCredentialsDto } from './dto';
 
 @Injectable()
 export class AuthService {
@@ -22,6 +22,16 @@ export class AuthService {
     return await this.userRepository.signUp(authCredentialsDto, role);
   }
 
+  async generateToken(payload: JwtPayload): Promise<string> {
+    const accessToken = await this.jwtService.sign(payload);
+
+    this.logger.debug(
+      `Generate Json token with pay load${JSON.stringify(payload)} `,
+    );
+
+    return accessToken;
+  }
+
   async signIn(
     authCredentialsDto: AuthCredentialsDto,
   ): Promise<{ accessToken: string }> {
@@ -32,13 +42,32 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    // Create token
-    const payload: JwtPayload = { username };
+    const accessToken = await this.generateToken({ username });
 
-    const accessToken = await this.jwtService.sign(payload);
-    this.logger.debug(
-      `Generate Json token with pay load${JSON.stringify(payload)} `,
-    );
+    return { accessToken };
+  }
+
+  async signIn3rd(data: Record<string, any>): Promise<{ accessToken: string }> {
+    const authCredentialsDto: AuthCredentialsDto = {
+      password: generatePassword(),
+      username: data?.user?.email?.split('@')[0],
+    };
+
+    let accessToken = null;
+
+    console.log('hack_call_redirect', authCredentialsDto);
+
+    const username =
+      await this.userRepository.validateUserPassword(authCredentialsDto);
+
+    if (!username) {
+      await this.userRepository.signUp(authCredentialsDto, UserRole.USER);
+      accessToken = await this.generateToken({
+        username: authCredentialsDto.username,
+      });
+    } else {
+      accessToken = await this.generateToken({ username });
+    }
 
     return { accessToken };
   }

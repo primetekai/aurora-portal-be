@@ -1,10 +1,10 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
 import { Transaction } from './transaction.entity';
-import { User } from 'src/app/auth/user.entity';
 import { Logger } from '@nestjs/common/services/logger.service';
 import * as moment from 'moment';
 import { TransactionStatus } from './transaction-status.emum';
+import { User } from '@app/auth';
 
 @Injectable()
 export class TransactionsRepository extends Repository<Transaction> {

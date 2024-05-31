@@ -1,8 +1,7 @@
 import { Column, Unique, OneToMany } from 'typeorm';
 import { BaseEntity, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import { Sections } from '../sections/sections.entity';
-import { Languages } from '../languages/languages.entity';
+import { Languages, Sections } from 'src/app';
 
 @Entity()
 @Unique(['username'])

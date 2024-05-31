@@ -11,8 +11,6 @@ import {
 } from '@nestjs/common';
 import { Sections } from './sections.entity';
 import { AuthGuard } from '@nestjs/passport';
-import { GetUser } from 'src/app/auth/get-user.decorator';
-import { User } from 'src/app/auth/user.entity';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -21,9 +19,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { UI_CONFIG_PATH } from 'src/config';
-import { RolesGuard } from '../auth/role.guard';
-import { Roles } from '../auth/roles.decorator';
-import { UserRole } from '../auth/user-role.emum';
+import { Roles, RolesGuard, UserRole, GetUser, User } from '@app/auth';
 
 @Controller(UI_CONFIG_PATH)
 @ApiTags('section')

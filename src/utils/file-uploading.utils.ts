@@ -3,11 +3,11 @@ import { diskStorage } from 'multer';
 import * as multer from 'multer';
 import * as AWS from 'aws-sdk';
 import * as multerS3 from 'multer-s3';
-import { environment } from '@app/environment';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { existsSync, mkdirSync } from 'fs';
 import fs from 'fs';
 import path from 'path';
+import { environment } from 'src/environments';
 
 AWS.config.update({
   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
@@ -21,7 +21,6 @@ enum TypeServer {
 type TypeOfServerStrings = keyof typeof TypeServer;
 
 export const fileInterceptor = (type: TypeOfServerStrings) => {
-  const date = new Date();
   let upload;
 
   if (type === 's3') {

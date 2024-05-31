@@ -1,12 +1,12 @@
-import { AuthCredentialsDto } from './dto/auth-credentials.dto';
 import { DataSource, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import { User } from './user.entity';
 import {
   ConflictException,
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
+import { AuthCredentialsDto } from '../dto';
+import { User } from './user.entity';
 import { UserRole } from './user-role.emum';
 
 @Injectable()
@@ -26,18 +26,16 @@ export class UserRepository extends Repository<User> {
     user.password = await this.hashPassword(password, user.salt);
     user.role = role;
     try {
-      console.log('hack', user);
       await user.save();
     } catch (error) {
-      console.log(error.code);
       if (error.code === '23505') {
-        // duplicate username in DB
         throw new ConflictException('username already exists');
       } else {
         throw new InternalServerErrorException();
       }
     }
   }
+
   private async hashPassword(password: string, salt: string): Promise<string> {
     return bcrypt.hash(password, salt);
   }

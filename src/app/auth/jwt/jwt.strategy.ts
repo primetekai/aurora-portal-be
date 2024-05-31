@@ -3,9 +3,9 @@ import { Strategy, ExtractJwt } from 'passport-jwt';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtPayload } from './jwt-payload.interface';
 import { InjectRepository } from '@nestjs/typeorm';
-import { UserRepository } from './user.repository';
-import { User } from './user.entity';
 import { JWT_SECRET } from 'src/config';
+import { UserRepository, User } from '../user';
+
 /// mục đích file này để định danh token
 /// lấy nội dung userRepository ra xác thực xong mới return ra use
 @Injectable()

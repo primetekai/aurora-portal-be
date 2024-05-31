@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { SectionsRepository } from './sections.repository';
 import { Sections } from './sections.entity';
-import { User } from 'src/app/auth/user.entity';
 import { LanguagesService } from '../languages/languages.service';
+import { User } from '@app/auth';
 
 @Injectable()
 export class SectionsService {

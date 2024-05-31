@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { Transaction } from './transaction.entity';
-import { User } from 'src/app/auth/user.entity';
 import { TransactionStatus } from './transaction-status.emum';
 import { TransactionsRepository } from './transaction.repository';
+import { User } from '@app/auth';
 
 @Injectable()
 export class TransactionService {

@@ -19,11 +19,9 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { PAYMENT_SERVICE } from 'src/config';
-import { RolesGuard } from '../auth/role.guard';
-import { Roles } from '../auth/roles.decorator';
-import { UserRole } from '../auth/user-role.emum';
 import { TransactionStatusValidationPipe } from './pipe/transaction-status-validation.pipe';
 import { TransactionStatus } from './transaction-status.emum';
+import { Roles, RolesGuard, UserRole } from '@app/auth';
 
 @Controller(PAYMENT_SERVICE)
 @ApiTags('transactions')

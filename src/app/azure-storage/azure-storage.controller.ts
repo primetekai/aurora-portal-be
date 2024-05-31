@@ -25,9 +25,7 @@ import {
 import { AzureStorageService } from './azure-storage.service';
 import { UploadFileDto } from './dto';
 import { AuthGuard } from '@nestjs/passport';
-import { RolesGuard } from '../auth/role.guard';
-import { Roles } from '../auth/roles.decorator';
-import { UserRole } from '../auth/user-role.emum';
+import { Roles, RolesGuard, UserRole } from '@app/auth';
 
 @Controller(COMMON_SERVICE)
 @ApiTags('upload')

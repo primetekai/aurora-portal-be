@@ -2,8 +2,8 @@ import { CreateLanguagesDto } from './dto/create-languages.dto';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { LanguagesRepository } from './languages.repository';
 import { Languages } from './languages.entity';
-import { User } from 'src/app/auth/user.entity';
 import { UpdateLanguagesDto } from './dto/update-languages.dto';
+import { User } from '@app/auth';
 
 @Injectable()
 export class LanguagesService {

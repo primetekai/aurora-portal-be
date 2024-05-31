@@ -1,4 +1,3 @@
-import { IEnvironment } from './ienvironment';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { Algorithm, Secret } from 'jsonwebtoken';
 import {
@@ -50,6 +49,7 @@ import {
   OIDC_CLIENT_ID,
   VAPID_SUBJECT,
 } from 'src/config';
+import { IEnvironment } from '.';
 
 function getDatabaseConfig(): TypeOrmModuleOptions {
   switch (DB_CONNECTION) {

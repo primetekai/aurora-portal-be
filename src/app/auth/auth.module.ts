@@ -1,12 +1,14 @@
-import { UserRepository } from './user.repository';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Module } from '@nestjs/common';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
-import { JwtStrategy } from './jwt.strategy';
 import { JWT_SECRET, EXPIRES_IN } from 'src/config';
+import { FacebookStrategy } from './facebook';
+import { GoogleStrategy } from './google';
+import { UserRepository } from './user';
+import { JwtStrategy } from './jwt';
 
 @Module({
   imports: [
@@ -22,7 +24,13 @@ import { JWT_SECRET, EXPIRES_IN } from 'src/config';
     TypeOrmModule.forFeature([UserRepository]),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy, UserRepository],
+  providers: [
+    AuthService,
+    JwtStrategy,
+    UserRepository,
+    GoogleStrategy,
+    FacebookStrategy,
+  ],
   exports: [JwtStrategy, PassportModule],
 })
 export class AuthModule {}

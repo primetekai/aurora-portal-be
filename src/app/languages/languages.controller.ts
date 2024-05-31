@@ -14,8 +14,6 @@ import {
 } from '@nestjs/common';
 import { Languages } from './languages.entity';
 import { AuthGuard } from '@nestjs/passport';
-import { GetUser } from 'src/app/auth/get-user.decorator';
-import { User } from 'src/app/auth/user.entity';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -24,13 +22,10 @@ import {
 } from '@nestjs/swagger';
 import { UpdateLanguagesDto } from './dto/update-languages.dto';
 import { UI_CONFIG_PATH_LANG } from 'src/config';
-import { RolesGuard } from '../auth/role.guard';
-import { Roles } from '../auth/roles.decorator';
-import { UserRole } from '../auth/user-role.emum';
+import { Roles, RolesGuard, UserRole, GetUser, User } from '@app/auth';
 
 @Controller(UI_CONFIG_PATH_LANG)
 @ApiTags('languages')
- 
 export class LanguagesController {
   private logger = new Logger('LanguagesController');
 

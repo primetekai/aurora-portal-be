@@ -6,14 +6,12 @@ import {
   Body,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { EmailDto } from './dto/email.dto';
 import { AuthGuard } from '@nestjs/passport';
-import { RolesGuard } from '../auth/role.guard';
-import { Roles } from '../auth/roles.decorator';
-import { UserRole } from '../auth/user-role.emum';
 import { MAIL_HOST } from 'src/config';
 import { EmailService } from '../email/email.service';
+import { Roles, RolesGuard, UserRole } from '@app/auth';
 
 // @ApiTags('Email', 'User')
 @Controller('email')

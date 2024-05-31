@@ -2,8 +2,8 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { CreateLanguagesDto } from './dto/create-languages.dto';
 import { DataSource, Repository } from 'typeorm';
 import { Languages } from './languages.entity';
-import { User } from 'src/app/auth/user.entity';
 import { Logger } from '@nestjs/common/services/logger.service';
+import { User } from '@app/auth';
 
 @Injectable()
 export class LanguagesRepository extends Repository<Languages> {

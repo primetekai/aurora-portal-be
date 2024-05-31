@@ -1,9 +1,9 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
 import { Sections } from './sections.entity';
-import { User } from 'src/app/auth/user.entity';
 import { Logger } from '@nestjs/common/services/logger.service';
 import * as moment from 'moment';
+import { User } from '@app/auth';
 
 @Injectable()
 export class SectionsRepository extends Repository<Sections> {
