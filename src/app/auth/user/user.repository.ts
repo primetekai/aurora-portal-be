@@ -53,4 +53,15 @@ export class UserRepository extends Repository<User> {
       return null;
     }
   }
+
+  async validateUser(authCredentialsDto: AuthCredentialsDto): Promise<User> {
+    const { username } = authCredentialsDto;
+
+    const user = await this.findOne({ where: { username } });
+
+    if (!user) {
+      await this.signUp(authCredentialsDto, UserRole.USER);
+    }
+    return user;
+  }
 }

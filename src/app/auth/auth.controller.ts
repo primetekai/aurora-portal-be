@@ -77,7 +77,6 @@ export class AuthController {
     @Req() req: Record<string, any>,
   ): Promise<{ accessToken: string }> {
     const userData = req?.user?.user;
-    console.log('data_facebook', userData);
     return this.authService.signIn3rd(userData);
   }
 
@@ -93,7 +92,6 @@ export class AuthController {
     @Req() req: Record<string, any>,
   ): Promise<{ accessToken: string }> {
     const userData = req?.user?.user;
-    console.log('data_google', userData);
     return this.authService.signIn3rd(userData);
   }
 }

@@ -53,19 +53,11 @@ export class AuthService {
       username: data?.email?.split('@')[0],
     };
 
-    let accessToken = null;
+    const accessToken = await this.generateToken({
+      username: authCredentialsDto.username,
+    });
 
-    const username =
-      await this.userRepository.validateUserPassword(authCredentialsDto);
-
-    if (!username) {
-      await this.userRepository.signUp(authCredentialsDto, UserRole.USER);
-      accessToken = await this.generateToken({
-        username: authCredentialsDto.username,
-      });
-    } else {
-      accessToken = await this.generateToken({ username });
-    }
+    await this.userRepository.validateUser(authCredentialsDto);
 
     return { accessToken };
   }
