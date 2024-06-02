@@ -7,37 +7,27 @@ on:
         description: 'Confirm Deployment'
         required: true
 env:
+  SERVER_IP: "20.39.193.105"
+  SERVER_USER: "azureuser"
   IMAGE: be-app-docker
-  USERNAME_DOCKER_HUB: warjamma
-
-permissions:
-  id-token: write
-  contents: write
-  issues: write
+  DOCKER_HUB_USERNAME: warjamma
 
 jobs: 
   deploy:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [18.x]
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
-      - name: Log in to Azure
-        uses: azure/login@v1
-        with:
-            creds: ${{ secrets.AZURE_CREDENTIALS }}
-            allow-no-subscriptions: true
+      - name: Configure SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" | tr -d '\r' > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          echo "StrictHostKeyChecking no" >> ~/.ssh/config
       - name: Deploy
         run: |
-          if sudo docker ps -a | grep -q "$IMAGE"; then
-            sudo docker stop "$IMAGE"
-            sudo docker rm "$IMAGE"
-          fi
-          sudo docker pull $USERNAME_DOCKER_HUB/$IMAGE:latest   
-          sudo docker run -d -p 3000:3000 --name "$IMAGE" $USERNAME_DOCKER_HUB/$IMAGE:latest
+          ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "
+            sudo docker pull $DOCKER_HUB_USERNAME/$IMAGE:latest
+            sudo docker stop $IMAGE || true
+            sudo docker rm $IMAGE || true
+            sudo docker run -d -p 3000:3000 --name $IMAGE $DOCKER_HUB_USERNAME/$IMAGE:latest
+            sudo docker image prune -f
+          "
