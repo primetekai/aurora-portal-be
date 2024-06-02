@@ -5,7 +5,10 @@ import {
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { AuthCredentialsDto } from '../dto';
+import {
+  AuthUserSignInCredentialsDto,
+  AuthUserSignUpCredentialsDto,
+} from '../dto';
 import { User } from './user.entity';
 import { UserRole } from './user-role.emum';
 
@@ -16,15 +19,16 @@ export class UserRepository extends Repository<User> {
   }
 
   async signUp(
-    authCredentialsDto: AuthCredentialsDto,
+    authCredentialsDto: AuthUserSignUpCredentialsDto,
     role: UserRole,
   ): Promise<void> {
-    const { username, password } = authCredentialsDto;
+    const { username, password, email } = authCredentialsDto;
     const user = new User();
     user.username = username;
     user.salt = await bcrypt.genSalt();
     user.password = await this.hashPassword(password, user.salt);
     user.role = role;
+    user.email = email;
     try {
       await user.save();
     } catch (error) {
@@ -41,7 +45,7 @@ export class UserRepository extends Repository<User> {
   }
 
   async validateUserPassword(
-    authCredentialsDto: AuthCredentialsDto,
+    authCredentialsDto: AuthUserSignInCredentialsDto,
   ): Promise<string> {
     const { username, password } = authCredentialsDto;
 
@@ -54,7 +58,9 @@ export class UserRepository extends Repository<User> {
     }
   }
 
-  async validateUser(authCredentialsDto: AuthCredentialsDto): Promise<User> {
+  async validateUser(
+    authCredentialsDto: AuthUserSignUpCredentialsDto,
+  ): Promise<User> {
     const { username } = authCredentialsDto;
 
     const user = await this.findOne({ where: { username } });

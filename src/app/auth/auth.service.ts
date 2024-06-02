@@ -4,7 +4,10 @@ import { Logger } from '@nestjs/common/services/logger.service';
 import { UserRepository, UserRole } from './user';
 import { generatePassword } from 'src/utils';
 import { JwtPayload } from './jwt';
-import { AuthCredentialsDto } from './dto';
+import {
+  AuthUserSignInCredentialsDto,
+  AuthUserSignUpCredentialsDto,
+} from './dto';
 
 @Injectable()
 export class AuthService {
@@ -16,7 +19,7 @@ export class AuthService {
   ) {}
 
   async signUp(
-    authCredentialsDto: AuthCredentialsDto,
+    authCredentialsDto: AuthUserSignUpCredentialsDto,
     role: UserRole,
   ): Promise<void> {
     return await this.userRepository.signUp(authCredentialsDto, role);
@@ -33,7 +36,7 @@ export class AuthService {
   }
 
   async signIn(
-    authCredentialsDto: AuthCredentialsDto,
+    authCredentialsDto: AuthUserSignInCredentialsDto,
   ): Promise<{ accessToken: string }> {
     const username =
       await this.userRepository.validateUserPassword(authCredentialsDto);
@@ -47,10 +50,13 @@ export class AuthService {
     return { accessToken };
   }
 
-  async signIn3rd(data: Record<string, any>): Promise<{ accessToken: string }> {
-    const authCredentialsDto: AuthCredentialsDto = {
+  async signInAdnSignUp3rd(
+    data: Record<string, any>,
+  ): Promise<{ accessToken: string }> {
+    const authCredentialsDto: AuthUserSignUpCredentialsDto = {
       password: generatePassword(),
       username: data?.email?.split('@')[0],
+      email: data?.email,
     };
 
     const accessToken = await this.generateToken({

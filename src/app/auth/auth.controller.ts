@@ -9,12 +9,16 @@ import {
   Req,
   HttpStatus,
 } from '@nestjs/common';
-import { AuthCredentialsDto } from './dto/auth-credentials.dto';
 import { ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ACCOUNT_SERVICE } from 'src/config';
-import { AdminAuthCredentialsDto } from './dto/admin-auth-credentials.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { UserRole } from './user';
+import {
+  AdminAuthSignInCredentialsDto,
+  AdminAuthSignUpCredentialsDto,
+  AuthUserSignInCredentialsDto,
+  AuthUserSignUpCredentialsDto,
+} from './dto';
 
 @Controller(ACCOUNT_SERVICE)
 @ApiTags('account')
@@ -24,19 +28,19 @@ export class AuthController {
   @ApiOperation({ summary: 'Signup admin' })
   @Post('/signup')
   signUpAdmin(
-    @Body(ValidationPipe) authCredentialsDto: AdminAuthCredentialsDto,
+    @Body(ValidationPipe) authCredentialsDto: AdminAuthSignUpCredentialsDto,
   ): Promise<void> {
     return this.authService.signUp(authCredentialsDto, UserRole.ADMIN);
   }
 
   @ApiOperation({ summary: 'Signin admin' })
   @ApiBody({
-    type: AdminAuthCredentialsDto,
+    type: AdminAuthSignInCredentialsDto,
   })
   @ApiConsumes('application/x-www-form-urlencoded')
   @Post('/signin')
   signInAdmin(
-    @Body(ValidationPipe) authCredentialsDto: AdminAuthCredentialsDto,
+    @Body(ValidationPipe) authCredentialsDto: AdminAuthSignInCredentialsDto,
   ): Promise<{ accessToken: string }> {
     return this.authService.signIn(authCredentialsDto);
   }
@@ -46,19 +50,19 @@ export class AuthController {
   @ApiOperation({ summary: 'Signup user' })
   @Post('/user/signup')
   signUp(
-    @Body(ValidationPipe) authCredentialsDto: AuthCredentialsDto,
+    @Body(ValidationPipe) authCredentialsDto: AuthUserSignUpCredentialsDto,
   ): Promise<void> {
     return this.authService.signUp(authCredentialsDto, UserRole.USER);
   }
 
   @ApiOperation({ summary: 'Signin user' })
   @ApiBody({
-    type: AuthCredentialsDto,
+    type: AuthUserSignInCredentialsDto,
   })
   @ApiConsumes('application/x-www-form-urlencoded')
   @Post('/user/signin')
   signIn(
-    @Body(ValidationPipe) authCredentialsDto: AuthCredentialsDto,
+    @Body(ValidationPipe) authCredentialsDto: AuthUserSignInCredentialsDto,
   ): Promise<{ accessToken: string }> {
     return this.authService.signIn(authCredentialsDto);
   }
@@ -77,7 +81,7 @@ export class AuthController {
     @Req() req: Record<string, any>,
   ): Promise<{ accessToken: string }> {
     const userData = req?.user?.user;
-    return this.authService.signIn3rd(userData);
+    return this.authService.signInAdnSignUp3rd(userData);
   }
 
   @Get('signin/google')
@@ -92,6 +96,6 @@ export class AuthController {
     @Req() req: Record<string, any>,
   ): Promise<{ accessToken: string }> {
     const userData = req?.user?.user;
-    return this.authService.signIn3rd(userData);
+    return this.authService.signInAdnSignUp3rd(userData);
   }
 }
