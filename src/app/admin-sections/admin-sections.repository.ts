@@ -63,9 +63,9 @@ export class AdminSectionsRepository extends Repository<AdminSections> {
     section: string,
   ): Promise<number> {
     const query = this.createQueryBuilder('admin_sections');
-    query.select('MAX(admin_sections.version)', 'max');
     query.where('admin_sections.language = :language', { language });
-    query.where('admin_sections.section = :section', { section });
+    query.andWhere('admin_sections.section = :section', { section });
+    query.select('MAX(admin_sections.version)', 'max');
 
     try {
       const version = await query.getRawOne();

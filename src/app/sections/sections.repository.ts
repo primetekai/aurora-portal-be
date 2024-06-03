@@ -60,12 +60,13 @@ export class SectionsRepository extends Repository<Sections> {
     section: string,
   ): Promise<number> {
     const query = this.createQueryBuilder('sections');
-    query.select('MAX(sections.version)', 'max');
     query.where('sections.language = :language', { language });
-    query.where('sections.section = :section', { section });
+    query.andWhere('sections.section = :section', { section });
+    query.select('MAX(sections.version)', 'max');
 
     try {
       const version = await query.getRawOne();
+
       return version?.max ? Number(version?.max) : 0;
     } catch (error) {
       this.logger.error(

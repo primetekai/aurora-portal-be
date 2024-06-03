@@ -22,7 +22,7 @@ import { ADMIN_UI_CONFIG_PATH } from 'src/config';
 import { Roles, RolesGuard, UserRole, GetUser, User } from '@app/auth';
 
 @Controller(ADMIN_UI_CONFIG_PATH)
-@ApiTags('admin_section')
+@ApiTags('admin section')
 export class AdminSectionsController {
   private logger = new Logger('AdminSectionsController');
 
