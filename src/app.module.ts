@@ -8,6 +8,7 @@ import {
   EmailConfirmModule,
   FilesModule,
   LanguagesModule,
+  AdminSectionsModule,
   SectionsModule,
 } from './app';
 import { TransactionModule } from './app/transaction';
@@ -17,6 +18,7 @@ import { TransactionModule } from './app/transaction';
     TypeOrmModule.forRoot(typeOrmConfig),
     AuthModule,
     LanguagesModule,
+    AdminSectionsModule,
     SectionsModule,
     FilesModule,
     TransactionModule,

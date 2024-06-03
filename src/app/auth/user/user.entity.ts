@@ -1,7 +1,7 @@
 import { Column, Unique, OneToMany } from 'typeorm';
 import { BaseEntity, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import { Languages, Sections } from 'src/app';
+import { Languages, Sections, AdminSections } from 'src/app';
 
 @Entity()
 @Unique(['username'])
@@ -29,6 +29,11 @@ export class User extends BaseEntity {
 
   @OneToMany(() => Sections, (section) => section?.user, { eager: true })
   section: Sections[];
+
+  @OneToMany(() => AdminSections, (sectionAdmin) => sectionAdmin?.user, {
+    eager: true,
+  })
+  sectionAdmin: AdminSections[];
 
   async validatePassword(password: string): Promise<boolean> {
     const hash = await bcrypt.hash(password, this.salt);
