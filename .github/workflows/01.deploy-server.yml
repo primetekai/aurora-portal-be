@@ -8,7 +8,7 @@ on:
         required: true
 env:
   SERVER_IP: "34.67.90.123"
-  SERVER_USER: "azureuser"
+  SERVER_USER: "g16521524"
   IMAGE: be-app-docker
   DOCKER_HUB_USERNAME: warjamma
 
