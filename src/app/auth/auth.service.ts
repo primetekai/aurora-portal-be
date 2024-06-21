@@ -1,13 +1,14 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Logger } from '@nestjs/common/services/logger.service';
-import { UserRepository, UserRole } from './user';
+import { User, UserRepository } from '../user';
 import { generatePassword } from 'src/utils';
 import { JwtPayload } from './jwt';
 import {
   AuthUserSignInCredentialsDto,
   AuthUserSignUpCredentialsDto,
 } from './dto';
+import { UserRole } from './enum';
 
 @Injectable()
 export class AuthService {
@@ -66,5 +67,19 @@ export class AuthService {
     await this.userRepository.validateUser(authCredentialsDto);
 
     return { accessToken };
+  }
+
+  async getAccounts(filters?: Record<string, any>): Promise<User[]> {
+    const users = await this.userRepository.getUsers(filters);
+
+    return users;
+  }
+
+  async getAccountById(
+    id: string,
+    role?: UserRole,
+  ): Promise<Record<string, any>> {
+    const data = await this.userRepository.getUserById(id, role);
+    return data;
   }
 }

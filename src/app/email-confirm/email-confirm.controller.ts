@@ -6,14 +6,14 @@ import {
   Body,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { EmailDto } from './dto/email.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { MAIL_HOST } from 'src/config';
 import { EmailService } from '../email/email.service';
-import { Roles, RolesGuard, UserRole } from '@app/auth';
+import { Roles, RolesGuard, UserRole } from '../auth';
 
-// @ApiTags('Email', 'User')
+@ApiTags('Email')
 @Controller('email')
 export class EmailConfirmController {
   constructor(private readonly emailService: EmailService) {}

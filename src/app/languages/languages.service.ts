@@ -3,7 +3,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { LanguagesRepository } from './languages.repository';
 import { Languages } from './languages.entity';
 import { UpdateLanguagesDto } from './dto/update-languages.dto';
-import { User } from '@app/auth';
+import { User } from '../user';
 
 @Injectable()
 export class LanguagesService {

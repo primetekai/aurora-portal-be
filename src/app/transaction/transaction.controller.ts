@@ -21,7 +21,7 @@ import {
 import { PAYMENT_SERVICE } from 'src/config';
 import { TransactionStatusValidationPipe } from './pipe/transaction-status-validation.pipe';
 import { TransactionStatus } from './transaction-status.emum';
-import { Roles, RolesGuard, UserRole } from '@app/auth';
+import { Roles, RolesGuard, UserRole } from '../auth';
 
 @Controller(PAYMENT_SERVICE)
 @ApiTags('transactions')

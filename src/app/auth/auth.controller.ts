@@ -8,17 +8,28 @@ import {
   UseGuards,
   Req,
   HttpStatus,
+  Res,
+  Param,
 } from '@nestjs/common';
-import { ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { ACCOUNT_SERVICE } from 'src/config';
 import { AuthGuard } from '@nestjs/passport';
-import { UserRole } from './user';
 import {
   AdminAuthSignInCredentialsDto,
   AdminAuthSignUpCredentialsDto,
   AuthUserSignInCredentialsDto,
   AuthUserSignUpCredentialsDto,
 } from './dto';
+import { UserRole } from './enum';
+import { GetUser, User } from '../user';
+import { RolesGuard, Roles } from './role';
 
 @Controller(ACCOUNT_SERVICE)
 @ApiTags('account')
@@ -46,7 +57,6 @@ export class AuthController {
   }
 
   // USER LOGIN
-
   @ApiOperation({ summary: 'Signup user' })
   @Post('/user/signup')
   signUp(
@@ -68,7 +78,6 @@ export class AuthController {
   }
 
   // 3RD LOGIN
-
   @Get('signin/facebook')
   @UseGuards(AuthGuard('facebook'))
   async facebookLogin(): Promise<any> {
@@ -97,5 +106,75 @@ export class AuthController {
   ): Promise<{ accessToken: string }> {
     const userData = req?.user?.user;
     return this.authService.signInAdnSignUp3rd(userData);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard(), RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiOperation({ summary: 'Get all accounts' })
+  @ApiResponse({ status: 200, description: 'Return all accounts.' })
+  @Get('/accounts')
+  async getAccounts(@Res() res, @GetUser() user: User) {
+    try {
+      const data = await this.authService.getAccounts(user);
+      return res.status(HttpStatus.OK).json(data);
+    } catch (e) {
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(e);
+    }
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard(), RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiOperation({ summary: 'Get user by id' })
+  @ApiResponse({ status: 200, description: 'Get user by id' })
+  @Get('/accounts/:id')
+  async getAccountById(
+    @Param('id') id: string,
+    @GetUser() user: User,
+    @Res() res,
+  ) {
+    try {
+      const data = await this.authService.getAccountById(id, UserRole.USER);
+      return res.status(HttpStatus.OK).json(data);
+    } catch (e) {
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(e);
+    }
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard(), RolesGuard)
+  @Roles(UserRole.USER)
+  @ApiOperation({ summary: 'Get user info' })
+  @ApiResponse({ status: 200, description: 'Get user info' })
+  @Get('/accounts/me/user-info')
+  async getProfile(@GetUser() user: User, @Res() res) {
+    try {
+      const data = await this.authService.getAccountById(
+        `${user.id}`,
+        UserRole.USER,
+      );
+      return res.status(HttpStatus.OK).json(data);
+    } catch (e) {
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(e);
+    }
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard(), RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiOperation({ summary: 'Get admin info' })
+  @ApiResponse({ status: 200, description: 'Get admin info' })
+  @Get('/accounts/me/admin-info')
+  async getAdminProfile(@GetUser() user: User, @Res() res) {
+    try {
+      const data = await this.authService.getAccountById(
+        `${user.id}`,
+        UserRole.ADMIN,
+      );
+      return res.status(HttpStatus.OK).json(data);
+    } catch (e) {
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(e);
+    }
   }
 }

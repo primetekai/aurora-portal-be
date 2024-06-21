@@ -6,4 +6,4 @@ export * from './facebook';
 export * from './google';
 export * from './jwt';
 export * from './role';
-export * from './user';
+export * from './enum';

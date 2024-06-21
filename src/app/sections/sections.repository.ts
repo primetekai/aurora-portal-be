@@ -3,7 +3,7 @@ import { DataSource, Repository } from 'typeorm';
 import { Sections } from './sections.entity';
 import { Logger } from '@nestjs/common/services/logger.service';
 import * as moment from 'moment';
-import { User } from '@app/auth';
+import { User } from '../user';
 
 @Injectable()
 export class SectionsRepository extends Repository<Sections> {

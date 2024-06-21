@@ -19,7 +19,8 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { ADMIN_UI_CONFIG_PATH } from 'src/config';
-import { Roles, RolesGuard, UserRole, GetUser, User } from '@app/auth';
+import { GetUser, User } from '../user';
+import { Roles, RolesGuard, UserRole } from '../auth';
 
 @Controller(ADMIN_UI_CONFIG_PATH)
 @ApiTags('admin section')

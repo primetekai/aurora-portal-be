@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Transaction } from './transaction.entity';
 import { TransactionStatus } from './transaction-status.emum';
 import { TransactionsRepository } from './transaction.repository';
-import { User } from '@app/auth';
+import { User } from '../user';
 
 @Injectable()
 export class TransactionService {

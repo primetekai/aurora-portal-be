@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { AdminSectionsRepository } from './admin-sections.repository';
 import { AdminSections } from './admin-sections.entity';
 import { LanguagesService } from '../languages/languages.service';
-import { User } from '@app/auth';
+import { User } from '../user';
 
 @Injectable()
 export class AdminSectionsService {

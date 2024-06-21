@@ -6,7 +6,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { TransactionStatus } from './transaction-status.emum';
-import { User } from '@app/auth';
+import { User } from '../user';
 
 @Entity()
 export class Transaction extends BaseEntity {

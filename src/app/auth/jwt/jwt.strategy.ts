@@ -4,7 +4,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtPayload } from './jwt-payload.interface';
 import { InjectRepository } from '@nestjs/typeorm';
 import { JWT_SECRET } from 'src/config';
-import { UserRepository, User } from '../user';
+import { UserRepository, User } from '../../user';
 
 /// mục đích file này để định danh token
 /// lấy nội dung userRepository ra xác thực xong mới return ra use

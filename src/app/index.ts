@@ -7,3 +7,4 @@ export * from './azure-storage';
 export * from './email-confirm';
 export * from './sections';
 export * from './admin-sections';
+export * from './user';

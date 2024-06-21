@@ -1,5 +1,5 @@
 import { BaseEntity, Entity, PrimaryColumn, Column, ManyToOne } from 'typeorm';
-import { User } from '@app/auth';
+import { User } from '../user';
 
 @Entity()
 export class Languages extends BaseEntity {

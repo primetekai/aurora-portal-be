@@ -22,7 +22,8 @@ import {
 } from '@nestjs/swagger';
 import { UpdateLanguagesDto } from './dto/update-languages.dto';
 import { UI_CONFIG_PATH_LANG } from 'src/config';
-import { Roles, RolesGuard, UserRole, GetUser, User } from '@app/auth';
+import { Roles, RolesGuard, UserRole } from '../auth';
+import { GetUser, User } from '../user';
 
 @Controller(UI_CONFIG_PATH_LANG)
 @ApiTags('languages')

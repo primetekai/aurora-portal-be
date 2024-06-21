@@ -1,4 +1,3 @@
-import { Roles, RolesGuard, UserRole } from '@app/auth';
 import {
   Bind,
   Controller,
@@ -18,6 +17,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { COMMON_SERVICE } from 'src/config';
+import { Roles, RolesGuard, UserRole } from '../auth';
 
 @Controller(COMMON_SERVICE)
 @ApiTags('upload')

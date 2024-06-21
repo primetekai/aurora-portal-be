@@ -7,7 +7,7 @@ import { PassportModule } from '@nestjs/passport';
 import { JWT_SECRET, EXPIRES_IN } from 'src/config';
 import { FacebookStrategy } from './facebook';
 import { GoogleStrategy } from './google';
-import { UserRepository } from './user';
+import { UserRepository } from '../user';
 import { JwtStrategy } from './jwt';
 
 @Module({

@@ -4,7 +4,7 @@ import { Transaction } from './transaction.entity';
 import { Logger } from '@nestjs/common/services/logger.service';
 import * as moment from 'moment';
 import { TransactionStatus } from './transaction-status.emum';
-import { User } from '@app/auth';
+import { User } from '../user';
 
 @Injectable()
 export class TransactionsRepository extends Repository<Transaction> {

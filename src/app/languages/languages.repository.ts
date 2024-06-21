@@ -3,7 +3,7 @@ import { CreateLanguagesDto } from './dto/create-languages.dto';
 import { DataSource, Repository } from 'typeorm';
 import { Languages } from './languages.entity';
 import { Logger } from '@nestjs/common/services/logger.service';
-import { User } from '@app/auth';
+import { User } from '../user';
 
 @Injectable()
 export class LanguagesRepository extends Repository<Languages> {

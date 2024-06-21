@@ -21,7 +21,8 @@ import { TransactionStatus } from './transaction-status.emum';
 import * as crypto from 'crypto';
 import { lastValueFrom } from 'rxjs';
 import { AxiosResponse } from 'axios';
-import { Roles, RolesGuard, UserRole, GetUser, User } from '@app/auth';
+import { Roles, RolesGuard, UserRole } from '../auth';
+import { GetUser, User } from '../user';
 
 @Controller(PAYMENT_SERVICE)
 @ApiTags('payment')

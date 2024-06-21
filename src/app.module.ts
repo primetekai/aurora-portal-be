@@ -10,6 +10,7 @@ import {
   LanguagesModule,
   AdminSectionsModule,
   SectionsModule,
+  UserModule,
 } from './app';
 import { TransactionModule } from './app/transaction';
 
@@ -17,6 +18,7 @@ import { TransactionModule } from './app/transaction';
   imports: [
     TypeOrmModule.forRoot(typeOrmConfig),
     AuthModule,
+    UserModule,
     LanguagesModule,
     AdminSectionsModule,
     SectionsModule,

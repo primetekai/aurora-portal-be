@@ -5,7 +5,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { User } from '@app/auth';
+import { User } from '../user';
 
 @Entity()
 export class AdminSections extends BaseEntity {
