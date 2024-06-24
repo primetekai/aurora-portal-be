@@ -10,7 +10,7 @@ import { Profile, Strategy, VerifyCallback } from 'passport-google-oauth20';
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
-  constructor(private authService: AuthService) {
+  constructor(private _: AuthService) {
     super({
       clientID: GOOGLE_APP_CLIENT_ID,
       clientSecret: GOOGLE_APP_CLIENT_SECRET,

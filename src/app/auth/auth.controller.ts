@@ -30,6 +30,7 @@ import {
 import { UserRole } from './enum';
 import { GetUser, User } from '../user';
 import { RolesGuard, Roles } from './role';
+import { AuthUserSignIn3rdCredentialsDto } from './dto/auth-user-signin-3rd-credentials.dto';
 
 @Controller(ACCOUNT_SERVICE)
 @ApiTags('account')
@@ -78,35 +79,48 @@ export class AuthController {
   }
 
   // 3RD LOGIN
-  @Get('signin/facebook')
-  @UseGuards(AuthGuard('facebook'))
-  async facebookLogin(): Promise<any> {
-    return HttpStatus.OK;
-  }
-
-  @Get('facebook/redirect')
-  @UseGuards(AuthGuard('facebook'))
-  async facebookLoginCallback(
-    @Req() req: Record<string, any>,
+  @ApiOperation({ summary: 'Signin 3rd user' })
+  @ApiBody({
+    type: AuthUserSignIn3rdCredentialsDto,
+  })
+  @ApiConsumes('application/x-www-form-urlencoded')
+  @Post('/user/signin-3rd')
+  signIn3rd(
+    @Body(ValidationPipe)
+    auth3rdCredentialsDto: AuthUserSignIn3rdCredentialsDto,
   ): Promise<{ accessToken: string }> {
-    const userData = req?.user?.user;
-    return this.authService.signInAdnSignUp3rd(userData);
+    return this.authService.signIn3rd(auth3rdCredentialsDto);
   }
 
-  @Get('signin/google')
-  @UseGuards(AuthGuard('google'))
-  async googleLogin(): Promise<any> {
-    return HttpStatus.OK;
-  }
+  // @Get('signin/facebook')
+  // @UseGuards(AuthGuard('facebook'))
+  // async facebookLogin(): Promise<any> {
+  //   return HttpStatus.OK;
+  // }
 
-  @Get('google/redirect')
-  @UseGuards(AuthGuard('google'))
-  async googleLoginCallback(
-    @Req() req: Record<string, any>,
-  ): Promise<{ accessToken: string }> {
-    const userData = req?.user?.user;
-    return this.authService.signInAdnSignUp3rd(userData);
-  }
+  // @Get('facebook/redirect')
+  // @UseGuards(AuthGuard('facebook'))
+  // async facebookLoginCallback(
+  //   @Req() req: Record<string, any>,
+  // ): Promise<{ accessToken: string }> {
+  //   const userData = req?.user?.user;
+  //   return this.authService.signInAdnSignUp3rd(userData);
+  // }
+
+  // @Get('signin/google')
+  // @UseGuards(AuthGuard('google'))
+  // async googleLogin(): Promise<any> {
+  //   return HttpStatus.OK;
+  // }
+
+  // @Get('google/redirect')
+  // @UseGuards(AuthGuard('google'))
+  // async googleLoginCallback(
+  //   @Req() req: Record<string, any>,
+  // ): Promise<{ accessToken: string }> {
+  //   const userData = req?.user?.user;
+  //   return this.authService.signInAdnSignUp3rd(userData);
+  // }
 
   @ApiBearerAuth()
   @UseGuards(AuthGuard(), RolesGuard)
@@ -154,7 +168,12 @@ export class AuthController {
         `${user.id}`,
         UserRole.USER,
       );
-      return res.status(HttpStatus.OK).json(data);
+      return res.status(HttpStatus.OK).json({
+        username: data?.username,
+        email: data?.email,
+        fullName: data?.fullName,
+        avatar: data?.avatar,
+      });
     } catch (e) {
       return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(e);
     }
@@ -172,7 +191,12 @@ export class AuthController {
         `${user.id}`,
         UserRole.ADMIN,
       );
-      return res.status(HttpStatus.OK).json(data);
+      return res.status(HttpStatus.OK).json({
+        username: data?.username,
+        email: data?.email,
+        fullName: data?.fullName,
+        avatar: data?.avatar,
+      });
     } catch (e) {
       return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(e);
     }
