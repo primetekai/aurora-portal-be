@@ -6,7 +6,6 @@ import {
   ValidationPipe,
   Get,
   UseGuards,
-  Req,
   HttpStatus,
   Res,
   Param,
