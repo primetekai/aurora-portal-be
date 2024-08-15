@@ -12,7 +12,7 @@ export class Sections extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   sectionId: string;
 
-  @Column()
+  @Column('text')
   section: string;
 
   @Column()
