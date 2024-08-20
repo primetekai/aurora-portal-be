@@ -1,14 +1,13 @@
-name: 01.build-develop
+name: 01.build-cybertech
 on:
   workflow_dispatch:
     inputs:
       confirmDeployment:
         description: 'Confirm Deployment'
         required: true
-
 env:
   IMAGE: be-app
-  DOT_ENV_FILE_NAME: .env.develop
+  DOT_ENV_FILE_NAME: .env.cybertech
 jobs:
   variables:
     name: setup variable
@@ -24,6 +23,9 @@ jobs:
     name: deploy be-app
     uses: ./.github/workflows/00.gke-deployment.yml
     with:
+      IMAGE: ${{ needs.variables.outputs.IMAGE }}
+      DOT_ENV_FILE_NAME: ${{ needs.variables.outputs.DOT_ENV_FILE_NAME }}
+    secrets:
       DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
       PASSWORD_DOCKER_HUB: ${{ secrets.PASSWORD_DOCKER_HUB }}
       SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
