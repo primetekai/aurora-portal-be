@@ -5,8 +5,6 @@ import { AuthService } from './auth.service';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { JWT_SECRET, EXPIRES_IN } from 'src/config';
-import { FacebookStrategy } from './facebook';
-import { GoogleStrategy } from './google';
 import { UserRepository } from '../user';
 import { JwtStrategy } from './jwt';
 
@@ -24,13 +22,7 @@ import { JwtStrategy } from './jwt';
     TypeOrmModule.forFeature([UserRepository]),
   ],
   controllers: [AuthController],
-  providers: [
-    AuthService,
-    JwtStrategy,
-    UserRepository,
-    GoogleStrategy,
-    FacebookStrategy,
-  ],
+  providers: [AuthService, JwtStrategy, UserRepository],
   exports: [JwtStrategy, PassportModule],
 })
 export class AuthModule {}

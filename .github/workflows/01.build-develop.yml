@@ -7,28 +7,26 @@ on:
         required: true
 
 env:
-  DEPLOYMENT_NAME: be-app-2024
-  IMAGE: be-app-docker
-  INGRESS_IP: 34.67.90.123
+  IMAGE: be-app
   DOT_ENV_FILE_NAME: .env.develop
 jobs:
   variables:
     name: setup variable
     runs-on: ubuntu-latest
     outputs:
-      DEPLOYMENT_NAME: ${{ env.DEPLOYMENT_NAME }}
       IMAGE: ${{ env.IMAGE }}
-      INGRESS_IP: ${{ env.INGRESS_IP }}
       DOT_ENV_FILE_NAME: ${{ env.DOT_ENV_FILE_NAME }}
     steps:
       - name: Echo
         run: echo prepare variable
-  be-app-2024:
+  be-app:
     needs: variables
-    name: deploy be-app-2024
+    name: deploy be-app
     uses: ./.github/workflows/00.gke-deployment.yml
     with:
-      DEPLOYMENT_NAME: ${{ needs.variables.outputs.DEPLOYMENT_NAME }}
-      IMAGE: ${{ needs.variables.outputs.IMAGE }}
-      INGRESS_IP: ${{ needs.variables.outputs.INGRESS_IP }}
-      DOT_ENV_FILE_NAME: ${{ needs.variables.outputs.DOT_ENV_FILE_NAME }}
+      DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
+      PASSWORD_DOCKER_HUB: ${{ secrets.PASSWORD_DOCKER_HUB }}
+      SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      SERVER_IP: ${{ secrets.SERVER_IP }}
+      SERVER_USER: ${{ secrets.SERVER_USER }}
+      PORT: ${{ secrets.PORT }}

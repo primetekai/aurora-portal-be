@@ -2,26 +2,35 @@ name: 00.gke-deployment
 on:
   workflow_call:
     inputs:
-      DEPLOYMENT_NAME:
-        required: true
-        type: string
       IMAGE:
-        required: true
-        type: string
-      INGRESS_IP:
         required: true
         type: string
       DOT_ENV_FILE_NAME:
         required: true
         type: string
+    secrets:
+      DOCKER_HUB_USERNAME:
+        required: true
+      PASSWORD_DOCKER_HUB:
+        required: true
+      SSH_PRIVATE_KEY:
+        required: true
+      SERVER_IP:
+        required: true
+      SERVER_USER:
+        required: true
+      PORT:
+        required: true
 env:
-  DEPLOYMENT_NAME: ${{ inputs.DEPLOYMENT_NAME }}
   IMAGE: ${{ inputs.IMAGE }}
-  INGRESS_IP: ${{ inputs.INGRESS_IP }}
   DOT_ENV_FILE_NAME: ${{ inputs.DOT_ENV_FILE_NAME }}
-  EMAIL_DOCKER_HUB: lgold141@gmail.com
-  PASSWORD_DOCKER_HUB: BWKk9q9B@Cm7!$M
-  USERNAME_DOCKER_HUB: warjamma
+  DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
+  PASSWORD_DOCKER_HUB: ${{ secrets.PASSWORD_DOCKER_HUB }}
+  SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+  SERVER_IP: ${{ secrets.SERVER_IP }}
+  SERVER_USER: ${{ secrets.SERVER_USER }}
+  PORT: ${{ secrets.PORT }}
+  GITHUB_SHA: ${{ github.sha }}
 
 jobs:
   setup-build-publish-deploy:
@@ -33,19 +42,40 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
+
       - name: Prepare dotenv
         run: rm -rf .env && mv $DOT_ENV_FILE_NAME .env
-      # Build 
-      - name: Build image
-        run: |-
-          docker build -t "$IMAGE" .
-      - name: Login docker
-        run: docker login -u" $EMAIL_DOCKER_HUB" -p "$PASSWORD_DOCKER_HUB"   
-      - name: Publish to Docker
-        run: |-
-          docker tag $IMAGE:latest $USERNAME_DOCKER_HUB/$IMAGE:latest
-          docker push $USERNAME_DOCKER_HUB/$IMAGE:latest  
+
+      - name: Install Docker Compose
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker-compose
+
+      - name: Build Docker image
+        run: docker-compose build
+
+      - name: Log in to Docker Hub
+        run: docker login -u" $DOCKER_HUB_USERNAME" -p "$PASSWORD_DOCKER_HUB"   
+
+      - name: Deploy with Docker Compose
+        run: docker compose push
+
+      - name: Configure SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" | tr -d '\r' > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          echo "StrictHostKeyChecking no" >> ~/.ssh/config
+
+      - name: Deploy
+        run: |
+          ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "
+            sudo docker pull $DOCKER_HUB_USERNAME/$IMAGE:$GITHUB_SHA
+            sudo docker rm $IMAGE || true
+            sudo docker run -d -p 4000:3000 --name $IMAGE $DOCKER_HUB_USERNAME/$IMAGE:$GITHUB_SHA
+          "

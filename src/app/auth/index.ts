@@ -2,8 +2,6 @@ export * from './auth.controller';
 export * from './auth.module';
 export * from './auth.service';
 export * from './dto';
-export * from './facebook';
-export * from './google';
 export * from './jwt';
 export * from './role';
 export * from './enum';

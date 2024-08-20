@@ -1,0 +1,10 @@
+version: "3.12"
+
+services:
+  be-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ${DOCKER_HUB_USERNAME}/${IMAGE}:${GITHUB_SHA}
+    ports:
+      - 3000:80
