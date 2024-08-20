@@ -7,4 +7,4 @@ services:
       dockerfile: Dockerfile
     image: ${DOCKER_HUB_USERNAME}/${IMAGE}:${GITHUB_SHA}
     ports:
-      - 3000:80
+      - 4000:4000
