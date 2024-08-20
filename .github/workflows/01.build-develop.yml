@@ -4,6 +4,7 @@ on:
     inputs:
       confirmDeployment:
         description: 'Confirm Deployment'
+        default: 'OK'
         required: true
 env:
   IMAGE: be-app
