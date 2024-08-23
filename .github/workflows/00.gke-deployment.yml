@@ -76,6 +76,7 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "
             sudo docker pull $DOCKER_HUB_USERNAME/$IMAGE:$GITHUB_SHA
+            sudo docker stop $IMAGE || true
             sudo docker rm $IMAGE || true
             sudo docker run -d -p 4000:4000 --name $IMAGE $DOCKER_HUB_USERNAME/$IMAGE:$GITHUB_SHA
           "
