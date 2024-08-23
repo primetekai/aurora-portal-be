@@ -1,11 +1,4 @@
-import {
-  BaseEntity,
-  Entity,
-  Column,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
-import { User } from '../user';
+import { BaseEntity, Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class Sections extends BaseEntity {
@@ -23,9 +16,6 @@ export class Sections extends BaseEntity {
 
   @Column()
   version: number;
-
-  @ManyToOne(() => User, (user) => user.section, { eager: false })
-  user: User;
 
   @Column()
   userId: number;

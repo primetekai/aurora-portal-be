@@ -20,7 +20,7 @@ import {
 } from '@nestjs/swagger';
 import { UI_CONFIG_PATH } from 'src/config';
 import { GetUser, User } from '../user';
-// import { Roles, RolesGuard, UserRole } from '../auth';
+import { Roles, RolesGuard, UserRole } from '../auth';
 
 @Controller(UI_CONFIG_PATH)
 @ApiTags('section')
@@ -29,9 +29,8 @@ export class SectionsController {
 
   constructor(private sectionsService: SectionsService) {}
   @ApiBearerAuth()
-  @UseGuards(AuthGuard())
-  // @UseGuards(AuthGuard(), RolesGuard)
-  // @Roles(UserRole.ADMIN)
+  @UseGuards(AuthGuard(), RolesGuard)
+  @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Get all sections' })
   @ApiResponse({ status: 200, description: 'Return all sections.' })
   @Get('/:language/sections')
@@ -76,9 +75,8 @@ export class SectionsController {
   }
 
   @ApiBearerAuth()
-  @UseGuards(AuthGuard())
-  // @UseGuards(AuthGuard(), RolesGuard)
-  // @Roles(UserRole.ADMIN)
+  @UseGuards(AuthGuard(), RolesGuard)
+  @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Create sections' })
   @ApiResponse({
     status: 201,

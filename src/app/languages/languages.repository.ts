@@ -37,7 +37,7 @@ export class LanguagesRepository extends Repository<Languages> {
     const lg = new Languages();
     lg.name = name;
     lg.language = language;
-    lg.user = user;
+    lg.userId = user.id;
 
     try {
       await lg.save();
@@ -48,7 +48,7 @@ export class LanguagesRepository extends Repository<Languages> {
       );
       throw new InternalServerErrorException();
     }
-    delete lg.user;
+
     return lg;
   }
 }

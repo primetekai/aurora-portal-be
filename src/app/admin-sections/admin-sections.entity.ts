@@ -24,9 +24,6 @@ export class AdminSections extends BaseEntity {
   @Column()
   version: number;
 
-  @ManyToOne(() => User, (user) => user.section, { eager: false })
-  user: User;
-
   @Column()
   userId: number;
 

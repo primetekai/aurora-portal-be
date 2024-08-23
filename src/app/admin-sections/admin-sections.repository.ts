@@ -91,7 +91,7 @@ export class AdminSectionsRepository extends Repository<AdminSections> {
     lg.data = JSON.stringify(data);
     lg.createAt = new Date(moment().format('YYYY-MM-DD HH:mm:ss'));
     lg.language = language;
-    lg.user = user;
+    lg.userId = user.id;
     lg.version = version + 1;
 
     try {
@@ -103,7 +103,7 @@ export class AdminSectionsRepository extends Repository<AdminSections> {
       );
       throw new InternalServerErrorException();
     }
-    delete lg.user;
+
     return lg;
   }
 }

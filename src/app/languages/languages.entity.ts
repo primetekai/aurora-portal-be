@@ -1,5 +1,4 @@
 import { BaseEntity, Entity, PrimaryColumn, Column, ManyToOne } from 'typeorm';
-import { User } from '../user';
 
 @Entity()
 export class Languages extends BaseEntity {
@@ -8,9 +7,6 @@ export class Languages extends BaseEntity {
 
   @Column()
   name: string;
-
-  @ManyToOne(() => User, (user) => user.lang, { eager: false })
-  user: User;
 
   @Column()
   userId: number;
