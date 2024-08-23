@@ -29,8 +29,8 @@ export class SectionsController {
 
   constructor(private sectionsService: SectionsService) {}
   @ApiBearerAuth()
-  @UseGuards(AuthGuard(), RolesGuard)
-  @Roles(UserRole.ADMIN)
+  // @UseGuards(AuthGuard(), RolesGuard)
+  // @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Get all sections' })
   @ApiResponse({ status: 200, description: 'Return all sections.' })
   @Get('/:language/sections')
@@ -75,8 +75,8 @@ export class SectionsController {
   }
 
   @ApiBearerAuth()
-  @UseGuards(AuthGuard(), RolesGuard)
-  @Roles(UserRole.ADMIN)
+  // @UseGuards(AuthGuard(), RolesGuard)
+  // @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Create sections' })
   @ApiResponse({
     status: 201,
