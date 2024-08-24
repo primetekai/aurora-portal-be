@@ -29,8 +29,9 @@ env:
   IMAGE: ${{ inputs.IMAGE }}
   DOT_ENV_FILE_NAME: ${{ inputs.DOT_ENV_FILE_NAME }}
   PORT: ${{ inputs.PORT }}
-  DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
-  PASSWORD_DOCKER_HUB: ${{ secrets.PASSWORD_DOCKER_HUB }}
+  HARBOR_URL: ${{ secrets.HARBOR_URL }}
+  HARBOR_USERNAME: ${{ secrets.HARBOR_USERNAME }}
+  HARBOR_PASSWORD: ${{ secrets.HARBOR_PASSWORD }}
   SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
   SERVER_IP: ${{ secrets.SERVER_IP }}
   SERVER_USER: ${{ secrets.SERVER_USER }}
