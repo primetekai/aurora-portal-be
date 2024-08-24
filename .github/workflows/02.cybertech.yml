@@ -1,4 +1,4 @@
-name: 01.cybertech
+name: 02.cybertech
 on:
   workflow_dispatch:
     inputs:
