@@ -1,0 +1,37 @@
+name: 01.cybertech
+on:
+  workflow_dispatch:
+    inputs:
+      confirmDeployment:
+        description: 'Confirm Deployment'
+        default: 'OK'
+        required: true
+env:
+  IMAGE: cybertech-be
+  DOT_ENV_FILE_NAME: .env.cybertech
+  PORT: 4100
+jobs:
+  variables:
+    name: setup variable
+    runs-on: ubuntu-latest
+    outputs:
+      IMAGE: ${{ env.IMAGE }}
+      DOT_ENV_FILE_NAME: ${{ env.DOT_ENV_FILE_NAME }}
+    steps:
+      - name: Echo
+        run: echo prepare variable
+  cybertech-be:
+    needs: variables
+    name: deploy cybertech-be
+    uses: ./.github/workflows/00.gke-deployment.yml
+    with:
+      IMAGE: ${{ needs.variables.outputs.IMAGE }}
+      DOT_ENV_FILE_NAME: ${{ needs.variables.outputs.DOT_ENV_FILE_NAME }}
+      PORT: ${{ needs.variables.outputs.PORT }}
+    secrets:
+      HARBOR_URL: ${{ secrets.HARBOR_URL }}
+      HARBOR_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
+      HARBOR_PASSWORD: ${{ secrets.PASSWORD_DOCKER_HUB }}
+      SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      SERVER_IP: ${{ secrets.SERVER_IP }}
+      SERVER_USER: ${{ secrets.SERVER_USER }}

@@ -8,10 +8,15 @@ on:
       DOT_ENV_FILE_NAME:
         required: true
         type: string
-    secrets:
-      DOCKER_HUB_USERNAME:
+      PORT:
         required: true
-      PASSWORD_DOCKER_HUB:
+        type: string
+    secrets:
+      HARBOR_URL:
+        required: true
+      HARBOR_USERNAME:
+        required: true
+      HARBOR_PASSWORD:
         required: true
       SSH_PRIVATE_KEY:
         required: true
@@ -19,17 +24,16 @@ on:
         required: true
       SERVER_USER:
         required: true
-      PORT:
-        required: true
+
 env:
   IMAGE: ${{ inputs.IMAGE }}
   DOT_ENV_FILE_NAME: ${{ inputs.DOT_ENV_FILE_NAME }}
+  PORT: ${{ inputs.PORT }}
   DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
   PASSWORD_DOCKER_HUB: ${{ secrets.PASSWORD_DOCKER_HUB }}
   SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
   SERVER_IP: ${{ secrets.SERVER_IP }}
   SERVER_USER: ${{ secrets.SERVER_USER }}
-  PORT: ${{ secrets.PORT }}
   GITHUB_SHA: ${{ github.sha }}
 
 jobs:
@@ -59,8 +63,8 @@ jobs:
       - name: Build Docker image
         run: docker-compose build
 
-      - name: Log in to Docker Hub
-        run: docker login -u" $DOCKER_HUB_USERNAME" -p "$PASSWORD_DOCKER_HUB"   
+      - name: Log in to Harbor
+        run: docker login $HARBOR_URL -u "$HARBOR_USERNAME" -p "$HARBOR_PASSWORD"  
 
       - name: Deploy with Docker Compose
         run: docker compose push
@@ -75,8 +79,8 @@ jobs:
       - name: Deploy
         run: |
           ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "
-            sudo docker pull $DOCKER_HUB_USERNAME/$IMAGE:$GITHUB_SHA
-            sudo docker stop $IMAGE || true
-            sudo docker rm $IMAGE || true
-            sudo docker run -d -p 4000:4000 --name $IMAGE $DOCKER_HUB_USERNAME/$IMAGE:$GITHUB_SHA
+            docker pull $HARBOR_URL/$HARBOR_USERNAME/$IMAGE:$GITHUB_SHA &&
+            docker stop $IMAGE || true
+            docker rm $IMAGE || true
+            docker run -d -p ${PORT}:4000 --name $IMAGE $HARBOR_URL/$HARBOR_USERNAME/$IMAGE:$GITHUB_SHA
           "

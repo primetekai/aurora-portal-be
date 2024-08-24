@@ -5,6 +5,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: ${DOCKER_HUB_USERNAME}/${IMAGE}:${GITHUB_SHA}
+    image: ${HARBOR_URL}/${HARBOR_USERNAME}/${IMAGE}:${GITHUB_SHA}
     ports:
       - 4000:4000
