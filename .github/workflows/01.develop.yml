@@ -17,6 +17,7 @@ jobs:
     outputs:
       IMAGE: ${{ env.IMAGE }}
       DOT_ENV_FILE_NAME: ${{ env.DOT_ENV_FILE_NAME }}
+      PORT: ${{ env.PORT }}
     steps:
       - name: Echo
         run: echo prepare variable
