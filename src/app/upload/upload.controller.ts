@@ -40,7 +40,7 @@ import { UploadFileDto } from './dto';
 export class UploadController {
   constructor(private readonly uploadService: UploadService) {}
 
-  private logger = new Logger('Asset Controller');
+  private logger = new Logger('Upload Controller');
 
   @ApiBearerAuth()
   @UseGuards(AuthGuard(), RolesGuard)
@@ -109,15 +109,16 @@ export class UploadController {
 
       const url = await this.uploadService.uploadFile(file, fileName);
 
-      return res.status(HttpStatus.OK).json(url);
+      return res.status(HttpStatus.CREATED).json({ url });
     } catch (error) {
       if (error instanceof HttpException) {
-        this.logger.error(`HttpException`, error.stack);
-
+        this.logger.error(`HttpException: ${error.message}`, error.stack);
         throw error;
       } else {
-        this.logger.error(`Internal Server Error"`, error.stack);
-
+        this.logger.error(
+          `Internal Server Error: ${error.message}`,
+          error.stack,
+        );
         throw new HttpException(
           'Internal Server Error',
           HttpStatus.INTERNAL_SERVER_ERROR,
@@ -128,6 +129,7 @@ export class UploadController {
 
   @ApiOperation({ summary: 'Get asset' })
   @ApiResponse({ status: 200, description: 'Return asset.' })
+  @ApiResponse({ status: 404, description: 'File not found' })
   @Get('/:fileName')
   async getSections(@Param('fileName') fileName: string, @Res() res) {
     try {
@@ -140,9 +142,17 @@ export class UploadController {
 
       res.setHeader('Content-Type', mimeType);
 
-      res.send(content);
+      res.status(HttpStatus.OK).send(content);
     } catch (e) {
-      return e;
+      if (e instanceof NotFoundException) {
+        this.logger.warn(`NotFoundException: ${e.message}`, e.stack);
+        res.status(HttpStatus.NOT_FOUND).send(e.message);
+      } else {
+        this.logger.error(`Internal Server Error: ${e.message}`, e.stack);
+        res
+          .status(HttpStatus.INTERNAL_SERVER_ERROR)
+          .send('Internal Server Error');
+      }
     }
   }
 }

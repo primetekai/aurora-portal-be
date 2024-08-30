@@ -48,18 +48,20 @@ export class UploadService {
 
   async getFileById(
     fileName: string,
-  ): Promise<{ content: Promise<Buffer>; mimeType: string }> {
+  ): Promise<{ content: Buffer; mimeType: string }> {
     const filePath = join(this.storagePath, fileName);
 
-    if (!filePath) {
-      throw new NotFoundException();
+    try {
+      await fs.access(filePath);
+
+      const mimeType = this.getMimeType(fileName);
+
+      const content = await fs.readFile(filePath);
+
+      return { content, mimeType };
+    } catch (error) {
+      throw new NotFoundException('File not found');
     }
-
-    const mimeType = this.getMimeType(fileName);
-
-    const content = fs.readFile(filePath);
-
-    return { content, mimeType };
   }
 
   private getMimeType(fileName: string): string {
