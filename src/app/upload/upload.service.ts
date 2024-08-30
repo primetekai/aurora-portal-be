@@ -7,7 +7,7 @@ import * as path from 'path';
 
 @Injectable()
 export class UploadService {
-  private readonly basePath = join(process.cwd(), '..', UPLOAD_FILE_PATH);
+  private readonly basePath = UPLOAD_FILE_PATH;
 
   private readonly storagePath = join(this.basePath, 'common');
 
