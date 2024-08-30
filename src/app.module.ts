@@ -9,6 +9,7 @@ import {
   AdminSectionsModule,
   SectionsModule,
   UserModule,
+  UploadModule,
 } from './app';
 
 @Module({
@@ -19,6 +20,7 @@ import {
     LanguagesModule,
     AdminSectionsModule,
     SectionsModule,
+    UploadModule,
   ],
 
   providers: [

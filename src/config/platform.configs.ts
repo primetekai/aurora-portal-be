@@ -18,8 +18,16 @@ const TYPE_IMAGE_FILE = process.env.NODE_APP_TYPE_IMAGE_FILE ?? [
   'image/png',
   'image/gif',
 ];
+const TYPE_VIDEO_FILE = process.env.NODE_APP_TYPE_VIDEO_FILE ?? [
+  'video/mp4',
+  'video/avi',
+  'video/mkv',
+];
 const MAX_SIZE_OF_IMAGE_FILE =
   process.env.NODE_APP_MAX_SIZE_OF_IMAGE_FILE ?? 2097152;
+const UPLOAD_FILE_PATH = process.env.NODE_APP_MAX_UPLOAD_FILE_PATH;
+const MAX_SIZE_OF_VIDEO_FILE =
+  process.env.NODE_APP_MAX_SIZE_OF_VIDEO_FILE ?? 104857600;
 
 export {
   NODE_ENV,
@@ -37,4 +45,7 @@ export {
   SWAGGER,
   TYPE_IMAGE_FILE,
   MAX_SIZE_OF_IMAGE_FILE,
+  UPLOAD_FILE_PATH,
+  MAX_SIZE_OF_VIDEO_FILE,
+  TYPE_VIDEO_FILE,
 };
