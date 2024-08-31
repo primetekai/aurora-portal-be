@@ -8,3 +8,5 @@ services:
     image: ${HARBOR_URL}/${HARBOR_USERNAME}/${IMAGE}:${GITHUB_SHA}
     ports:
       - 4000:4000
+    volumes:
+      - /home/ubuntu/cybertech_web/cbtcdn:/home/ubuntu/cbtcdn
