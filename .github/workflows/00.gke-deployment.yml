@@ -83,5 +83,7 @@ jobs:
             docker pull $HARBOR_URL/$HARBOR_USERNAME/$IMAGE:$GITHUB_SHA &&
             docker stop $IMAGE || true
             docker rm $IMAGE || true
-            docker run -d -p ${PORT}:4000 --name $IMAGE $HARBOR_URL/$HARBOR_USERNAME/$IMAGE:$GITHUB_SHA
+            docker run -d -p ${PORT}:4000 \
+              -v /home/ubuntu/cybertech_web/cbtcdn:/home/ubuntu/cbtcdn \
+              --name $IMAGE $HARBOR_URL/$HARBOR_USERNAME/$IMAGE:$GITHUB_SHA
           "
