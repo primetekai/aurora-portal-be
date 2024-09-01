@@ -109,7 +109,7 @@ export class UploadController {
 
       const url = await this.uploadService.uploadFile(file, fileName);
 
-      return res.status(HttpStatus.CREATED).json({ url });
+      return res.status(HttpStatus.CREATED).json(url);
     } catch (error) {
       if (error instanceof HttpException) {
         this.logger.error(`HttpException: ${error.message}`, error.stack);
