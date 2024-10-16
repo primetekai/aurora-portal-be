@@ -21,17 +21,17 @@ export class SectionsService {
     section: string,
     user: User,
   ): Promise<Record<string, any>> {
-    const version = await this.sectionsRepository.getMaxVersion(
-      user,
-      language,
-      section,
-    );
+    // const version = await this.sectionsRepository.getMaxVersion(
+    //   user,
+    //   language,
+    //   section,
+    // );
 
     const data = await this.sectionsRepository.getSectionsById(
       user,
       language,
       section,
-      version,
+      1,
     );
     return data;
   }
@@ -42,18 +42,18 @@ export class SectionsService {
     language: string,
     section: string,
   ): Promise<Sections> {
-    const version = await this.sectionsRepository.getMaxVersion(
-      user,
-      language,
-      section,
-    );
+    // const version = await this.sectionsRepository.getMaxVersion(
+    //   user,
+    //   language,
+    //   section,
+    // );
 
     return this.sectionsRepository.createSections(
       data,
       user,
       language,
       section,
-      version,
+      1,
     );
   }
 }

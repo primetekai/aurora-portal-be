@@ -39,7 +39,7 @@ export class SectionsRepository extends Repository<Sections> {
     const query = this.createQueryBuilder('sections');
     query.where('sections.section = :section', { section });
     query.andWhere('sections.language = :language', { language });
-    query.andWhere('sections.version = :version', { version });
+    // query.andWhere('sections.version = :version', { version });
 
     try {
       const sections = await query.getMany();
@@ -90,7 +90,8 @@ export class SectionsRepository extends Repository<Sections> {
     lg.createAt = new Date(moment().format('YYYY-MM-DD HH:mm:ss'));
     lg.language = language;
     lg.userId = user.id;
-    lg.version = version + 1;
+    lg.version = 1;
+    // lg.version = version + 1;
 
     try {
       await lg.save();
