@@ -11,6 +11,7 @@ import {
   UserModule,
   UploadModule,
 } from './app';
+import { SpeedToTextModule } from './app/speed-to-text';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import {
     AdminSectionsModule,
     SectionsModule,
     UploadModule,
+    SpeedToTextModule,
   ],
 
   providers: [
