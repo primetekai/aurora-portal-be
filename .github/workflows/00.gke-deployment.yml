@@ -24,6 +24,8 @@ on:
         required: true
       SERVER_USER:
         required: true
+      NODE_APP_OPENAI_API_KEY:
+        required: true
 
 env:
   IMAGE: ${{ inputs.IMAGE }}
@@ -35,6 +37,7 @@ env:
   SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
   SERVER_IP: ${{ secrets.SERVER_IP }}
   SERVER_USER: ${{ secrets.SERVER_USER }}
+  NODE_APP_OPENAI_API_KEY: ${{ secrets.NODE_APP_OPENAI_API_KEY }}
   GITHUB_SHA: ${{ github.sha }}
 
 jobs:
@@ -84,6 +87,7 @@ jobs:
             docker stop $IMAGE || true
             docker rm $IMAGE || true
             docker run -d -p ${PORT}:4000 \
+              -e NODE_APP_OPENAI_API_KEY='${NODE_APP_OPENAI_API_KEY}' \
               -v /home/ubuntu/cybertech_web/cbtcdn:/home/ubuntu/cbtcdn \
               --name $IMAGE $HARBOR_URL/$HARBOR_USERNAME/$IMAGE:$GITHUB_SHA
           "

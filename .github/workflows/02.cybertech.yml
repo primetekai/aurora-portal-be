@@ -35,3 +35,4 @@ jobs:
       SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
       SERVER_IP: ${{ secrets.SERVER_IP }}
       SERVER_USER: ${{ secrets.SERVER_USER }}
+      NODE_APP_OPENAI_API_KEY: ${{ secrets.NODE_APP_OPENAI_API_KEY }}
