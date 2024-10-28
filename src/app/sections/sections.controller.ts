@@ -1,15 +1,18 @@
-import { SectionsService } from './sections.service';
-import { HttpStatus, Logger, Query, Res } from '@nestjs/common';
 import {
   Body,
   Controller,
   Get,
   Post,
+  Put,
   Param,
+  Query,
   UsePipes,
   UseGuards,
+  Res,
+  HttpStatus,
+  Logger,
 } from '@nestjs/common';
-import { Sections } from './sections.entity';
+import { SectionsService } from './sections.service';
 import { AuthGuard } from '@nestjs/passport';
 import {
   ApiBearerAuth,
@@ -18,9 +21,9 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { UI_CONFIG_PATH } from 'src/config';
 import { GetUser, User } from '../user';
 import { Roles, RolesGuard, UserRole } from '../auth';
+import { UI_CONFIG_PATH } from 'src/config';
 
 @Controller(UI_CONFIG_PATH)
 @ApiTags('section')
@@ -28,6 +31,7 @@ export class SectionsController {
   private logger = new Logger('SectionsController');
 
   constructor(private sectionsService: SectionsService) {}
+
   @ApiBearerAuth()
   @UseGuards(AuthGuard(), RolesGuard)
   @Roles(UserRole.ADMIN)
@@ -43,7 +47,9 @@ export class SectionsController {
       const data = await this.sectionsService.getSections(user, language);
       return res.status(HttpStatus.OK).json(data);
     } catch (e) {
-      return e;
+      return res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json({ message: e.message });
     }
   }
 
@@ -70,7 +76,9 @@ export class SectionsController {
       );
       return res.status(HttpStatus.OK).json(data);
     } catch (e) {
-      return e;
+      return res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json({ message: e.message });
     }
   }
 
@@ -80,7 +88,7 @@ export class SectionsController {
   @ApiOperation({ summary: 'Create sections' })
   @ApiResponse({
     status: 201,
-    description: 'The sections has been successfully created.',
+    description: 'The sections have been successfully created.',
   })
   @Post('/:language')
   @ApiQuery({
@@ -90,15 +98,61 @@ export class SectionsController {
     required: true,
   })
   @UsePipes()
-  createSections(
+  async createSections(
     @Param('language') language: string,
     @Query('section') section: string,
     @GetUser() user: User,
     @Body() data: Record<string, any>,
-  ): Promise<Sections> {
-    this.logger.verbose(
-      `User "${user.username}" create a new sections. Data: ${JSON.stringify(data)}`,
-    );
-    return this.sectionsService.createSections(data, user, language, section);
+    @Res() res,
+  ) {
+    try {
+      const newSection = await this.sectionsService.createSections(
+        data,
+        user,
+        language,
+        section,
+      );
+      return res.status(HttpStatus.CREATED).json(newSection);
+    } catch (e) {
+      return res.status(HttpStatus.BAD_REQUEST).json({ message: e.message });
+    }
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard(), RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiOperation({ summary: 'Update section' })
+  @ApiResponse({
+    status: 200,
+    description: 'The section has been successfully updated.',
+  })
+  @Put('/:language')
+  @ApiQuery({
+    name: 'section',
+    type: String,
+    description: 'Section is required',
+    required: true,
+  })
+  @UsePipes()
+  async updateSections(
+    @Param('language') language: string,
+    @Query('section') section: string,
+    @GetUser() user: User,
+    @Body() data: Record<string, any>,
+    @Res() res,
+  ) {
+    try {
+      const updatedSection = await this.sectionsService.updateSections(
+        data,
+        user,
+        language,
+        section,
+      );
+      return res.status(HttpStatus.OK).json(updatedSection);
+    } catch (e) {
+      return res
+        .status(e.status || HttpStatus.INTERNAL_SERVER_ERROR)
+        .json({ message: e.message });
+    }
   }
 }

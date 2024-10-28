@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
 import { SectionsRepository } from './sections.repository';
 import { Sections } from './sections.entity';
 import { LanguagesService } from '../languages/languages.service';
@@ -10,9 +14,9 @@ export class SectionsService {
     private sectionsRepository: SectionsRepository,
     private languagesRepository: LanguagesService,
   ) {}
+
   async getSections(user: User, language: string): Promise<string[]> {
     const sections = await this.sectionsRepository.getSections(user, language);
-
     return [...new Set(sections.map((s) => s.section))];
   }
 
@@ -21,17 +25,10 @@ export class SectionsService {
     section: string,
     user: User,
   ): Promise<Record<string, any>> {
-    // const version = await this.sectionsRepository.getMaxVersion(
-    //   user,
-    //   language,
-    //   section,
-    // );
-
     const data = await this.sectionsRepository.getSectionsById(
       user,
       language,
       section,
-      1,
     );
     return data;
   }
@@ -42,18 +39,43 @@ export class SectionsService {
     language: string,
     section: string,
   ): Promise<Sections> {
-    // const version = await this.sectionsRepository.getMaxVersion(
-    //   user,
-    //   language,
-    //   section,
-    // );
+    const existingSection = await this.sectionsRepository.getSectionsById(
+      user,
+      language,
+      section,
+    );
+    if (existingSection) {
+      throw new BadRequestException(
+        `Section with language "${language}" and section "${section}" already exists.`,
+      );
+    }
 
     return this.sectionsRepository.createSections(
       data,
       user,
       language,
       section,
-      1,
     );
+  }
+
+  async updateSections(
+    data: Record<string, any>,
+    user: User,
+    language: string,
+    section: string,
+  ): Promise<Sections> {
+    const existingSection = await this.sectionsRepository.findOne({
+      where: { language, section },
+    });
+    if (!existingSection) {
+      throw new NotFoundException(
+        `Section with language "${language}" and section "${section}" not found.`,
+      );
+    }
+
+    existingSection.data = JSON.stringify(data);
+    await this.sectionsRepository.save(existingSection);
+
+    return existingSection;
   }
 }
