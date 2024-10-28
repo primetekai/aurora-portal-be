@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  BadRequestException,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { SectionsRepository } from './sections.repository';
 import { Sections } from './sections.entity';
 import { LanguagesService } from '../languages/languages.service';
@@ -33,32 +29,7 @@ export class SectionsService {
     return data;
   }
 
-  async createSections(
-    data: Record<string, any>,
-    user: User,
-    language: string,
-    section: string,
-  ): Promise<Sections> {
-    const existingSection = await this.sectionsRepository.getSectionsById(
-      user,
-      language,
-      section,
-    );
-    if (existingSection) {
-      throw new BadRequestException(
-        `Section with language "${language}" and section "${section}" already exists.`,
-      );
-    }
-
-    return this.sectionsRepository.createSections(
-      data,
-      user,
-      language,
-      section,
-    );
-  }
-
-  async updateSections(
+  async createOrUpdateSections(
     data: Record<string, any>,
     user: User,
     language: string,
@@ -67,15 +38,18 @@ export class SectionsService {
     const existingSection = await this.sectionsRepository.findOne({
       where: { language, section },
     });
-    if (!existingSection) {
-      throw new NotFoundException(
-        `Section with language "${language}" and section "${section}" not found.`,
+
+    if (existingSection) {
+      existingSection.data = JSON.stringify(data);
+      await this.sectionsRepository.save(existingSection);
+      return existingSection;
+    } else {
+      return this.sectionsRepository.createSections(
+        data,
+        user,
+        language,
+        section,
       );
     }
-
-    existingSection.data = JSON.stringify(data);
-    await this.sectionsRepository.save(existingSection);
-
-    return existingSection;
   }
 }

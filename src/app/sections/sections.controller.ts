@@ -3,7 +3,6 @@ import {
   Controller,
   Get,
   Post,
-  Put,
   Param,
   Query,
   UsePipes,
@@ -81,14 +80,13 @@ export class SectionsController {
         .json({ message: e.message });
     }
   }
-
   @ApiBearerAuth()
   @UseGuards(AuthGuard(), RolesGuard)
   @Roles(UserRole.ADMIN)
-  @ApiOperation({ summary: 'Create sections' })
+  @ApiOperation({ summary: 'Create or update sections' })
   @ApiResponse({
     status: 201,
-    description: 'The sections have been successfully created.',
+    description: 'The section has been successfully created or updated.',
   })
   @Post('/:language')
   @ApiQuery({
@@ -98,7 +96,7 @@ export class SectionsController {
     required: true,
   })
   @UsePipes()
-  async createSections(
+  async createOrUpdateSections(
     @Param('language') language: string,
     @Query('section') section: string,
     @GetUser() user: User,
@@ -106,52 +104,16 @@ export class SectionsController {
     @Res() res,
   ) {
     try {
-      const newSection = await this.sectionsService.createSections(
+      const sectionData = await this.sectionsService.createOrUpdateSections(
         data,
         user,
         language,
         section,
       );
-      return res.status(HttpStatus.CREATED).json(newSection);
-    } catch (e) {
-      return res.status(HttpStatus.BAD_REQUEST).json({ message: e.message });
-    }
-  }
-
-  @ApiBearerAuth()
-  @UseGuards(AuthGuard(), RolesGuard)
-  @Roles(UserRole.ADMIN)
-  @ApiOperation({ summary: 'Update section' })
-  @ApiResponse({
-    status: 200,
-    description: 'The section has been successfully updated.',
-  })
-  @Put('/:language')
-  @ApiQuery({
-    name: 'section',
-    type: String,
-    description: 'Section is required',
-    required: true,
-  })
-  @UsePipes()
-  async updateSections(
-    @Param('language') language: string,
-    @Query('section') section: string,
-    @GetUser() user: User,
-    @Body() data: Record<string, any>,
-    @Res() res,
-  ) {
-    try {
-      const updatedSection = await this.sectionsService.updateSections(
-        data,
-        user,
-        language,
-        section,
-      );
-      return res.status(HttpStatus.OK).json(updatedSection);
+      return res.status(HttpStatus.CREATED).json(sectionData);
     } catch (e) {
       return res
-        .status(e.status || HttpStatus.INTERNAL_SERVER_ERROR)
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
         .json({ message: e.message });
     }
   }
