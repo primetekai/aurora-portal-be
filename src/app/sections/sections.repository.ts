@@ -61,6 +61,7 @@ export class SectionsRepository extends Repository<Sections> {
     sectionEntity.createAt = new Date(moment().format('YYYY-MM-DD HH:mm:ss'));
     sectionEntity.language = language;
     sectionEntity.userId = user.id;
+    sectionEntity.version = 1;
 
     try {
       await sectionEntity.save();
