@@ -80,6 +80,13 @@ export class UploadService {
         return 'video/avi';
       case '.mkv':
         return 'video/mkv';
+      case '.pdf':
+        return 'application/pdf';
+      case '.doc':
+      case '.docx':
+        return 'application/msword';
+      case '.zip':
+        return 'application/zip';
       default:
         return 'application/octet-stream';
     }

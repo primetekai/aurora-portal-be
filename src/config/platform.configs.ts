@@ -23,11 +23,19 @@ const TYPE_VIDEO_FILE = process.env.NODE_APP_TYPE_VIDEO_FILE ?? [
   'video/avi',
   'video/mkv',
 ];
+const TYPE_FILE_FILE = [
+  'application/pdf',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'application/zip',
+];
+
 const MAX_SIZE_OF_IMAGE_FILE =
   process.env.NODE_APP_MAX_SIZE_OF_IMAGE_FILE ?? 2097152;
 const UPLOAD_FILE_PATH = process.env.NODE_APP_MAX_UPLOAD_FILE_PATH;
 const MAX_SIZE_OF_VIDEO_FILE =
   process.env.NODE_APP_MAX_SIZE_OF_VIDEO_FILE ?? 104857600;
+const MAX_SIZE_OF_FILE_FILE = 20971520;
 const OPENAI_API_KEY = process.env.NODE_APP_OPENAI_API_KEY;
 
 export {
@@ -45,9 +53,11 @@ export {
   EXPIRES_IN,
   SWAGGER,
   TYPE_IMAGE_FILE,
+  TYPE_FILE_FILE,
   MAX_SIZE_OF_IMAGE_FILE,
   UPLOAD_FILE_PATH,
   MAX_SIZE_OF_VIDEO_FILE,
   TYPE_VIDEO_FILE,
+  MAX_SIZE_OF_FILE_FILE,
   OPENAI_API_KEY,
 };
