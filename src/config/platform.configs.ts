@@ -23,7 +23,7 @@ const TYPE_VIDEO_FILE = process.env.NODE_APP_TYPE_VIDEO_FILE ?? [
   'video/avi',
   'video/mkv',
 ];
-const TYPE_FILE_FILE = [
+const TYPE_FILE_FILE = process.env.NODE_APP_TYPE_FILE_FILE ?? [
   'application/pdf',
   'application/msword',
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
