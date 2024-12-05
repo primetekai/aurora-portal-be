@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-import { join } from 'path';
+import { extname, join } from 'path';
 import { v4 as uuidv4 } from 'uuid';
 
 export const checkAndRemoveFileNameExist = (
@@ -18,7 +18,7 @@ export const checkAndRemoveFileNameExist = (
       uniqueFileName = fileName;
     }
   } else {
-    uniqueFileName = `${uuidv4()}-${fileNameRoot}`;
+    uniqueFileName = `${uuidv4()}${extname(fileNameRoot)}`;
   }
   return uniqueFileName;
 };

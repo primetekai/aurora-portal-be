@@ -7,7 +7,7 @@ on:
         default: 'OK'
         required: true
 env:
-  IMAGE: cybertech-be
+  IMAGE: cybertech-be-node
   DOT_ENV_FILE_NAME: .env.cybertech
   PORT: 4100
 jobs:
@@ -21,9 +21,9 @@ jobs:
     steps:
       - name: Echo
         run: echo prepare variable
-  cybertech-be:
+  cybertech-be-node:
     needs: variables
-    name: deploy cybertech-be
+    name: deploy cybertech-be-node
     uses: ./.github/workflows/00.gke-deployment.yml
     with:
       IMAGE: ${{ needs.variables.outputs.IMAGE }}

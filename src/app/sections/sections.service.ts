@@ -10,9 +10,9 @@ export class SectionsService {
     private sectionsRepository: SectionsRepository,
     private languagesRepository: LanguagesService,
   ) {}
+
   async getSections(user: User, language: string): Promise<string[]> {
     const sections = await this.sectionsRepository.getSections(user, language);
-
     return [...new Set(sections.map((s) => s.section))];
   }
 
@@ -21,39 +21,35 @@ export class SectionsService {
     section: string,
     user: User,
   ): Promise<Record<string, any>> {
-    const version = await this.sectionsRepository.getMaxVersion(
-      user,
-      language,
-      section,
-    );
-
     const data = await this.sectionsRepository.getSectionsById(
       user,
       language,
       section,
-      version,
     );
     return data;
   }
 
-  async createSections(
+  async createOrUpdateSections(
     data: Record<string, any>,
     user: User,
     language: string,
     section: string,
   ): Promise<Sections> {
-    const version = await this.sectionsRepository.getMaxVersion(
-      user,
-      language,
-      section,
-    );
+    const existingSection = await this.sectionsRepository.findOne({
+      where: { language, section },
+    });
 
-    return this.sectionsRepository.createSections(
-      data,
-      user,
-      language,
-      section,
-      version,
-    );
+    if (existingSection) {
+      existingSection.data = JSON.stringify(data);
+      await this.sectionsRepository.save(existingSection);
+      return existingSection;
+    } else {
+      return this.sectionsRepository.createSections(
+        data,
+        user,
+        language,
+        section,
+      );
+    }
   }
 }
