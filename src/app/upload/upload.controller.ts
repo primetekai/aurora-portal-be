@@ -28,8 +28,10 @@ import {
   CBT_CDN,
   MAX_SIZE_OF_IMAGE_FILE,
   MAX_SIZE_OF_VIDEO_FILE,
+  MAX_SIZE_OF_FILE_FILE,
   TYPE_IMAGE_FILE,
   TYPE_VIDEO_FILE,
+  TYPE_FILE_FILE,
 } from 'src/config';
 import { Roles, RolesGuard, UserRole } from '../auth';
 import { UploadService } from './upload.service';
@@ -46,7 +48,7 @@ export class UploadController {
   @UseGuards(AuthGuard(), RolesGuard)
   @Roles(UserRole.ADMIN)
   @Post('upload')
-  @ApiOperation({ summary: 'Upload a file (image or video)' })
+  @ApiOperation({ summary: 'Upload a file (image, video, or document)' })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     type: UploadFileDto,
@@ -60,8 +62,8 @@ export class UploadController {
   @ApiQuery({
     name: 'fileType',
     type: String,
-    description: 'Type of the file to upload (image or video)',
-    enum: ['image', 'video'],
+    description: 'Type of the file to upload (image, video, or file)',
+    enum: ['image', 'video', 'file'],
     required: false,
   })
   @ApiResponse({ status: 201, description: 'File uploaded successfully' })
@@ -69,7 +71,7 @@ export class UploadController {
   async uploadFile(
     @UploadedFile() file: Express.Multer.File,
     @Query('fileName') fileName: string,
-    @Query('fileType') fileType: 'image' | 'video' = 'image',
+    @Query('fileType') fileType: 'image' | 'video' | 'file' = 'image',
     @Res() res,
   ) {
     try {
@@ -98,6 +100,18 @@ export class UploadController {
         if (!TYPE_VIDEO_FILE.includes(file.mimetype))
           throw new HttpException(
             'Unsupported video type',
+            HttpStatus.UNSUPPORTED_MEDIA_TYPE,
+          );
+      } else if (fileType === 'file') {
+        if (file.size > Number(MAX_SIZE_OF_FILE_FILE))
+          throw new HttpException(
+            'File size is too large',
+            HttpStatus.PAYLOAD_TOO_LARGE,
+          );
+
+        if (!TYPE_FILE_FILE.includes(file.mimetype))
+          throw new HttpException(
+            'Unsupported file type',
             HttpStatus.UNSUPPORTED_MEDIA_TYPE,
           );
       } else {
