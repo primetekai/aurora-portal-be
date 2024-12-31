@@ -1,4 +1,4 @@
-name: 02.cybertech
+name: 02.primetek
 on:
   workflow_dispatch:
     inputs:
@@ -7,8 +7,8 @@ on:
         default: 'OK'
         required: true
 env:
-  IMAGE: cybertech-be-node
-  DOT_ENV_FILE_NAME: .env.cybertech
+  IMAGE: primetek-be-web
+  DOT_ENV_FILE_NAME: .env.primetek
   PORT: 4100
 jobs:
   variables:
