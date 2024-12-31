@@ -1,7 +1,7 @@
 const COMMON_SERVICE = '/common';
 const ACCOUNT_SERVICE = '/account';
 const PAYMENT_SERVICE = '/payment';
-const CBT_CDN = '/cbtcdn';
+const CBT_CDN = '/cdn';
 const AI_SERVICE = '/genai';
 
 export {
