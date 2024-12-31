@@ -88,6 +88,6 @@ jobs:
             docker rm $IMAGE || true &&
             docker run -d -p ${PORT}:4000 \
               -e NODE_APP_OPENAI_API_KEY='${NODE_APP_OPENAI_API_KEY}' \
-              -v /home/ubuntu/cybertech_web/cbtcdn:/home/ubuntu/cbtcdn \
+              -v /home/ubuntu/resource-web/cbtcdn:/home/ubuntu/cbtcdn \
               --name $IMAGE $HARBOR_URL/$HARBOR_USERNAME/$IMAGE:$GITHUB_SHA
           "
