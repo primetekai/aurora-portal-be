@@ -83,10 +83,10 @@ jobs:
       - name: Deploy
         run: |
           ssh -o StrictHostKeyChecking=no -p 774 $SERVER_USER@$SERVER_IP "
-            docker pull $HARBOR_URL/$HARBOR_USERNAME/$IMAGE:$GITHUB_SHA &&
-            docker stop $IMAGE || true &&
-            docker rm $IMAGE || true &&
-            docker run -d -p ${PORT}:4000 \
+            podman pull $HARBOR_URL/$HARBOR_USERNAME/$IMAGE:$GITHUB_SHA &&
+            podman stop $IMAGE || true &&
+            podman rm $IMAGE || true &&
+            podman run -d -p ${PORT}:4000 \
               -e NODE_APP_OPENAI_API_KEY='${NODE_APP_OPENAI_API_KEY}' \
               -v /home/ubuntu/resource-web/cdn:/home/ubuntu/cdn \
               --name $IMAGE $HARBOR_URL/$HARBOR_USERNAME/$IMAGE:$GITHUB_SHA
