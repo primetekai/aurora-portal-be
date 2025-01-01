@@ -9,4 +9,4 @@ services:
     ports:
       - 4000:4000
     volumes:
-      - /home/ubuntu/cybertech_web/cbtcdn:/home/ubuntu/cbtcdn
+      - /home/primetek/resource-web/cdn:/home/ubuntu/cdn

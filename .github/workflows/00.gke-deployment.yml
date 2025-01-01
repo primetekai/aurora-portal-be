@@ -88,6 +88,6 @@ jobs:
             podman rm $IMAGE || true &&
             podman run -d -p ${PORT}:4000 \
               -e NODE_APP_OPENAI_API_KEY='${NODE_APP_OPENAI_API_KEY}' \
-              -v /home/ubuntu/resource-web/cdn:/home/ubuntu/cdn \
+              -v /home/primetek/resource-web/cdn:/home/ubuntu/cdn \
               --name $IMAGE $HARBOR_URL/$HARBOR_USERNAME/$IMAGE:$GITHUB_SHA
           "
