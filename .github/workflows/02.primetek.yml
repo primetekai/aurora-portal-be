@@ -7,7 +7,7 @@ on:
         default: 'OK'
         required: true
 env:
-  IMAGE: primetek-be-web
+  IMAGE: api-web
   DOT_ENV_FILE_NAME: .env.primetek
   PORT: 4100
 jobs:
@@ -21,9 +21,9 @@ jobs:
     steps:
       - name: Echo
         run: echo prepare variable
-  cybertech-be-node:
+  api-web:
     needs: variables
-    name: deploy cybertech-be-node
+    name: deploy api-web
     uses: ./.github/workflows/00.gke-deployment.yml
     with:
       IMAGE: ${{ needs.variables.outputs.IMAGE }}
