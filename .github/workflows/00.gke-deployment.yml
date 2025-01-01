@@ -82,7 +82,7 @@ jobs:
 
       - name: Deploy
         run: |
-          ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "
+          ssh -o StrictHostKeyChecking=no -p 774 $SERVER_USER@$SERVER_IP "
             docker pull $HARBOR_URL/$HARBOR_USERNAME/$IMAGE:$GITHUB_SHA &&
             docker stop $IMAGE || true &&
             docker rm $IMAGE || true &&
