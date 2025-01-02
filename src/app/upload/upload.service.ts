@@ -57,7 +57,7 @@ export class UploadService {
       throw new Error('Could not save the file');
     }
 
-    const fileUrl = `http://${HOST_NAME}${CBT_CDN}/${uniqueFileName}`;
+    const fileUrl = `https://${HOST_NAME}${CBT_CDN}/${uniqueFileName}`;
 
     this.logger.log(`File uploaded successfully: ${fileUrl}`);
     return fileUrl;
