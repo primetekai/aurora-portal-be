@@ -239,16 +239,17 @@ export class CrawlController {
       });
 
       const page = await browser.newPage();
+
       await page.setUserAgent(
         'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36',
       );
 
-      if (source === 'facebook') {
-        await this.safeGoto(page, url, {
-          waitUntil: 'networkidle0',
-          timeout: 10000,
-        });
+      await this.safeGoto(page, url, {
+        waitUntil: 'networkidle0',
+        timeout: 10000,
+      });
 
+      if (source === 'facebook') {
         const closeButtonSelector = 'div[aria-label="Close"][role="button"]';
 
         await page.waitForSelector(closeButtonSelector, { visible: true });
@@ -261,28 +262,24 @@ export class CrawlController {
             popup.remove();
           }
         });
-
-        await new Promise((resolve) => setTimeout(resolve, 100));
       } else if (source === 'tiktok') {
-        await this.safeGoto(page, url, {
-          waitUntil: 'networkidle0',
-          timeout: 10000,
-        });
-
         const closeButtonSelector = 'button[aria-label="Close"][role="button"]';
 
         await page.waitForSelector(closeButtonSelector, { visible: true });
 
         await page.click(closeButtonSelector);
-
-        await new Promise((resolve) => setTimeout(resolve, 100));
-      } else {
-        await this.safeGoto(page, url, {
-          waitUntil: 'networkidle0',
-          timeout: 10000,
+      } else if (source === 'x') {
+        await page.evaluate(() => {
+          const popup = document.querySelector(
+            'div.css-175oi2r.r-12vffkv[style*="position: absolute; bottom: 0px; width: 100%;"]',
+          );
+          if (popup) {
+            popup.remove();
+          }
         });
-        await new Promise((resolve) => setTimeout(resolve, 100));
       }
+
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       const base64Image: string = await page.screenshot({
         fullPage: true,
