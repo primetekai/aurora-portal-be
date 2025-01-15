@@ -263,6 +263,11 @@ export class CrawlController {
           }
         });
       } else if (source === 'tiktok') {
+        await this.safeGoto(page, url, {
+          waitUntil: 'networkidle0',
+          timeout: 30000,
+        });
+
         const closeButtonSelector = 'button[aria-label="Close"][role="button"]';
 
         await page.waitForSelector(closeButtonSelector, { visible: true });
