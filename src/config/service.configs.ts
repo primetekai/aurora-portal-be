@@ -3,6 +3,7 @@ const ACCOUNT_SERVICE = '/account';
 const PAYMENT_SERVICE = '/payment';
 const CBT_CDN = '/cdn';
 const AI_SERVICE = '/genai';
+const CRAWL_SERVICE = '/crawl';
 
 export {
   COMMON_SERVICE,
@@ -10,4 +11,5 @@ export {
   PAYMENT_SERVICE,
   CBT_CDN,
   AI_SERVICE,
+  CRAWL_SERVICE,
 };

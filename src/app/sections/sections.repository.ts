@@ -2,7 +2,7 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
 import { Sections } from './sections.entity';
 import { Logger } from '@nestjs/common/services/logger.service';
-import * as moment from 'moment';
+import moment from 'moment';
 import { User } from '../user';
 
 @Injectable()

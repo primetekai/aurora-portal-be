@@ -12,6 +12,7 @@ import {
   UploadModule,
 } from './app';
 import { SpeedToTextModule } from './app/speed-to-text';
+import { CrawlModule } from './app/crawl';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { SpeedToTextModule } from './app/speed-to-text';
     SectionsModule,
     UploadModule,
     SpeedToTextModule,
+    CrawlModule,
   ],
 
   providers: [
