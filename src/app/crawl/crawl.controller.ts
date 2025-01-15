@@ -223,6 +223,7 @@ export class CrawlController {
     try {
       const browser = await puppeteer.launch({
         headless: true,
+        executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
         args: [
           '--no-sandbox',
           '--disable-setuid-sandbox',
@@ -230,6 +231,10 @@ export class CrawlController {
           '--disable-web-security',
           '--disable-features=IsolateOrigins',
           '--ignore-certificate-errors',
+          '--disable-gpu',
+          '--no-first-run',
+          '--no-zygote',
+          '--single-process',
         ],
       });
 
