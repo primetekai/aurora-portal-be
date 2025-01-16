@@ -13,7 +13,7 @@ import { CRAWL_SERVICE } from 'src/config';
 import { Response } from 'express';
 import puppeteer from 'puppeteer-extra';
 import { default as StealthPlugin } from 'puppeteer-extra-plugin-stealth';
-import type { Page, WaitForOptions } from 'puppeteer';
+import type { Browser, Page, WaitForOptions } from 'puppeteer';
 
 puppeteer.use(StealthPlugin());
 
@@ -220,8 +220,10 @@ export class CrawlController {
     @Query('source') source: string,
     @Res() res: Response,
   ) {
+    let browser: Browser | null = null;
+
     try {
-      const browser = await puppeteer.launch({
+      browser = await puppeteer.launch({
         headless: true,
         executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
         args: [
@@ -301,6 +303,12 @@ export class CrawlController {
         'Failed to generate screenshot',
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
+    } finally {
+      if (browser) {
+        await browser.close().catch((err) => {
+          console.error('Error closing browser:', err.message);
+        });
+      }
     }
   }
 
