@@ -1,4 +1,4 @@
-name: 01.develop
+name: 01.druce-portal-be
 on:
   workflow_dispatch:
     inputs:
@@ -7,9 +7,9 @@ on:
         default: 'OK'
         required: true
 env:
-  IMAGE: be-app
-  DOT_ENV_FILE_NAME: .env.develop
-  PORT: 4000
+  IMAGE: druce-portal-be
+  DOT_ENV_FILE_NAME: .env.druce-portal
+  PORT: 5000
 jobs:
   variables:
     name: setup variable
@@ -21,9 +21,9 @@ jobs:
     steps:
       - name: Echo
         run: echo prepare variable
-  be-app:
+  druce-portal-be:
     needs: variables
-    name: deploy be-app
+    name: deploy druce-portal-be
     uses: ./.github/workflows/00.gke-deployment.yml
     with:
       IMAGE: ${{ needs.variables.outputs.IMAGE }}
@@ -36,4 +36,7 @@ jobs:
       SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
       SERVER_IP: ${{ secrets.SERVER_IP }}
       SERVER_USER: ${{ secrets.SERVER_USER }}
-      NODE_APP_OPENAI_API_KEY: ${{ secrets.NODE_APP_OPENAI_API_KEY }}
+      NODE_APP_DB_PASSWORD: ${{ secrets.NODE_APP_DB_PASSWORD }}
+      NODE_APP_DB_USERNAME: ${{ secrets.NODE_APP_DB_USERNAME }}
+      NODE_APP_DB_HOSTNAME: ${{ secrets.NODE_APP_DB_HOSTNAME }}
+      NODE_APP_DB_PORT: ${{ secrets.NODE_APP_DB_PORT }}

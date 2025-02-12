@@ -24,7 +24,13 @@ on:
         required: true
       SERVER_USER:
         required: true
-      NODE_APP_OPENAI_API_KEY:
+      NODE_APP_DB_PASSWORD:
+        required: true
+      NODE_APP_DB_USERNAME:
+        required: true
+      NODE_APP_DB_HOSTNAME:
+        required: true
+      NODE_APP_DB_PORT:
         required: true
 
 env:
@@ -37,7 +43,10 @@ env:
   SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
   SERVER_IP: ${{ secrets.SERVER_IP }}
   SERVER_USER: ${{ secrets.SERVER_USER }}
-  NODE_APP_OPENAI_API_KEY: ${{ secrets.NODE_APP_OPENAI_API_KEY }}
+  NODE_APP_DB_PASSWORD: ${{ secrets.NODE_APP_DB_PASSWORD }}
+  NODE_APP_DB_USERNAME: ${{ secrets.NODE_APP_DB_USERNAME }}
+  NODE_APP_DB_HOSTNAME: ${{ secrets.NODE_APP_DB_HOSTNAME }}
+  NODE_APP_DB_PORT: ${{ secrets.NODE_APP_DB_PORT }}
   GITHUB_SHA: ${{ github.sha }}
 
 jobs:
@@ -87,7 +96,10 @@ jobs:
             podman stop $IMAGE || true &&
             podman rm $IMAGE || true &&
             podman run -d -p ${PORT}:4000 \
-              -e NODE_APP_OPENAI_API_KEY='${NODE_APP_OPENAI_API_KEY}' \
+              -e NODE_APP_DB_PORT='${NODE_APP_DB_PORT}' \
+              -e NODE_APP_DB_PASSWORD='${NODE_APP_DB_PASSWORD}' \
+              -e NODE_APP_DB_HOSTNAME='${NODE_APP_DB_HOSTNAME}' \
+              -e NODE_APP_DB_USERNAME='${NODE_APP_DB_USERNAME}' \
               -v /home/primetek/resource-web/cdn:/home/ubuntu/cdn \
               --name $IMAGE $HARBOR_URL/$HARBOR_USERNAME/$IMAGE:$GITHUB_SHA
           "

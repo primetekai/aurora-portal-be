@@ -9,10 +9,7 @@ import {
   AdminSectionsModule,
   SectionsModule,
   UserModule,
-  UploadModule,
 } from './app';
-import { SpeedToTextModule } from './app/speed-to-text';
-import { CrawlModule } from './app/crawl';
 
 @Module({
   imports: [
@@ -22,9 +19,9 @@ import { CrawlModule } from './app/crawl';
     LanguagesModule,
     AdminSectionsModule,
     SectionsModule,
-    UploadModule,
-    SpeedToTextModule,
-    CrawlModule,
+    // UploadModule,
+    // SpeedToTextModule,
+    // CrawlModule,
   ],
 
   providers: [
