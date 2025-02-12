@@ -9,6 +9,7 @@ import {
   HttpStatus,
   Res,
   Param,
+  Patch,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -25,6 +26,7 @@ import {
   AdminAuthSignUpCredentialsDto,
   AuthUserSignInCredentialsDto,
   AuthUserSignUpCredentialsDto,
+  ChangePasswordDto,
 } from './dto';
 import { UserRole } from './enum';
 import { GetUser, User } from '../user';
@@ -154,5 +156,18 @@ export class AuthController {
     } catch (e) {
       return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(e);
     }
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard(), RolesGuard)
+  @Roles(UserRole.USER)
+  @ApiOperation({ summary: 'Change password' })
+  @ApiResponse({ status: 200, description: 'Change password' })
+  @Patch('/change-password')
+  async changePassword(
+    @GetUser() user: User,
+    @Body(ValidationPipe) changePasswordDto: ChangePasswordDto,
+  ): Promise<{ message: string }> {
+    return this.authService.changePassword(user, changePasswordDto);
   }
 }

@@ -6,8 +6,10 @@ import { JwtPayload } from './jwt';
 import {
   AuthUserSignInCredentialsDto,
   AuthUserSignUpCredentialsDto,
+  ChangePasswordDto,
 } from './dto';
 import { UserRole } from './enum';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -62,5 +64,22 @@ export class AuthService {
   ): Promise<Record<string, any>> {
     const data = await this.userRepository.getUserById(id, role);
     return data;
+  }
+
+  async changePassword(
+    user: User,
+    changePasswordDto: ChangePasswordDto,
+  ): Promise<{ message: string }> {
+    const { currentPassword, newPassword } = changePasswordDto;
+
+    if (!(await user.validatePassword(currentPassword))) {
+      throw new UnauthorizedException('Current password is incorrect');
+    }
+
+    user.salt = await bcrypt.genSalt();
+    user.password = await bcrypt.hash(newPassword, user.salt);
+
+    await this.userRepository.save(user);
+    return { message: 'Password changed successfully' };
   }
 }
