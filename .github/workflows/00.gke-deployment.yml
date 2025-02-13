@@ -66,7 +66,13 @@ jobs:
           node-version: ${{ matrix.node-version }}
 
       - name: Prepare dotenv
-        run: rm -rf .env && mv $DOT_ENV_FILE_NAME .env
+        run: |
+          rm -rf .env
+          echo "NODE_APP_DB_USERNAME=$NODE_APP_DB_USERNAME" >> .env
+          echo "NODE_APP_DB_PORT=$NODE_APP_DB_PORT" >> .env
+          echo "NODE_APP_DB_PASSWORD=$NODE_APP_DB_PASSWORD" >> .env
+          echo "NODE_APP_DB_HOSTNAME=$NODE_APP_DB_HOSTNAME" >> .env
+          cat $DOT_ENV_FILE_NAME >> .env
 
       - name: Install Docker Compose
         run: |
@@ -96,10 +102,6 @@ jobs:
             podman stop $IMAGE || true &&
             podman rm $IMAGE || true &&
             podman run -d -p ${PORT}:4000 \
-              -e NODE_APP_DB_PORT='${NODE_APP_DB_PORT}' \
-              -e NODE_APP_DB_PASSWORD='${NODE_APP_DB_PASSWORD}' \
-              -e NODE_APP_DB_HOSTNAME='${NODE_APP_DB_HOSTNAME}' \
-              -e NODE_APP_DB_USERNAME='${NODE_APP_DB_USERNAME}' \
               -v /home/primetek/resource-web/cdn:/home/ubuntu/cdn \
               --name $IMAGE $HARBOR_URL/$HARBOR_USERNAME/$IMAGE:$GITHUB_SHA
           "
