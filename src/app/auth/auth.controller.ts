@@ -10,6 +10,7 @@ import {
   Res,
   Param,
   Patch,
+  Logger,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -36,6 +37,9 @@ import { RolesGuard, Roles } from './role';
 @ApiTags('account')
 export class AuthController {
   constructor(private authService: AuthService) {}
+
+  private logger = new Logger('User auth');
+
   // ADMIN LOGIN
   @ApiOperation({ summary: 'Signup admin' })
   @Post('/signup')
@@ -64,6 +68,50 @@ export class AuthController {
     @Body(ValidationPipe) authCredentialsDto: AuthUserSignUpCredentialsDto,
   ): Promise<void> {
     return this.authService.signUp(authCredentialsDto, UserRole.USER);
+  }
+
+  @Post('/signup/json')
+  async signUpBatch(
+    @Body(ValidationPipe) authCredentialsArray: AuthUserSignUpCredentialsDto[],
+  ): Promise<any> {
+    if (
+      !Array.isArray(authCredentialsArray) ||
+      authCredentialsArray.length === 0
+    ) {
+      throw new Error('Invalid input data. Expected a JSON array.');
+    }
+
+    this.logger.log(
+      `📢 Received ${authCredentialsArray.length} users for registration...`,
+    );
+
+    const results = [];
+
+    for (const authCredentialsDto of authCredentialsArray) {
+      try {
+        await this.authService.signUp(authCredentialsDto, UserRole.USER);
+        results.push({ email: authCredentialsDto.email, status: '✅ Success' });
+
+        this.logger.log(
+          `✅ Registration successful: ${authCredentialsDto.email}`,
+        );
+
+        // Wait 1 second between each request to prevent server overload
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+      } catch (error) {
+        this.logger.error(
+          `❌ Registration failed for ${authCredentialsDto.email}:`,
+          error.message,
+        );
+        results.push({
+          email: authCredentialsDto.email,
+          status: '❌ Failed',
+          error: error.message,
+        });
+      }
+    }
+
+    return { message: 'Batch registration completed', results };
   }
 
   @ApiOperation({ summary: 'Signin user' })
