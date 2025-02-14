@@ -3,14 +3,14 @@ import { IsString, MinLength, MaxLength } from 'class-validator';
 
 export class ChangePasswordDto {
   @IsString()
-  @MinLength(6)
-  @MaxLength(20)
+  @MinLength(4)
+  @MaxLength(100)
   @ApiProperty({ default: '*******', required: true })
   currentPassword: string;
 
   @IsString()
-  @MinLength(6)
-  @MaxLength(20)
+  @MinLength(4)
+  @MaxLength(100)
   @ApiProperty({ default: '*******', required: true })
   newPassword: string;
 }

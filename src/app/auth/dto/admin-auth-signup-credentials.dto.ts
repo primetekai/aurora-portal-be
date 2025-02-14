@@ -10,7 +10,7 @@ import {
 export class AdminAuthSignUpCredentialsDto {
   @IsString()
   @MinLength(4)
-  @MaxLength(20)
+  @MaxLength(100)
   @ApiProperty({ default: 'mao123', required: true })
   username: string;
 
@@ -18,9 +18,15 @@ export class AdminAuthSignUpCredentialsDto {
   @IsEmail()
   email: string;
 
+  @ApiProperty({ default: 'mao123', required: true })
   @IsString()
   @MinLength(4)
-  @MaxLength(20)
+  @MaxLength(100)
+  fullName: string;
+
+  @IsString()
+  @MinLength(4)
+  @MaxLength(100)
   @Matches(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
     message: 'Password to weak',
   })
