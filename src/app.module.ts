@@ -10,6 +10,7 @@ import {
   SectionsModule,
   UserModule,
 } from './app';
+import { CrawlModule } from './crawl';
 
 @Module({
   imports: [
@@ -19,9 +20,9 @@ import {
     LanguagesModule,
     AdminSectionsModule,
     SectionsModule,
+    CrawlModule,
     // UploadModule,
     // SpeedToTextModule,
-    // CrawlModule,
   ],
 
   providers: [
