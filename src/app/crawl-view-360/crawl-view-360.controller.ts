@@ -48,9 +48,9 @@ export class CrawlController {
       res.set({ 'Content-Type': 'application/json' });
       return res.json({ base64: `data:image/png;base64,${base64Image}` });
     } catch (error) {
-      console.error('Error generating screenshot:', error);
+      console.error('❌ Lỗi khi tạo ảnh chụp màn hình:', error);
       throw new HttpException(
-        'Failed to generate screenshot',
+        'Không thể tạo ảnh chụp màn hình',
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
@@ -60,19 +60,19 @@ export class CrawlController {
   @ApiQuery({
     name: 'location',
     required: true,
-    description: 'Location for the 360-degree view',
+    description: 'Vị trí muốn chụp ảnh 360 độ',
   })
   @ApiResponse({
     status: 200,
-    description: 'Returns a base64-encoded image of the requested location',
+    description: 'Trả về URL của video 360 từ MinIO',
   })
   @ApiResponse({
     status: 400,
-    description: 'Invalid location provided!',
+    description: 'Vị trí không hợp lệ!',
   })
   @ApiResponse({
     status: 500,
-    description: 'Failed to capture the image',
+    description: 'Lỗi trong quá trình chụp ảnh',
   })
   async generateImage360(
     @Query('location') location: string,
@@ -80,21 +80,32 @@ export class CrawlController {
   ) {
     if (!location) {
       throw new HttpException(
-        'Location parameter is required!',
+        '❌ Thiếu tham số location!',
         HttpStatus.BAD_REQUEST,
       );
     }
 
     try {
-      const base64Image =
-        await this.crawlService.crawlCaptureGoogleEarth(location);
+      console.log(`🌍 Bắt đầu chụp ảnh 360 độ tại vị trí: ${location}`);
+
+      // 📌 Lấy đường link tải video từ MinIO
+      const result = await this.crawlService.crawlCaptureGoogleEarth(location);
+
+      if (!result || !result.downloadUrl) {
+        throw new Error('Lỗi khi tải video lên MinIO');
+      }
+
+      console.log(`✅ Video đã tải lên MinIO: ${result.downloadUrl}`);
 
       res.set({ 'Content-Type': 'application/json' });
-      return res.json({ base64: `data:image/png;base64,${base64Image}` });
+      return res.json({
+        message: '✅ Thành công!',
+        downloadUrl: result.downloadUrl, // Trả về URL video từ MinIO
+      });
     } catch (error) {
-      console.error('❌ Error capturing Google Earth screenshot:', error);
+      console.error('❌ Lỗi khi chụp ảnh Google Earth 360:', error);
       throw new HttpException(
-        'Failed to generate the screenshot',
+        'Không thể tạo video 360 độ',
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
