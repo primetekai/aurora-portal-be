@@ -1,6 +1,6 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
-import { Crawl } from './crawl.entity';
+import { Crawl } from './crawl-view-360.entity';
 import { Logger } from '@nestjs/common/services/logger.service';
 import moment from 'moment';
 

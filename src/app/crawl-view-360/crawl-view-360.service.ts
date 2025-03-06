@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { CrawlRepository } from './crawl.repository';
-import { Crawl } from './crawl.entity';
+import { CrawlRepository } from './crawl-view-360.repository';
+import { Crawl } from './crawl-view-360.entity';
 import { captureGoogleEarth, crawlSnapShotScreenWebService } from './service';
 
 @Injectable()

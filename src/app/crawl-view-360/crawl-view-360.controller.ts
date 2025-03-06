@@ -7,10 +7,11 @@ import {
   Query,
   HttpException,
 } from '@nestjs/common';
-import { CrawlService } from './crawl.service';
+import { CrawlService } from './crawl-view-360.service';
 import { ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CRAWL_SERVICE } from 'src/config';
 import { Response } from 'express';
+
 @Controller(CRAWL_SERVICE)
 @ApiTags('crawl')
 export class CrawlController {

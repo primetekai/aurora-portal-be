@@ -9,9 +9,10 @@ import {
   AdminSectionsModule,
   SectionsModule,
   UserModule,
+  CrawlModule,
+  KSplatModule,
 } from './app';
-import { CrawlModule } from './crawl';
-
+ 
 @Module({
   imports: [
     TypeOrmModule.forRoot(typeOrmConfig),
@@ -21,6 +22,7 @@ import { CrawlModule } from './crawl';
     AdminSectionsModule,
     SectionsModule,
     CrawlModule,
+    KSplatModule,
     // UploadModule,
     // SpeedToTextModule,
   ],
