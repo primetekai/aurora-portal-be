@@ -62,7 +62,8 @@ export const captureGoogleEarth = async (location: string): Promise<string> => {
 
     await delay(1000);
 
-    await clickMultipleTimes(page, 1884, 1014, 4);
+    await clickMultipleTimes(page, 1884, 1014, 3);
+
     await delay(1000);
 
     await delay(1000);
