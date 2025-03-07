@@ -20,32 +20,32 @@ export class ConvertService {
   async convertToKsplat(inputFile: string): Promise<string> {
     if (!fs.existsSync(inputFile)) {
       throw new InternalServerErrorException(
-        `❌ File does not exist: ${inputFile}`,
+        `❌ File không tồn tại: ${inputFile}`,
       );
     }
 
-    // 📝 Output file path
+    // 📝 Đường dẫn file đầu ra
     const outputFile = path.join(
       this.sectionFolder,
       path.basename(inputFile).replace(/\.(ply|splat)$/, '.ksplat'),
     );
 
     try {
-      console.log(`🚀 Converting file: ${inputFile} ➝ ${outputFile}`);
+      console.log(`🚀 Đang chuyển đổi file: ${inputFile} ➝ ${outputFile}`);
 
-      // ✅ Call CreateKSplatService to convert the file
+      // ✅ Gọi CreateKSplatService để chuyển đổi file
       await this.createKSplatService.convertToKSplat(inputFile, outputFile);
 
-      console.log(`✅ Conversion successful: ${outputFile}`);
+      console.log(`✅ Chuyển đổi thành công: ${outputFile}`);
 
-      // 🗑️ Delete the original file after conversion
+      // 🗑️ Xóa file gốc sau khi convert
       fs.unlinkSync(inputFile);
 
       return outputFile;
     } catch (error) {
-      console.error(`❌ Conversion error: ${error.message}`);
+      console.error(`❌ Lỗi khi chuyển đổi: ${error.message}`);
       throw new InternalServerErrorException(
-        `Error during file conversion: ${error.message}`,
+        `Lỗi khi chuyển đổi file: ${error.message}`,
       );
     }
   }
