@@ -10,7 +10,7 @@ puppeteer.use(StealthPlugin());
 
 export const captureGoogleEarth = async (location: string): Promise<string> => {
   const browser = await puppeteer.launch({
-    headless: true, // Cần bật UI để quay video
+    headless: false,
     defaultViewport: {
       width: 1920,
       height: 1080,
@@ -26,6 +26,7 @@ export const captureGoogleEarth = async (location: string): Promise<string> => {
   });
 
   const page = await browser.newPage();
+
   await page.setUserAgent(
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36',
   );
@@ -38,17 +39,16 @@ export const captureGoogleEarth = async (location: string): Promise<string> => {
     });
 
     await delay(5000);
+
     await clickSearchInput(page);
+
     await delay(1000);
+
     await page.keyboard.type(location, { delay: 100 });
+
     await page.keyboard.press('Enter');
 
     await delay(5000);
-
-    // await zoomMap(page, 20);
-    // await clickMultipleTimes(page, 1884, 1014, 6);
-
-    // await delay(1000);
 
     await page.reload({ waitUntil: 'networkidle2' });
 
@@ -56,25 +56,29 @@ export const captureGoogleEarth = async (location: string): Promise<string> => {
 
     await clickButtonUI(page, 880, 1015);
 
-    await delay(1000);
+    await clickButtonUI(page, 55, 150);
 
     await page.reload({ waitUntil: 'networkidle2' });
 
-    await clickMultipleTimes(page, 1884, 1014, 6);
+    await delay(1000);
 
+    await clickMultipleTimes(page, 1884, 1014, 4);
     await delay(1000);
 
     await delay(1000);
+
     await doubleClickButtonUI(page, 1750, 1010);
-    await delay(1000);
 
-    console.log('🎥 Recording screenshots for 50 seconds...');
-    const framesDir = await captureFrames(page, 40);
+    console.log('🎥 Recording screenshots for 40 seconds...');
+
+    const framesDir = await captureFrames(page, 20);
 
     console.log('🎞 Converting images to video...');
+
     const videoPath = await convertImagesToVideo(framesDir);
 
     await browser.close();
+
     return videoPath;
   } catch (error) {
     console.error('❌ Error capturing Google Earth video:', error);
@@ -87,7 +91,7 @@ const captureFrames = async (page: Page, duration: number): Promise<string> => {
   const framesDir = path.join(__dirname, 'frames');
   await fs.ensureDir(framesDir);
 
-  const frameRate = 5; // Chụp 5 ảnh mỗi giây
+  const frameRate = 5; // Capture 5 frames per second
   const totalFrames = duration * frameRate;
 
   for (let i = 0; i < totalFrames; i++) {
@@ -95,19 +99,29 @@ const captureFrames = async (page: Page, duration: number): Promise<string> => {
       framesDir,
       `frame-${String(i).padStart(4, '0')}.jpg`,
     );
+
     await page.screenshot({ path: filePath, type: 'jpeg' });
-    await delay(1000 / frameRate); // Đợi trước khi chụp tiếp
+
+    await delay(1000 / frameRate); // Wait before capturing the next frame
   }
 
   return framesDir;
 };
 
 const convertImagesToVideo = async (framesDir: string): Promise<string> => {
-  const videoFileName = `${uuidv4()}.mp4`; // 🔹 Tạo tên file video ngẫu nhiên
+  const videoFileName = `${uuidv4()}.mp4`; // 🔹 Generate a random video file name
+
   const videoPath = path.join(__dirname, videoFileName);
 
   return new Promise((resolve, reject) => {
-    const ffmpegCommand = `ffmpeg -framerate 5 -i ${framesDir}/frame-%04d.jpg -c:v libx264 -pix_fmt yuv420p ${videoPath}`;
+    // const ffmpegCommand = `ffmpeg -framerate 5 -i ${framesDir}/frame-%04d.jpg -c:v libx264 -pix_fmt yuv420p ${videoPath}`;
+    // 👇 Crop video: keep 80% of the height, cutting 10% from the top and 10% from the bottom
+
+    const ffmpegCommand = `
+    ffmpeg -framerate 5 -i ${framesDir}/frame-%04d.jpg \
+    -vf "crop=in_w:in_h*0.8:0:in_h*0.1" \
+    -c:v libx264 -pix_fmt yuv420p ${videoPath}
+  `;
 
     exec(ffmpegCommand, (error, stdout, stderr) => {
       if (error) {
@@ -128,19 +142,24 @@ const convertToBase64 = async (filePath: string): Promise<string> => {
 
 const clickSearchInput = async (page: Page) => {
   console.log('🖱️ Clicking on the search input...');
+
   const x = 185;
   const y = 32;
+
   await page.mouse.click(x, y);
+
   console.log(`✅ Clicked on search input at: (${x}, ${y})`);
 };
 
 const clickButtonUI = async (page: Page, x: number, y: number) => {
   console.log(`🖱️ Clicking at (${x}, ${y})...`);
+
   await page.mouse.click(x, y, { delay: 150 });
 };
 
 const doubleClickButtonUI = async (page: Page, x: number, y: number) => {
   console.log(`🖱️ Double clicking at (${x}, ${y})...`);
+
   await page.mouse.click(x, y, { clickCount: 2, delay: 100 });
 };
 
@@ -158,9 +177,10 @@ const clickMultipleTimes = async (
   count: number,
 ) => {
   console.log(`🖱️ Clicking at (${x}, ${y}) ${count} times...`);
+
   for (let i = 0; i < count; i++) {
-    await page.mouse.click(x, y, { delay: 100 }); // Thêm delay để tránh click quá nhanh
-    await delay(100); // Đợi một chút giữa các lần click
+    await page.mouse.click(x, y, { delay: 100 }); // Add delay to prevent clicking too fast
+    await delay(100); // Wait a bit between clicks
   }
   console.log(`✅ Finished clicking ${count} times at (${x}, ${y})`);
 };

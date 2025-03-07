@@ -23,17 +23,20 @@ export class CrawlController {
   @ApiQuery({
     name: 'url',
     required: true,
-    description: 'URL của trang web cần chụp hình',
+    description: 'URL of the webpage to capture',
   })
   @ApiQuery({
     name: 'source',
     required: true,
-    description: 'Nguồn của trang web (e.g., facebook, google)',
+    description: 'Source of the webpage (e.g., Facebook, Google)',
   })
-  @ApiResponse({ status: 200, description: 'Trả về file ảnh của trang web' })
+  @ApiResponse({
+    status: 200,
+    description: 'Returns the screenshot of the webpage',
+  })
   @ApiResponse({
     status: 400,
-    description: 'URL hoặc nguồn không hợp lệ',
+    description: 'Invalid URL or source',
   })
   async generateImage(
     @Query('url') url: string,
@@ -48,9 +51,9 @@ export class CrawlController {
       res.set({ 'Content-Type': 'application/json' });
       return res.json({ base64: `data:image/png;base64,${base64Image}` });
     } catch (error) {
-      console.error('❌ Lỗi khi tạo ảnh chụp màn hình:', error);
+      console.error('❌ Error generating screenshot:', error);
       throw new HttpException(
-        'Không thể tạo ảnh chụp màn hình',
+        'Unable to generate screenshot',
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
@@ -60,19 +63,19 @@ export class CrawlController {
   @ApiQuery({
     name: 'location',
     required: true,
-    description: 'Vị trí muốn chụp ảnh 360 độ',
+    description: 'Location to capture a 360-degree image',
   })
   @ApiResponse({
     status: 200,
-    description: 'Trả về URL của video 360 từ MinIO',
+    description: 'Returns the URL of the 360-degree video from MinIO',
   })
   @ApiResponse({
     status: 400,
-    description: 'Vị trí không hợp lệ!',
+    description: 'Invalid location!',
   })
   @ApiResponse({
     status: 500,
-    description: 'Lỗi trong quá trình chụp ảnh',
+    description: 'Error during the image capture process',
   })
   async generateImage360(
     @Query('location') location: string,
@@ -80,32 +83,36 @@ export class CrawlController {
   ) {
     if (!location) {
       throw new HttpException(
-        '❌ Thiếu tham số location!',
+        '❌ Missing location parameter!',
         HttpStatus.BAD_REQUEST,
       );
     }
 
     try {
-      console.log(`🌍 Bắt đầu chụp ảnh 360 độ tại vị trí: ${location}`);
+      console.log(
+        `🌍 Starting 360-degree image capture at location: ${location}`,
+      );
 
-      // 📌 Lấy đường link tải video từ MinIO
+      // 📌 Retrieve the video download link from MinIO
       const result = await this.crawlService.crawlCaptureGoogleEarth(location);
 
       if (!result || !result.downloadUrl) {
-        throw new Error('Lỗi khi tải video lên MinIO');
+        throw new Error('Error uploading video to MinIO');
       }
 
-      console.log(`✅ Video đã tải lên MinIO: ${result.downloadUrl}`);
+      console.log(
+        `✅ Video successfully uploaded to MinIO: ${result.downloadUrl}`,
+      );
 
       res.set({ 'Content-Type': 'application/json' });
       return res.json({
-        message: '✅ Thành công!',
-        downloadUrl: result.downloadUrl, // Trả về URL video từ MinIO
+        message: '✅ Success!',
+        downloadUrl: result.downloadUrl, // Return the MinIO video URL
       });
     } catch (error) {
-      console.error('❌ Lỗi khi chụp ảnh Google Earth 360:', error);
+      console.error('❌ Error capturing Google Earth 360 image:', error);
       throw new HttpException(
-        'Không thể tạo video 360 độ',
+        'Unable to generate 360-degree video',
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }

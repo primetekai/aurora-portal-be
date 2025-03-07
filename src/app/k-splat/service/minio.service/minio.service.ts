@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Client } from 'minio';
 import * as path from 'path';
 import * as fs from 'fs';
+import { IMinioUploadFile } from './minio.type';
 
 @Injectable()
 export class MinIOService {
@@ -32,46 +33,50 @@ export class MinIOService {
     this.testMinioConnection();
   }
 
-  // Kiểm tra xem có kết nối được MinIO không
+  // Check if MinIO connection is successful
   private async testMinioConnection() {
     try {
       await this.minioClient.listBuckets();
-      this.logger.log('✅ Kết nối MinIO thành công!');
+      this.logger.log('✅ Successfully connected to MinIO!');
     } catch (error) {
-      this.logger.error(`❌ Không thể kết nối MinIO: ${error.stack}`);
+      this.logger.error(`❌ Unable to connect to MinIO: ${error.stack}`);
     }
   }
 
-  // Xóa file sau khi xử lý
+  // Delete file after processing
   private deleteFile(filePath: string) {
     try {
       if (fs.existsSync(filePath)) {
         fs.unlinkSync(filePath);
-        this.logger.log(`🗑️ Đã xóa file: ${filePath}`);
+        this.logger.log(`🗑️ File deleted: ${filePath}`);
       }
     } catch (error) {
-      this.logger.error(`❌ Lỗi khi xóa file: ${error.message}`);
+      this.logger.error(`❌ Error deleting file: ${error.message}`);
     }
   }
 
-  // Upload file lên MinIO
-  async uploadFile(
-    objectName: string,
-    filePath: string,
-  ): Promise<string | null> {
+  // Upload file to MinIO
+  async uploadFile(params?: IMinioUploadFile): Promise<string | null> {
+    const {
+      objectName,
+      filePath,
+      pathDir = this.pathDir,
+      bucketName = this.bucketName,
+    } = params;
+
     try {
-      // Kiểm tra nếu file có tồn tại trước khi upload
+      // Check if the file exists before uploading
       if (!fs.existsSync(filePath)) {
-        throw new Error(`❌ File không tồn tại: ${filePath}`);
+        throw new Error(`❌ File does not exist: ${filePath}`);
       }
 
-      // Kiểm tra đường dẫn object để tránh lỗi lặp thư mục
-      const fullObjectName = objectName.startsWith(this.pathDir)
+      // Ensure correct object path to avoid redundant directories
+      const fullObjectName = objectName.startsWith(pathDir)
         ? objectName
-        : `${this.pathDir}/${objectName}`;
+        : `${pathDir}/${objectName}`;
 
       console.log(
-        `📝 Sẽ upload vào MinIO: Bucket = ${this.bucketName}, Path = ${fullObjectName}`,
+        `📝 Uploading to MinIO: Bucket = ${bucketName}, Path = ${fullObjectName}`,
       );
 
       await this.minioClient.fPutObject(
@@ -80,17 +85,18 @@ export class MinIOService {
         filePath,
       );
 
-      const fileUrl = `http://s3-dev.aurora-tech.com/${this.bucketName}/${fullObjectName}`;
+      const fileUrl = `http://s3-dev.aurora-tech.com/${bucketName}/${fullObjectName}`;
       // const fileUrl = `http://${this.minioClient.host}:${this.minioClient.port}/${this.bucketName}/${fullObjectName}`;
-      console.log(`✅ Upload thành công! File URL: ${fileUrl}`);
+      console.log(`✅ Upload successful! File URL: ${fileUrl}`);
 
-      // 🗑️ Xóa file sau khi upload thành công
+      // 🗑️ Delete file after successful upload
       this.deleteFile(filePath);
 
       return fileUrl;
     } catch (error) {
-      this.logger.error(`❌ Lỗi khi upload MinIO: ${error.message}`);
-      // 🗑️ Xóa file sau khi upload thành công
+      this.logger.error(`❌ Error uploading to MinIO: ${error.message}`);
+
+      // 🗑️ Delete file after failed upload attempt
       this.deleteFile(filePath);
 
       return null;

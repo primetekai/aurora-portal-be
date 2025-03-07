@@ -44,10 +44,13 @@ export class KSplatService {
       // 2️⃣ Upload file .ksplat lên MinIO
       const minioDir = process.env.MINIO_PATH_DIR || '3gs_service';
       const minioPath = `${minioDir}/${fileName}`;
-      const downloadUrl = await this.minioService.uploadFile(
-        minioPath,
-        outputFile,
-      );
+
+      const downloadUrl = await this.minioService.uploadFile({
+        objectName: minioPath,
+        filePath: outputFile,
+        pathDir: '3gs_service',
+        bucketName: '3d-tour-outside',
+      });
 
       if (!downloadUrl) {
         throw new Error('Lỗi khi tải lên MinIO');

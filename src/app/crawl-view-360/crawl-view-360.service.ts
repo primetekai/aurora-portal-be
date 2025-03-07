@@ -21,68 +21,78 @@ export class CrawlService {
     return crawlSnapShotScreenWebService(phoneNumber, source);
   }
 
-  // 🗑️ Hàm xóa file để tránh rác
+  // 🗑️ Function to delete temporary files to avoid clutter
   private deleteFile(filePath: string) {
     try {
       if (filePath && fs.existsSync(filePath)) {
         fs.unlinkSync(filePath);
-        console.log(`🗑️ Đã xóa file tạm: ${filePath}`);
+        console.log(`🗑️ Temporary file deleted: ${filePath}`);
       }
     } catch (error) {
-      console.error(`⚠️ Lỗi khi xóa file tạm: ${filePath} - ${error.message}`);
+      console.error(
+        `⚠️ Error deleting temporary file: ${filePath} - ${error.message}`,
+      );
     }
   }
 
   async crawlCaptureGoogleEarth(location: string): Promise<any> {
-    let outputFile: string | null = null; // 🔹 Định nghĩa outputFile trước
+    let outputFile: string | null = null;
 
-    console.log(`🌍 Bắt đầu quay video Google Earth tại vị trí: ${location}`);
+    console.log(
+      `🌍 Starting Google Earth video capture at location: ${location}`,
+    );
 
     try {
-      // 1️⃣ Quay video Google Earth
+      // 1️⃣ Capture Google Earth video
       outputFile = await captureGoogleEarth(location);
-      console.log(`📽️ Video đã được tạo: ${outputFile}`);
+      console.log(`📽️ Video created: ${outputFile}`);
 
-      // Lấy tên file từ đường dẫn (Windows + Linux đều chạy đúng)
+      // Extract file name from path (compatible with both Windows and Linux)
       const fileName = path.basename(outputFile);
 
       if (!fileName) {
-        throw new Error('Không thể xác định tên file video.');
+        throw new Error('Unable to determine video file name.');
       }
 
-      console.log(`📂 Tên file video: ${fileName}`);
+      console.log(`📂 Video file name: ${fileName}`);
 
-      // 2️⃣ Upload file lên MinIO
-      const minioDir = process.env.MINIO_PATH_DIR || '3gs_service';
+      // 2️⃣ Upload file to MinIO
+      const minioDir = process.env.MINIO_PATH_DIR || '33d-video-360';
+
       const minioPath = `${minioDir}/${fileName}`;
 
-      console.log(`📤 Đang tải video lên MinIO tại: ${minioPath}`);
+      console.log(`📤 Uploading video to MinIO at: ${minioPath}`);
 
-      const downloadUrl = await this.minioService.uploadFile(
-        minioPath,
-        outputFile,
-      );
+      const downloadUrl = await this.minioService.uploadFile({
+        objectName: minioPath,
+        filePath: outputFile,
+        pathDir: minioDir,
+        bucketName: '3d-tour-outside',
+      });
 
       if (!downloadUrl) {
-        throw new Error('❌ Lỗi khi tải video lên MinIO');
+        throw new Error('❌ Error uploading video to MinIO');
       }
 
-      console.log(`✅ Video đã tải lên MinIO thành công! URL: ${downloadUrl}`);
+      console.log(
+        `✅ Video successfully uploaded to MinIO! URL: ${downloadUrl}`,
+      );
 
-      // 🗑️ Xóa file video sau khi upload thành công
       this.deleteFile(outputFile);
 
-      return { message: '✅ Quá trình quay và upload hoàn tất', downloadUrl };
+      return {
+        message: '✅ Capture and upload process completed successfully',
+        downloadUrl,
+      };
     } catch (error) {
-      console.error(`❌ Lỗi trong quá trình xử lý: ${error.message}`);
+      console.error(`❌ Error during processing: ${error.message}`);
 
-      // 🗑️ Nếu lỗi, xóa luôn file gốc nếu đã tạo
       if (outputFile) {
         this.deleteFile(outputFile);
       }
 
       throw new InternalServerErrorException(
-        `❌ Lỗi khi xử lý video: ${error.message}`,
+        `❌ Error processing video: ${error.message}`,
       );
     }
   }
