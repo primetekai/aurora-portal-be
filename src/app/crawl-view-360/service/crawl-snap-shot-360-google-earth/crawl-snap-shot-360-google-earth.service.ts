@@ -22,24 +22,19 @@ export const captureGoogleEarth = async (location: string): Promise<string> => {
       '--disable-web-security',
       '--disable-features=IsolateOrigins',
       '--ignore-certificate-errors',
-      '--enable-webgl',
-      '--disable-software-rasterizer',
-      '--use-gl=egl',
-      '--window-size=1920,1080',
     ],
   });
 
   const page = await browser.newPage();
 
   await page.setUserAgent(
-    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36',
+    'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
   );
 
   try {
     console.log(`🔍 Opening Google Earth...`);
 
     await page.goto('https://earth.google.com/web/', {
-      timeout: 0,
       waitUntil: 'networkidle2',
     });
 
@@ -52,13 +47,6 @@ export const captureGoogleEarth = async (location: string): Promise<string> => {
     await page.keyboard.type(location, { delay: 100 });
 
     await page.keyboard.press('Enter');
-
-    const currentUrl = await page.url();
-    console.log('🔍 URL hiện tại:', currentUrl);
-
-    if (!currentUrl.includes('@')) {
-      throw new Error('❌ Google Earth không tải được vị trí!');
-    }
 
     await delay(5000);
 
@@ -75,7 +63,6 @@ export const captureGoogleEarth = async (location: string): Promise<string> => {
     await delay(1000);
 
     await clickMultipleTimes(page, 1884, 1014, 3);
-
     await delay(1000);
 
     await delay(1000);
