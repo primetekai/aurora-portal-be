@@ -1,0 +1,59 @@
+# 🏗️ Stage 1: Build
+FROM node:18-alpine AS builder
+
+# Cập nhật danh sách package và cài đặt Chromium + thư viện cần thiết
+RUN apk update && apk add --no-cache \
+  chromium \
+  nss freetype freetype-dev harfbuzz ca-certificates \
+  libx11 libxcomposite libxdamage libxi libxtst \
+  pango cups libxrandr libxkbcommon \
+  alsa-lib libxshmfence gdk-pixbuf cairo dbus \
+  mesa-gl fontconfig libjpeg-turbo \
+  && rm -rf /var/cache/apk/*
+
+WORKDIR /app
+
+# Cài đặt NestJS CLI
+RUN npm install -g @nestjs/cli
+
+# Sao chép package.json để cài dependencies
+COPY package*.json ./
+
+# Cài đặt dependencies (chỉ production để giảm dung lượng)
+RUN npm install --only=production --no-cache
+
+# Sao chép mã nguồn vào container
+COPY . .
+
+# Build ứng dụng
+RUN nest build
+
+# 🏗️ Stage 2: Runtime
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Cài đặt Chromium trong runtime container
+RUN apk update && apk add --no-cache \
+  chromium \
+  nss freetype freetype-dev harfbuzz ca-certificates \
+  libx11 libxcomposite libxdamage libxi libxtst \
+  pango cups libxrandr libxkbcommon \
+  alsa-lib libxshmfence gdk-pixbuf cairo dbus \
+  mesa-gl fontconfig libjpeg-turbo \
+  && rm -rf /var/cache/apk/*
+
+# Copy file build từ builder stage
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/node_modules ./node_modules
+COPY package.json ./
+
+# Định nghĩa biến môi trường cho Puppeteer sử dụng Chromium
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
+ENV PORT=3000
+
+# Mở cổng ứng dụng
+EXPOSE 3000
+
+# Chạy ứng dụng NestJS
+CMD ["node", "dist/main"]
