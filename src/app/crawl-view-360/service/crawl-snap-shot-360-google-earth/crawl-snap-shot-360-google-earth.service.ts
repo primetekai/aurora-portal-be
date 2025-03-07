@@ -22,6 +22,10 @@ export const captureGoogleEarth = async (location: string): Promise<string> => {
       '--disable-web-security',
       '--disable-features=IsolateOrigins',
       '--ignore-certificate-errors',
+      '--enable-webgl',
+      '--disable-software-rasterizer',
+      '--use-gl=egl',
+      '--window-size=1920,1080',
     ],
   });
 
@@ -48,6 +52,13 @@ export const captureGoogleEarth = async (location: string): Promise<string> => {
     await page.keyboard.type(location, { delay: 100 });
 
     await page.keyboard.press('Enter');
+
+    const currentUrl = await page.url();
+    console.log('🔍 URL hiện tại:', currentUrl);
+
+    if (!currentUrl.includes('@')) {
+      throw new Error('❌ Google Earth không tải được vị trí!');
+    }
 
     await delay(5000);
 
