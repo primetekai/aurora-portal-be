@@ -1,7 +1,7 @@
 import { LoggingInterceptor } from './app/interceptor/logging.interceptor';
 import { Module } from '@nestjs/common';
-import { typeOrmConfig } from './config/typeorm.config';
-import { TypeOrmModule } from '@nestjs/typeorm';
+// import { typeOrmConfig } from './config/typeorm.config';
+// import { TypeOrmModule } from '@nestjs/typeorm';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import {
   // AuthModule,
@@ -15,7 +15,7 @@ import {
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot(typeOrmConfig),
+    // TypeOrmModule.forRoot(typeOrmConfig),
     // AuthModule,
     // UserModule,
     // LanguagesModule,

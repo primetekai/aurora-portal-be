@@ -1,6 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Client } from 'minio';
-import * as path from 'path';
 import * as fs from 'fs';
 import { IMinioUploadFile } from './minio.type';
 

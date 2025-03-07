@@ -1,6 +1,4 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { CrawlRepository } from './crawl-view-360.repository';
-import { Crawl } from './crawl-view-360.entity';
 import { captureGoogleEarth, crawlSnapShotScreenWebService } from './service';
 import { MinIOService } from '../k-splat/service';
 import * as fs from 'fs';
@@ -8,14 +6,7 @@ import * as path from 'path';
 
 @Injectable()
 export class CrawlService {
-  constructor(
-    private sectionsRepository: CrawlRepository,
-    private readonly minioService: MinIOService,
-  ) {}
-
-  async crawlDataWithSource(data: Record<string, any>): Promise<Crawl> {
-    return this.sectionsRepository.createCrawl(data);
-  }
+  constructor(private readonly minioService: MinIOService) {}
 
   async crawlSnapShotScreenWeb(phoneNumber, source): Promise<any> {
     return crawlSnapShotScreenWebService(phoneNumber, source);
