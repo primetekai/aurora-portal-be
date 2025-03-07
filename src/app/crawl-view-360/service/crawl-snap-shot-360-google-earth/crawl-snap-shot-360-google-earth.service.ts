@@ -35,6 +35,7 @@ export const captureGoogleEarth = async (location: string): Promise<string> => {
     console.log(`🔍 Opening Google Earth...`);
 
     await page.goto('https://earth.google.com/web/', {
+      timeout: 0,
       waitUntil: 'networkidle2',
     });
 
