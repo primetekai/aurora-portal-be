@@ -20,6 +20,7 @@ export const captureGoogleEarthV1 = async (
       '--disable-web-security',
       '--disable-features=IsolateOrigins',
       '--ignore-certificate-errors',
+      '--disable-gpu',
     ],
   });
 
