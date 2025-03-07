@@ -33,8 +33,8 @@ export class CreateKSplatService {
       console.log(`🚀 Converting file: ${inputFile} ➝ ${outputFile}`);
 
       const fileData = fs.readFileSync(inputFile);
-      const format =
-        GaussianSplats3D.LoaderUtils.sceneFormatFromPath(inputFile);
+      const filePath = inputFile.toLowerCase().trim();
+      const format = GaussianSplats3D.LoaderUtils.sceneFormatFromPath(filePath);
 
       if (!format) {
         throw new InternalServerErrorException(
