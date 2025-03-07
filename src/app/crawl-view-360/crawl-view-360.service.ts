@@ -48,7 +48,7 @@ export class CrawlService {
       console.log(`📂 Video file name: ${fileName}`);
 
       // 2️⃣ Upload file to MinIO
-      const minioDir = process.env.MINIO_PATH_DIR || '33d-video-360';
+      const minioDir = process.env.MINIO_PATH_DIR || '3d-video-360';
 
       const minioPath = `${minioDir}/${fileName}`;
 

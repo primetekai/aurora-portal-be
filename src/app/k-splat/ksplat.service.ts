@@ -10,67 +10,67 @@ export class KSplatService {
     private readonly minioService: MinIOService,
   ) {}
 
-  // 🗑️ Hàm xóa file để tránh rác
+  // 🗑️ Function to delete files to prevent clutter
   private deleteFile(filePath: string) {
     try {
       if (filePath && fs.existsSync(filePath)) {
         fs.unlinkSync(filePath);
-        console.log(`🗑️ Đã xóa file: ${filePath}`);
+        console.log(`🗑️ File deleted: ${filePath}`);
       }
     } catch (error) {
-      console.error(`❌ Lỗi khi xóa file: ${filePath} - ${error.message}`);
+      console.error(`❌ Error deleting file: ${filePath} - ${error.message}`);
     }
   }
 
   async processFile(
     filePath: string,
   ): Promise<{ message: string; downloadUrl: string }> {
-    let outputFile: string | null = null; // 🔹 Định nghĩa outputFile trước
+    let outputFile: string | null = null; // 🔹 Define outputFile beforehand
 
     try {
-      // 1️⃣ Convert file sang .ksplat
+      // 1️⃣ Convert file to .ksplat
       outputFile = await this.convertService.convertToKsplat(filePath);
 
-      // Lấy tên file từ đường dẫn (Windows + Linux đều chạy đúng)
+      // Extract file name from the path (works on both Windows and Linux)
       const fileName = path.basename(outputFile);
 
       if (!fileName) {
-        throw new Error('Không thể xác định tên file.');
+        throw new Error('Unable to determine file name.');
       }
 
-      // 🗑️ Xóa file gốc sau khi convert
+      // 🗑️ Delete the original file after conversion
       this.deleteFile(filePath);
 
-      // 2️⃣ Upload file .ksplat lên MinIO
-      const minioDir = process.env.MINIO_PATH_DIR || '3gs_service';
+      // 2️⃣ Upload .ksplat file to MinIO
+      const minioDir = process.env.MINIO_PATH_DIR || 'ksplat-files';
       const minioPath = `${minioDir}/${fileName}`;
 
       const downloadUrl = await this.minioService.uploadFile({
         objectName: minioPath,
         filePath: outputFile,
-        pathDir: '3gs_service',
+        pathDir: 'ksplat-files',
         bucketName: '3d-tour-outside',
       });
 
       if (!downloadUrl) {
-        throw new Error('Lỗi khi tải lên MinIO');
+        throw new Error('Error uploading to MinIO');
       }
 
-      // 🗑️ Xóa file .ksplat sau khi upload thành công
+      // 🗑️ Delete .ksplat file after successful upload
       this.deleteFile(outputFile);
 
-      return { message: '✅ Chuyển đổi thành công', downloadUrl };
+      return { message: '✅ Conversion successful', downloadUrl };
     } catch (error) {
-      console.error(`❌ Lỗi xử lý file: ${error.message}`);
+      console.error(`❌ File processing error: ${error.message}`);
 
-      // 🗑️ Nếu lỗi, xóa luôn cả file gốc & file .ksplat (nếu có)
+      // 🗑️ If an error occurs, delete both the original file & .ksplat file (if exists)
       this.deleteFile(filePath);
       if (outputFile) {
         this.deleteFile(outputFile);
       }
 
       throw new InternalServerErrorException(
-        `❌ Lỗi xử lý file: ${error.message}`,
+        `❌ File processing error: ${error.message}`,
       );
     }
   }

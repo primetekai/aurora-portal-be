@@ -1,13 +1,13 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import * as fs from 'fs';
 import * as path from 'path';
-import { PlyLoader, KSplatLoader } from '@mkkellogg/gaussian-splats-3d';
+import { CreateKSplatService } from '../create-ksplat.service';
 
 @Injectable()
 export class ConvertService {
   private readonly sectionFolder = './section/uploads';
 
-  constructor() {
+  constructor(private readonly createKSplatService: CreateKSplatService) {
     this.createSectionFolder();
   }
 
@@ -20,44 +20,32 @@ export class ConvertService {
   async convertToKsplat(inputFile: string): Promise<string> {
     if (!fs.existsSync(inputFile)) {
       throw new InternalServerErrorException(
-        `❌ File không tồn tại: ${inputFile}`,
+        `❌ File does not exist: ${inputFile}`,
       );
     }
 
-    // 📝 Đường dẫn file đầu ra
+    // 📝 Output file path
     const outputFile = path.join(
       this.sectionFolder,
       path.basename(inputFile).replace(/\.(ply|splat)$/, '.ksplat'),
     );
 
     try {
-      console.log(`🚀 Đang convert file: ${inputFile} ➝ ${outputFile}`);
+      console.log(`🚀 Converting file: ${inputFile} ➝ ${outputFile}`);
 
-      // ⚡ Load file PLY/SPLAT vào GaussianSplats3D
-      const splatBuffer = await PlyLoader.loadFromURL(
-        `file://${path.resolve(inputFile)}`,
-        () => {}, // ✅ Fix lỗi: Truyền `onProgress` là một hàm trống
-        false, // progressiveLoad = false
-        undefined, // onProgressiveLoadSectionProgress (không cần)
-        5, // splatAlphaRemovalThreshold
-        1, // compressionLevel
-        true, // optimizeSplatData
-        0, // sphericalHarmonicsDegree
-        {},
-      );
+      // ✅ Call CreateKSplatService to convert the file
+      await this.createKSplatService.convertToKSplat(inputFile, outputFile);
 
-      // 📝 Lưu file .ksplat
-      await KSplatLoader.downloadFile(splatBuffer, outputFile);
+      console.log(`✅ Conversion successful: ${outputFile}`);
 
-      console.log(`✅ Chuyển đổi thành công: ${outputFile}`);
-
-      // 🗑️ Xóa file gốc sau khi convert
+      // 🗑️ Delete the original file after conversion
       fs.unlinkSync(inputFile);
 
       return outputFile;
     } catch (error) {
+      console.error(`❌ Conversion error: ${error.message}`);
       throw new InternalServerErrorException(
-        `❌ Lỗi khi convert: ${error.message}`,
+        `Error during file conversion: ${error.message}`,
       );
     }
   }
