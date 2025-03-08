@@ -18,59 +18,41 @@ export class PulsarService implements OnModuleInit, OnModuleDestroy {
 
   async onModuleInit() {
     this.logger.log('🚀 Initializing Pulsar Service...');
-    await this.testConnection();
 
     this.client = new Pulsar.Client({
-      serviceUrl: 'pulsar://192.168.10.186:6650',
+      serviceUrl: 'pulsar://192.168.10.206:6650',
     });
 
     this.consumer = await this.client.subscribe({
-      topic: 'property-capture-request',
+      topic: 'persistent://public/default/property-capture-request',
       subscription: 'property-capture-request-subscription',
-      subscriptionType: 'Shared',
+      subscriptionType: 'KeyShared',
       listener: this.handleMessage.bind(this),
     });
 
     this.producer = await this.client.createProducer({
-      topic: 'property-capture-completed',
+      topic: 'persistent://public/default/property-capture-completed',
     });
 
     this.logger.log('🔵 Pulsar service started and listening...');
   }
 
-  private async testConnection() {
-    this.logger.log('🔄 Testing Pulsar connection...');
-    try {
-      const client = new Pulsar.Client({
-        serviceUrl: 'pulsar://192.168.10.186:6650',
-      });
-
-      const testProducer = await client.createProducer({
-        topic: 'test-connection',
-      });
-
-      await testProducer.send({
-        data: Buffer.from('Test message from NestJS'),
-      });
-
-      this.logger.log(
-        '✅ Successfully connected to Pulsar and sent a test message.',
-      );
-
-      await testProducer.close();
-      await client.close();
-    } catch (error) {
-      this.logger.error('❌ Pulsar connection failed:', error);
-    }
-  }
-
   private async handleMessage(msg: Pulsar.Message, consumer: Pulsar.Consumer) {
     try {
-      const data = JSON.parse(msg.getData().toString());
-      this.logger.log(`📩 Received message: ${JSON.stringify(data)}`);
+      const rawData = msg.getData().toString();
+      this.logger.log(`📩 Raw message data: ${rawData}`);
 
-      const { propertyId, propertyData } = data;
-      const { longitude, latitude } = propertyData;
+      if (!rawData.startsWith('{')) {
+        this.logger.error(`❌ Received invalid JSON message: ${rawData}`);
+        consumer.acknowledge(msg);
+        return;
+      }
+
+      const res = JSON.parse(rawData);
+      this.logger.log(`✅ Parsed message: ${JSON.stringify(res)}`);
+
+      const { propertyId, data } = res;
+      const { longitude, latitude } = data;
 
       if (!longitude || !latitude) {
         this.logger.warn('⚠️ Missing longitude or latitude');
@@ -80,8 +62,7 @@ export class PulsarService implements OnModuleInit, OnModuleDestroy {
       this.logger.log(
         `🌍 Crawling video for location: (${latitude}, ${longitude})`,
       );
-
-      const location = `${longitude} ${latitude}`;
+      const location = `${latitude} ${longitude}`;
       const result = await this.crawlService.crawlCaptureGoogleEarth(location);
 
       if (!result || !result.downloadUrl) {
@@ -93,7 +74,7 @@ export class PulsarService implements OnModuleInit, OnModuleDestroy {
         eventType: 'PROPERTY_COMPLETED',
         timestamp: new Date().toISOString(),
         propertyId,
-        propertyData: {
+        data: {
           videoUrl: result.downloadUrl,
         },
       };
@@ -107,7 +88,7 @@ export class PulsarService implements OnModuleInit, OnModuleDestroy {
       );
       consumer.acknowledge(msg);
     } catch (error) {
-      this.logger.error('❌ Error processing message:', error);
+      this.logger.error(`❌ Error processing message: ${error.message}`);
     }
   }
 

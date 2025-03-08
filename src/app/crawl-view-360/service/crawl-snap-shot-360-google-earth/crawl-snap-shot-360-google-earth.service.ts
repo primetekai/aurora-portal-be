@@ -16,12 +16,19 @@ export const captureGoogleEarth = async (location: string): Promise<string> => {
       height: 1080,
     },
     args: [
+      // '--no-sandbox',
+      // '--disable-setuid-sandbox',
+      // '--disable-dev-shm-usage',
+      // '--disable-web-security',
+      // '--disable-features=IsolateOrigins',
+      // '--ignore-certificate-errors',
       '--no-sandbox',
       '--disable-setuid-sandbox',
       '--disable-dev-shm-usage',
-      '--disable-web-security',
-      '--disable-features=IsolateOrigins',
-      '--ignore-certificate-errors',
+      '--disable-gpu',
+      '--no-first-run',
+      '--no-zygote',
+      '--single-process',
     ],
   });
 
