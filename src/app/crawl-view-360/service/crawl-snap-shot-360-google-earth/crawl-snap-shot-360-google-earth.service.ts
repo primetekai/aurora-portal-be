@@ -30,6 +30,7 @@ export const captureGoogleEarth = async (location: string): Promise<string> => {
       '--no-zygote',
       '--single-process',
     ],
+    executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
   });
 
   const page = await browser.newPage();
