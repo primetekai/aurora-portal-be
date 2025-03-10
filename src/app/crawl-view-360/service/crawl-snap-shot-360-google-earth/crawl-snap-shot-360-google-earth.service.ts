@@ -13,22 +13,27 @@ export const captureGoogleEarth = async (
   location: string,
 ): Promise<ICaptureGoogleEarth> => {
   const browser = await puppeteer.launch({
-    headless: true,
-    executablePath: process.env.PUPPETEER_EXECUTABLE_PATH, // Sử dụng Google Chrome
+    headless: true, // Dùng chế độ headless mới của Chrome
+    executablePath: process.env.PUPPETEER_EXECUTABLE_PATH, // Sử dụng Google Chrome trong container
     defaultViewport: { width: 1920, height: 1080 },
     args: [
-      '--disable-dev-shm-usage',
-      '--disable-gpu-compositing',
-      '--use-gl=egl',
-      '--ignore-gpu-blacklist',
-      '--enable-webgl',
-      '--disable-software-rasterizer',
+      '--disable-dev-shm-usage', // Tránh lỗi bộ nhớ chia sẻ trong container
+      '--disable-software-rasterizer', // Không dùng rasterizer phần mềm (chạy GPU thật)
+      '--disable-gpu-compositing', // Tránh lỗi render
+      '--enable-webgl', // Kích hoạt WebGL
+      '--enable-webgl2-compute-context', // Kích hoạt WebGL 2.0
+      '--ignore-gpu-blacklist', // Bỏ qua danh sách chặn GPU của Chrome
+      '--use-gl=egl', // Dùng EGL thay vì X11
+      '--enable-features=Vulkan', // Kích hoạt Vulkan API (nếu NVIDIA hỗ trợ)
       '--window-size=1920x1080',
       '--no-sandbox',
       '--disable-setuid-sandbox',
-      '--disable-accelerated-2d-canvas',
-      '--enable-webgl2-compute-context',
+      '--disable-accelerated-2d-canvas', // Vô hiệu hóa tăng tốc vẽ 2D
     ],
+    env: {
+      DISPLAY: process.env.DISPLAY || ':99', // Đảm bảo Chrome biết dùng Xvfb
+      VGL_DISPLAY: process.env.VGL_DISPLAY || ':99', // Dùng VirtualGL nếu có
+    },
   });
 
   const page = await browser.newPage();
