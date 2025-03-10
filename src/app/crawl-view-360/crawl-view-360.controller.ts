@@ -96,18 +96,19 @@ export class CrawlController {
       // 📌 Retrieve the video download link from MinIO
       const result = await this.crawlService.crawlCaptureGoogleEarth(location);
 
-      if (!result || !result.downloadUrl) {
+      if (!result || !result.videoPath || !result.videoZoomPath) {
         throw new Error('Error uploading video to MinIO');
       }
 
       console.log(
-        `✅ Video successfully uploaded to MinIO: ${result.downloadUrl}`,
+        `✅ Video successfully uploaded to MinIO: ${result.downloadUrl} ${result.videoZoomPath}`,
       );
 
       res.set({ 'Content-Type': 'application/json' });
       return res.json({
         message: '✅ Success!',
-        downloadUrl: result.downloadUrl, // Return the MinIO video URL
+        videoPath: result.videoPath, // Return the MinIO video URL
+        videoZoomPath: result.videoZoomPath, // Return the MinIO video URL
       });
     } catch (error) {
       console.error('❌ Error capturing Google Earth 360 image:', error);

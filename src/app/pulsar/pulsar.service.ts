@@ -20,7 +20,7 @@ export class PulsarService implements OnModuleInit, OnModuleDestroy {
     this.logger.log('🚀 Initializing Pulsar Service...');
 
     this.client = new Pulsar.Client({
-      serviceUrl: 'pulsar://192.168.10.206:6650',
+      serviceUrl: 'pulsar://194.233.69.2:6650',
     });
 
     this.consumer = await this.client.subscribe({

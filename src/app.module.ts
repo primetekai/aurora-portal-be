@@ -11,7 +11,7 @@ import {
   // UserModule,
   CrawlModule,
   KSplatModule,
-  // PulsarModule,
+  PulsarModule,
 } from './app';
 
 @Module({
@@ -26,7 +26,7 @@ import {
     // SpeedToTextModule,
     CrawlModule,
     KSplatModule,
-    // PulsarModule,
+    PulsarModule,
   ],
 
   providers: [
