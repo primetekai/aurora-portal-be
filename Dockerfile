@@ -1,5 +1,5 @@
 # Sử dụng Node + Chromium + GPU NVIDIA
-FROM nvidia/cuda:12.7.0-runtime-ubuntu22.04
+FROM nvidia/cuda:12.8.0-runtime-ubuntu22.04
 
 # Cài đặt các thư viện cần thiết
 RUN apt-get update && apt-get install -y \
@@ -7,7 +7,6 @@ RUN apt-get update && apt-get install -y \
   libgl1-mesa-glx libgl1-mesa-dri libgbm1 \
   xserver-xorg-video-dummy xvfb virtualgl \
   google-chrome-stable
-
 
 # Tải và cài đặt Puppeteer và các thư viện Node.js
 WORKDIR /app
