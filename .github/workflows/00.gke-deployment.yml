@@ -102,6 +102,10 @@ jobs:
             podman stop $IMAGE || true &&
             podman rm $IMAGE || true &&
             podman run -d -p ${PORT}:4000 \
-              -v /home/primetek/resource-web/cdn:/home/ubuntu/cdn \
-              --name $IMAGE $HARBOR_URL/$HARBOR_USERNAME/$IMAGE:$GITHUB_SHA
+            -v /home/primetek/resource-web/cdn:/home/ubuntu/cdn \
+            --device /dev/dri \
+            --env DISPLAY=:99 \
+            --security-opt seccomp=unconfined \
+            --security-opt=label=disable \
+            --name $IMAGE $HARBOR_URL/$HARBOR_USERNAME/$IMAGE:$GITHUB_SHA
           "

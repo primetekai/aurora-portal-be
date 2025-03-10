@@ -13,19 +13,21 @@ export const captureGoogleEarth = async (
   location: string,
 ): Promise<ICaptureGoogleEarth> => {
   const browser = await puppeteer.launch({
-    headless: false,
-    executablePath: '/usr/bin/chromium-browser',
-    defaultViewport: {
-      width: 1920,
-      height: 1080,
-    },
+    headless: true,
+    executablePath: process.env.PUPPETEER_EXECUTABLE_PATH, // Sử dụng Google Chrome
+    defaultViewport: { width: 1920, height: 1080 },
     args: [
+      '--disable-dev-shm-usage',
+      '--disable-gpu-compositing',
+      '--use-gl=egl',
+      '--ignore-gpu-blacklist',
+      '--enable-webgl',
+      '--disable-software-rasterizer',
+      '--window-size=1920x1080',
       '--no-sandbox',
       '--disable-setuid-sandbox',
-      '--enable-webgl',
-      '--ignore-gpu-blacklist',
-      '--use-gl=egl',
-      '--disable-gpu-compositing',
+      '--disable-accelerated-2d-canvas',
+      '--enable-webgl2-compute-context',
     ],
   });
 
