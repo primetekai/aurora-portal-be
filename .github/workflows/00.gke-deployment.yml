@@ -104,8 +104,12 @@ jobs:
             podman run -d -p ${PORT}:4000 \
             -v /home/primetek/resource-web/cdn:/home/ubuntu/cdn \
             --device /dev/dri \
+            --device /dev/snd \
             --env DISPLAY=:99 \
+            --env PUPPETEER_EXECUTABLE_PATH=/usr/bin/google-chrome-stable \
+            --shm-size=2gb \
             --security-opt seccomp=unconfined \
             --security-opt=label=disable \
+            --cap-add=SYS_ADMIN \
             --name $IMAGE $HARBOR_URL/$HARBOR_USERNAME/$IMAGE:$GITHUB_SHA
           "
