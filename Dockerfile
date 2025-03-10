@@ -14,7 +14,10 @@ RUN wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add
   apt-get update && apt-get install -y google-chrome-stable && \
   apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Cài đặt các gói npm và Puppeteer
+# Cài đặt NestJS CLI trước khi build
+RUN npm install -g @nestjs/cli
+
+# Cài đặt các gói npm
 WORKDIR /app
 COPY package*.json ./
 RUN npm install --omit=dev
@@ -22,7 +25,7 @@ RUN npm install --omit=dev
 # Copy toàn bộ mã nguồn
 COPY . .
 
-# Build ứng dụng nếu cần
+# Build ứng dụng
 RUN npm run build
 
 # Thiết lập đường dẫn Puppeteer để sử dụng Chrome cài đặt sẵn
