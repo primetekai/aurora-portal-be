@@ -97,7 +97,11 @@ jobs:
 
       - name: Deploy
         run: |
-          podman run -d -p ${PORT}:4000 \
+          ssh -o StrictHostKeyChecking=no -p 775 $SERVER_USER@$SERVER_IP "
+            podman pull $HARBOR_URL/$HARBOR_USERNAME/$IMAGE:$GITHUB_SHA &&
+            podman stop $IMAGE || true &&
+            podman rm $IMAGE || true &&
+            podman run -d -p ${PORT}:4000 \
             -v /home/primetek/resource-web/cdn:/home/ubuntu/cdn \
             --device /dev/dri \
             --device /dev/nvidia0 \
@@ -107,9 +111,14 @@ jobs:
             --env VGL_DISPLAY=:99 \
             --env PUPPETEER_EXECUTABLE_PATH=/usr/bin/google-chrome-stable \
             --env NVIDIA_DRIVER_CAPABILITIES=compute,graphics,utility,video \
+            --env __NV_PRIME_RENDER_OFFLOAD=1 \
+            --env __GLX_VENDOR_LIBRARY_NAME=nvidia \
+            --env __GL_DEFAULTS_PATH=/usr/share/nvidia \
             --shm-size=2gb \
             --security-opt seccomp=unconfined \
             --security-opt=label=disable \
             --cap-add=SYS_ADMIN \
+            --cap-add=SYS_NICE \
+            --cap-add=IPC_LOCK \
             --name $IMAGE $HARBOR_URL/$HARBOR_USERNAME/$IMAGE:$GITHUB_SHA
           "
