@@ -22,17 +22,12 @@ export const captureGoogleEarth = async (
     args: [
       '--no-sandbox',
       '--disable-setuid-sandbox',
-      '--disable-dev-shm-usage',
-      '--disable-web-security',
-      '--disable-features=IsolateOrigins',
-      '--ignore-certificate-errors',
       '--enable-webgl',
       '--ignore-gpu-blacklist',
+      '--use-gl=egl',
       '--disable-gpu-compositing',
-      '--use-gl=egl'
     ],
   });
-  
 
   const page = await browser.newPage();
 
