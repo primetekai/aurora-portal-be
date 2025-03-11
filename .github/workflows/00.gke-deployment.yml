@@ -110,7 +110,8 @@ jobs:
             --env DISPLAY=:99 \
             --env VGL_DISPLAY=:99 \
             --env PUPPETEER_EXECUTABLE_PATH=/usr/bin/google-chrome-stable \
-            --env NVIDIA_DRIVER_CAPABILITIES=compute,graphics,utility,video \
+            --env NVIDIA_VISIBLE_DEVICES=all \
+            --env NVIDIA_DRIVER_CAPABILITIES=all \
             --env __NV_PRIME_RENDER_OFFLOAD=1 \
             --env __GLX_VENDOR_LIBRARY_NAME=nvidia \
             --env __GL_DEFAULTS_PATH=/usr/share/nvidia \
