@@ -1,4 +1,3 @@
-# Sử dụng CUDA 12.8 với Ubuntu 22.04 (hỗ trợ NVIDIA tốt nhất)
 FROM nvidia/cuda:12.8.0-runtime-ubuntu22.04
 
 # Thiết lập môi trường
@@ -15,16 +14,18 @@ RUN apt-get update && apt-get install -y \
   libatk-bridge2.0-0 libgtk-3-0 && \
   rm -rf /var/lib/apt/lists/*
 
-# Cài đặt VirtualGL từ source chính thức
+# Cài đặt VirtualGL và Google Chrome
 RUN wget https://sourceforge.net/projects/virtualgl/files/3.1/virtualgl_3.1_amd64.deb -O /tmp/virtualgl.deb && \
   dpkg -i /tmp/virtualgl.deb || apt-get -f install -y && \
-  rm /tmp/virtualgl.deb
-
-# Cài đặt Google Chrome từ repo chính thức
-RUN curl -fsSL https://dl.google.com/linux/linux_signing_key.pub | apt-key add - && \
+  rm /tmp/virtualgl.deb && \
+  curl -fsSL https://dl.google.com/linux/linux_signing_key.pub | apt-key add - && \
   echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" | tee /etc/apt/sources.list.d/google-chrome.list && \
   apt-get update && apt-get install -y google-chrome-stable && \
   rm -rf /var/lib/apt/lists/*
+
+# Cài đặt Node.js 20.x
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
+  apt-get install -y nodejs
 
 # Thiết lập biến môi trường cho Puppeteer
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/google-chrome-stable
