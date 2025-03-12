@@ -19,7 +19,7 @@ COPY . .
 
 RUN npm run build
 
-ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 
 EXPOSE 4000
 

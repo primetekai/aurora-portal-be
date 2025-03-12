@@ -13,7 +13,7 @@ export const captureGoogleEarth = async (
   location: string,
 ): Promise<ICaptureGoogleEarth> => {
   const browser = await puppeteer.launch({
-    executablePath: '/usr/bin/chromium-browser',
+    executablePath: '/usr/bin/chromium',
     headless: true,
     defaultViewport: {
       width: 1920,
