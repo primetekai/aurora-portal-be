@@ -52,7 +52,8 @@ export class PulsarService implements OnModuleInit, OnModuleDestroy {
       this.logger.log(`✅ Parsed message: ${JSON.stringify(res)}`);
 
       const { propertyId, data } = res;
-      const { longitude, latitude } = data;
+
+      const { longitude, latitude, zoom } = data;
 
       if (!longitude || !latitude) {
         this.logger.warn('⚠️ Missing longitude or latitude');
@@ -63,7 +64,10 @@ export class PulsarService implements OnModuleInit, OnModuleDestroy {
         `🌍 Crawling video for location: (${latitude}, ${longitude})`,
       );
       const location = `${latitude} ${longitude}`;
-      const result = await this.crawlService.crawlCaptureGoogleEarth(location);
+      const result = await this.crawlService.crawlCaptureGoogleEarth(
+        location,
+        zoom,
+      );
 
       if (!result || !result) {
         this.logger.error('❌ Failed to get download URL');
@@ -76,6 +80,7 @@ export class PulsarService implements OnModuleInit, OnModuleDestroy {
         propertyId,
         data: {
           videoUrl: result,
+          zoom,
         },
       };
 
