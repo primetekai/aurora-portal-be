@@ -65,7 +65,7 @@ export class PulsarService implements OnModuleInit, OnModuleDestroy {
       const location = `${latitude} ${longitude}`;
       const result = await this.crawlService.crawlCaptureGoogleEarth(location);
 
-      if (!result || !result.downloadUrl) {
+      if (!result || !result) {
         this.logger.error('❌ Failed to get download URL');
         return;
       }
@@ -75,7 +75,7 @@ export class PulsarService implements OnModuleInit, OnModuleDestroy {
         timestamp: new Date().toISOString(),
         propertyId,
         data: {
-          videoUrl: result.downloadUrl,
+          videoUrl: result,
         },
       };
 

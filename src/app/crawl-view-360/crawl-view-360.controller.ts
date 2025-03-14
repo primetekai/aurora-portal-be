@@ -65,6 +65,11 @@ export class CrawlController {
     required: true,
     description: 'Location to capture a 360-degree image',
   })
+  @ApiQuery({
+    name: 'zoom',
+    required: true,
+    description: 'Zoom to capture a 360-degree image',
+  })
   @ApiResponse({
     status: 200,
     description: 'Returns the URL of the 360-degree video from MinIO',
@@ -79,6 +84,7 @@ export class CrawlController {
   })
   async generateImage360(
     @Query('location') location: string,
+    @Query('zoom') zoom: number,
     @Res() res: Response,
   ) {
     if (!location) {
@@ -93,22 +99,21 @@ export class CrawlController {
         `🌍 Starting 360-degree image capture at location: ${location}`,
       );
 
-      // 📌 Retrieve the video download link from MinIO
-      const result = await this.crawlService.crawlCaptureGoogleEarth(location);
+      const result = await this.crawlService.crawlCaptureGoogleEarth(
+        location,
+        zoom,
+      );
 
-      if (!result || !result.videoPath || !result.videoZoomPath) {
+      if (!result) {
         throw new Error('Error uploading video to MinIO');
       }
 
-      console.log(
-        `✅ Video successfully uploaded to MinIO: ${result.downloadUrl} ${result.videoZoomPath}`,
-      );
+      console.log(`✅ Video successfully uploaded to MinIO: ${result}`);
 
       res.set({ 'Content-Type': 'application/json' });
       return res.json({
         message: '✅ Success!',
-        videoPath: result.videoPath, // Return the MinIO video URL
-        videoZoomPath: result.videoZoomPath, // Return the MinIO video URL
+        downloadUrl: result,
       });
     } catch (error) {
       console.error('❌ Error capturing Google Earth 360 image:', error);
