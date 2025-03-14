@@ -20,8 +20,8 @@ export const captureGoogleEarth = async (
       height: 1080,
     },
     args: [
-      '--no-sandbox',
-      '--disable-setuid-sandbox',
+      // '--no-sandbox',
+      // '--disable-setuid-sandbox',
       // 'puppeteer-extra-plugin-stealth',
       // '--no-sandbox',
       // '--disable-setuid-sandbox',
@@ -30,6 +30,13 @@ export const captureGoogleEarth = async (
       // '--no-first-run',
       // '--no-zygote',
       // '--single-process',
+
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-dev-shm-usage',
+      '--disable-web-security',
+      '--disable-features=IsolateOrigins',
+      '--ignore-certificate-errors',
     ],
   });
 
