@@ -26,7 +26,7 @@ export class PulsarService implements OnModuleInit, OnModuleDestroy {
     this.consumer = await this.client.subscribe({
       topic: 'persistent://public/default/property-capture-request',
       subscription: 'property-capture-request-subscription',
-      subscriptionType: 'KeyShared',
+      subscriptionType: 'Shared',
       listener: this.handleMessage.bind(this),
     });
 
