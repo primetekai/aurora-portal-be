@@ -66,6 +66,10 @@ export const captureGoogleEarth = async (
       waitUntil: 'networkidle2',
     });
 
+    await delay(1000);
+
+    await page.reload({ waitUntil: 'networkidle2' });
+
     await delay(5000);
 
     await clickSearchInput(page);
