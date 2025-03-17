@@ -21,38 +21,7 @@ export const captureGoogleEarth = async (
       width: 1920,
       height: 1080,
     },
-    args: [
-      '--no-sandbox',
-      '--disable-setuid-sandbox',
-      '--disable-dev-shm-usage',
-      '--disable-web-security',
-      '--disable-features=IsolateOrigins',
-      '--ignore-certificate-errors',
-      //dev
-      // '--no-sandbox',
-      // '--disable-setuid-sandbox',
-      // '--disable-dev-shm-usage',
-      // '--disable-gpu',
-      // '--no-first-run',
-      // '--no-zygote',
-      // dev
-      // '--disable-accelerated-2d-canvas',
-      // '--disable-features=site-per-process',
-      // '--disable-background-networking',
-      // '--disable-breakpad',
-      // '--disable-client-side-phishing-detection',
-      // '--disable-default-apps',
-      // '--disable-extensions',
-      // '--disable-hang-monitor',
-      // '--disable-popup-blocking',
-      // '--disable-prompt-on-repost',
-      // '--disable-sync',
-      // '--metrics-recording-only',
-      // '--mute-audio',
-      // '--no-first-run',
-      // '--safebrowsing-disable-auto-update',
-      // '--enable-automation',
-    ],
+    args: ['--no-sandbox', '--disable-setuid-sandbox'],
   });
 
   const page = await browser.newPage();
@@ -107,27 +76,31 @@ export const captureGoogleEarth = async (
 
     await delay(1000);
 
-    console.log('🎥 Recording screenshot videos 1 for 40 seconds...');
+    console.log('🎥 Starting high-quality video capture...');
 
-    const framesDir = await captureFrames(page, 20);
+    const framesDir = await captureFramesWithDynamicRate(page);
+    const videoPath = await convertToVideo(framesDir);
 
-    console.log('🎞 Converting images to video...');
-
-    const videoPath = await convertImagesToVideo(framesDir);
-
-    await delay(1000);
+    // Cleanup frames
+    await fs
+      .remove(framesDir)
+      .catch((err) =>
+        console.warn('⚠️ Warning: Could not remove frames directory:', err),
+      );
 
     await browser.close();
-
     return videoPath;
   } catch (error) {
-    console.error('❌ Error capturing Google Earth video:', error);
+    console.error('❌ Error during capture:', error);
     await browser.close();
     throw error;
   }
 };
 
-const captureFrames = async (page: Page, duration: number): Promise<string> => {
+const captureFramesMac = async (
+  page: Page,
+  duration: number,
+): Promise<string> => {
   const framesDir = path.join(__dirname, 'frames');
   await fs.ensureDir(framesDir);
 
@@ -148,7 +121,267 @@ const captureFrames = async (page: Page, duration: number): Promise<string> => {
   return framesDir;
 };
 
-const convertImagesToVideo = async (framesDir: string): Promise<string> => {
+// Rap
+const captureFrames1 = async (
+  page: Page,
+  duration: number,
+): Promise<string> => {
+  const framesDir = path.join(__dirname, 'frames');
+  await fs.ensureDir(framesDir);
+
+  const endTimeFirstPart = 5000; // 5 giây đầu
+  const endTimeSecondPart = 10000; // 10 giây đầu
+  const endTimeThirdPart = duration * 1000; // 40 giây đầy đủ
+
+  let currentTime = 0;
+  let frameRate;
+  let totalFrames = 0;
+
+  while (currentTime < endTimeThirdPart) {
+    if (currentTime < endTimeFirstPart) {
+      frameRate = 12; // 12 frames/giây
+    } else if (currentTime < endTimeSecondPart) {
+      frameRate = 8; // 8 frames/giây
+    } else {
+      frameRate = 1.67; // 1.67 frames/giây
+    }
+
+    const filePath = path.join(
+      framesDir,
+      `frame-${String(Math.floor(currentTime / 1000)).padStart(4, '0')}.jpg`,
+    );
+
+    await page.screenshot({ path: filePath, type: 'jpeg' });
+
+    const delayTime = 1000 / frameRate;
+    await delay(delayTime);
+    currentTime += delayTime;
+    totalFrames++;
+  }
+
+  console.log(`Total frames captured: ${totalFrames}`);
+  return framesDir;
+};
+
+const captureFrames = async (page: Page, duration: number): Promise<string> => {
+  const framesDir = path.join(__dirname, 'frames');
+  await fs.ensureDir(framesDir);
+
+  const endTimeFirstPart = 5000; // 5 giây đầu
+  const endTimeSecondPart = 10000; // 10 giây đầu
+  const endTimeThirdPart = duration * 1000; // 40 giây đầy đủ
+
+  let currentTime = 0;
+  let frameRate;
+  let totalFrames = 0;
+
+  while (currentTime < endTimeThirdPart) {
+    if (currentTime < endTimeFirstPart) {
+      frameRate = 66.6; // 66.6 frames/giây
+    } else if (currentTime < endTimeSecondPart) {
+      frameRate = 66.6; // 66.6 frames/giây
+    } else {
+      frameRate = 11.1; // 11.1 frames/giây
+    }
+
+    const filePath = path.join(
+      framesDir,
+      `frame-${String(Math.floor(currentTime / 1000)).padStart(4, '0')}.jpg`,
+    );
+
+    await page.screenshot({ path: filePath, type: 'jpeg' });
+
+    const delayTime = 1000 / frameRate;
+    await delay(delayTime);
+    currentTime += delayTime;
+    totalFrames++;
+  }
+
+  console.log(`Total frames captured: ${totalFrames}`);
+  return framesDir;
+};
+
+interface CaptureConfig {
+  startFrameRate: number;
+  midFrameRate: number;
+  endFrameRate: number;
+  quality: number;
+  format: 'jpeg' | 'png';
+}
+
+const captureFramesHQ = async (
+  page: Page,
+  duration: number,
+  config: CaptureConfig = {
+    startFrameRate: 60, // Smooth start
+    midFrameRate: 45, // Good middle motion
+    endFrameRate: 30, // Stable end
+    quality: 100, // Maximum quality
+    format: 'png', // Better quality than JPEG
+  },
+): Promise<string> => {
+  const framesDir = path.join(__dirname, `frames-${uuidv4()}`);
+  await fs.ensureDir(framesDir);
+
+  const phases = [
+    { duration: 5000, frameRate: config.startFrameRate }, // First 5 seconds
+    { duration: 5000, frameRate: config.midFrameRate }, // Next 5 seconds
+    { duration: (duration - 10) * 1000, frameRate: config.endFrameRate }, // Remaining time
+  ];
+
+  let currentTime = 0;
+  let frameCount = 0;
+
+  console.log('📸 Starting high-quality frame capture...');
+
+  for (const phase of phases) {
+    const endTime = currentTime + phase.duration;
+    const frameInterval = 1000 / phase.frameRate;
+
+    while (currentTime < endTime) {
+      const frameNumber = String(frameCount).padStart(6, '0');
+      const filePath = path.join(
+        framesDir,
+        `frame-${frameNumber}.${config.format}`,
+      );
+
+      await page.screenshot({
+        path: filePath,
+        type: config.format,
+        quality: config.format === 'jpeg' ? config.quality : undefined,
+        fullPage: false,
+        optimizeForSpeed: true,
+      });
+
+      frameCount++;
+      currentTime += frameInterval;
+      await delay(frameInterval);
+
+      if (frameCount % 100 === 0) {
+        console.log(`📊 Captured ${frameCount} frames...`);
+      }
+    }
+  }
+
+  console.log(`✅ Total frames captured: ${frameCount}`);
+  return framesDir;
+};
+
+interface CapturePhase {
+  duration: number; // in seconds
+  totalFrames: number;
+}
+
+const captureFramesWithDynamicRate = async (page: Page): Promise<string> => {
+  const framesDir = path.join(__dirname, `frames-${uuidv4()}`);
+  await fs.ensureDir(framesDir);
+
+  // Define capture phases
+  const phases: CapturePhase[] = [
+    { duration: 5, totalFrames: 60 }, // First 5 seconds: 60 frames (12 fps)
+    { duration: 5, totalFrames: 40 }, // Next 5 seconds: 40 frames (8 fps)
+    { duration: 30, totalFrames: 50 }, // Last 30 seconds: 50 frames (~1.67 fps)
+  ];
+
+  let frameCount = 0;
+  console.log('📸 Starting optimized frame capture...');
+
+  for (const phase of phases) {
+    const frameInterval = (phase.duration * 1000) / phase.totalFrames;
+    const startTime = Date.now();
+    const endTime = startTime + phase.duration * 1000;
+
+    console.log(
+      `🎥 Starting phase: ${phase.totalFrames} frames over ${phase.duration}s`,
+    );
+
+    for (let i = 0; i < phase.totalFrames; i++) {
+      const frameNumber = String(frameCount).padStart(6, '0');
+      const filePath = path.join(framesDir, `frame-${frameNumber}.png`);
+
+      await page.screenshot({
+        path: filePath,
+        type: 'png',
+        fullPage: false,
+        optimizeForSpeed: false, // Prioritize quality over speed
+      });
+
+      frameCount++;
+
+      if (frameCount % 10 === 0) {
+        console.log(`📊 Captured ${frameCount} frames...`);
+      }
+
+      const nextCaptureTime = startTime + (i + 1) * frameInterval;
+      const now = Date.now();
+      const waitTime = Math.max(0, nextCaptureTime - now);
+
+      if (waitTime > 0) {
+        await delay(waitTime);
+      }
+    }
+  }
+
+  console.log(`✅ Capture completed: ${frameCount} total frames`);
+  return framesDir;
+};
+
+const convertImagesToVideo = async (
+  framesDir: string,
+  totalFrames: number,
+  desiredDuration: number,
+): Promise<string> => {
+  const videoFileName = `${uuidv4()}.mp4`;
+  const videoPath = path.join(__dirname, videoFileName);
+
+  // Tính tỷ lệ khung hình dựa trên tổng số frames và thời gian mong muốn của video
+  const frameRate = totalFrames / desiredDuration;
+
+  const ffmpegCommand = `
+    ffmpeg -framerate ${frameRate} -i ${framesDir}/frame-%04d.jpg \
+    -c:v libx264 -pix_fmt yuv420p -t ${desiredDuration} ${videoPath}
+  `;
+
+  return new Promise((resolve, reject) => {
+    exec(ffmpegCommand, (error, stdout, stderr) => {
+      if (error) {
+        console.error(`❌ FFmpeg error: ${stderr}`);
+        reject(error);
+      } else {
+        console.log(`✅ Video created successfully: ${videoPath}`);
+        resolve(videoPath);
+      }
+    });
+  });
+};
+
+// 300 frame
+const convertImagesToVideo300s = async (framesDir: string): Promise<string> => {
+  const videoFileName = `${uuidv4()}.mp4`;
+  const videoPath = path.join(__dirname, videoFileName);
+
+  const averageFrameRate = 150 / 40; // Tính tỷ lệ khung hình trung bình từ tổng số frames và thời gian
+
+  const ffmpegCommand = `
+    ffmpeg -framerate ${averageFrameRate} -i ${framesDir}/frame-%04d.jpg \
+    -vf "crop=in_w:in_h*0.8:0:in_h*0.1" \
+    -c:v libx264 -pix_fmt yuv420p ${videoPath}
+  `;
+
+  return new Promise((resolve, reject) => {
+    exec(ffmpegCommand, (error, stdout, stderr) => {
+      if (error) {
+        console.error(`❌ FFmpeg error: ${stderr}`);
+        reject(error);
+      } else {
+        console.log(`✅ Video created successfully: ${videoPath}`);
+        resolve(videoPath);
+      }
+    });
+  });
+};
+
+const convertImagesToVideoMac = async (framesDir: string): Promise<string> => {
   const videoFileName = `${uuidv4()}.mp4`; // 🔹 Generate a random video file name
 
   const videoPath = path.join(__dirname, videoFileName);
@@ -171,6 +404,96 @@ const convertImagesToVideo = async (framesDir: string): Promise<string> => {
         console.log(`✅ Video created successfully: ${videoPath}`);
         resolve(videoPath);
       }
+    });
+  });
+};
+
+const convertToHighQualityVideo = async (
+  framesDir: string,
+  outputFileName: string = `${uuidv4()}.mp4`,
+): Promise<string> => {
+  const videoPath = path.join(__dirname, outputFileName);
+
+  // Advanced FFmpeg settings for high quality
+  const ffmpegCommand = `
+    ffmpeg -framerate 60 -i ${framesDir}/frame-%06d.png \
+    -c:v libx264 \
+    -preset slow \
+    -crf 17 \
+    -profile:v high \
+    -tune film \
+    -movflags +faststart \
+    -pix_fmt yuv420p \
+    -vf "scale=1920:1080:flags=lanczos,crop=in_w:in_h*0.8:0:in_h*0.1" \
+    -metadata title="Google Earth 360 View" \
+    -y ${videoPath}
+  `;
+
+  return new Promise((resolve, reject) => {
+    console.log('🎬 Starting video encoding...');
+
+    exec(ffmpegCommand, (error, stdout, stderr) => {
+      if (error) {
+        console.error('❌ FFmpeg error:', stderr);
+        reject(error);
+        return;
+      }
+
+      // Verify the output video
+      fs.stat(videoPath, (err, stats) => {
+        if (err) {
+          reject(new Error('Video file not created'));
+          return;
+        }
+
+        const fileSizeMB = stats.size / (1024 * 1024);
+        console.log(
+          `✅ Video created successfully! Size: ${fileSizeMB.toFixed(2)}MB`,
+        );
+        resolve(videoPath);
+      });
+    });
+  });
+};
+
+const convertToVideo = async (framesDir: string): Promise<string> => {
+  const videoPath = path.join(__dirname, `${uuidv4()}.mp4`);
+
+  const ffmpegCommand = `
+    ffmpeg -framerate 24 -i ${framesDir}/frame-%06d.png \
+    -c:v libx264 \
+    -preset slow \
+    -crf 18 \
+    -profile:v high \
+    -tune film \
+    -movflags +faststart \
+    -pix_fmt yuv420p \
+    -vf "scale=1920:1080:flags=lanczos,fps=24" \
+    -y ${videoPath}
+  `;
+
+  return new Promise((resolve, reject) => {
+    console.log('🎬 Converting frames to video...');
+
+    exec(ffmpegCommand, (error, stdout, stderr) => {
+      if (error) {
+        console.error('❌ FFmpeg error:', stderr);
+        reject(error);
+        return;
+      }
+
+      fs.stat(videoPath, (err, stats) => {
+        if (err) {
+          reject(new Error('Video file not created'));
+          return;
+        }
+
+        const fileSizeMB = stats.size / (1024 * 1024);
+        console.log(
+          `✅ Video created successfully! Size: ${fileSizeMB.toFixed(2)}MB`,
+        );
+        resolve(videoPath);
+      });
     });
   });
 };
