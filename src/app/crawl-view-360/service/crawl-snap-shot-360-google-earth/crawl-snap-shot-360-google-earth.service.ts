@@ -14,6 +14,8 @@ export const captureGoogleEarth = async (
 ): Promise<string> => {
   const browser = await puppeteer.launch({
     executablePath: '/usr/bin/chromium-browser',
+    // executablePath:
+    //   '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
     headless: false,
     defaultViewport: {
       width: 1920,
@@ -184,7 +186,7 @@ const clickSearchInput = async (page: Page) => {
   const x = 185;
   const y = 32;
 
-  await page.mouse.click(x, y, { delay: 1000 });
+  await page.mouse.click(x, y, { delay: 100 });
 
   console.log(`✅ Clicked on search input at: (${x}, ${y})`);
 };
@@ -192,7 +194,7 @@ const clickSearchInput = async (page: Page) => {
 const clickButtonUI = async (page: Page, x: number, y: number) => {
   console.log(`🖱️ Clicking at (${x}, ${y})...`);
 
-  await page.mouse.click(x, y, { delay: 1000 });
+  await page.mouse.click(x, y, { delay: 100 });
 };
 
 // Rotate
@@ -219,7 +221,7 @@ const clickMultipleTimes = async (
   console.log(`🖱️ Clicking at (${x}, ${y}) ${count} times...`);
 
   for (let i = 0; i < count; i++) {
-    await page.mouse.click(x, y, { delay: 1000 }); // Add delay to prevent clicking too fast
+    await page.mouse.click(x, y, { delay: 100 }); // Add delay to prevent clicking too fast
     await delay(1000); // Wait a bit between clicks
   }
   console.log(`✅ Finished clicking ${count} times at (${x}, ${y})`);
