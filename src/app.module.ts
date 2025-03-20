@@ -13,6 +13,7 @@ import {
   KSplatModule,
   PulsarModule,
 } from './app';
+import { NODE_ENV } from './config';
 
 @Module({
   imports: [
@@ -24,9 +25,9 @@ import {
     // SectionsModule,
     // UploadModule,
     // SpeedToTextModule,
-    CrawlModule,
     KSplatModule,
-    PulsarModule,
+    ...(NODE_ENV === 'development' ? [CrawlModule] : []),
+    ...(NODE_ENV === 'development' ? [PulsarModule] : []),
   ],
 
   providers: [

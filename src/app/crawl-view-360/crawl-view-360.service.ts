@@ -1,8 +1,8 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import {
   captureGoogleEarth,
   crawlSnapShotScreenWebService,
-  ICaptureGoogleEarth,
+  IVideoMetadata,
 } from './service';
 import { MinIOService } from '../k-splat/service';
 import * as fs from 'fs';
@@ -30,92 +30,88 @@ export class CrawlService {
     }
   }
 
-  async crawlCaptureGoogleEarth(location: string): Promise<any> {
-    let outputFile: ICaptureGoogleEarth | null = null;
+  async crawlCaptureGoogleEarth(
+    location: string,
+    zoom?: number,
+  ): Promise<string | null> {
+    let outputFile: IVideoMetadata | null = null;
+    const MIN_VIDEO_SIZE_MB = 1;
+    const MAX_RETRIES = 2;
 
     console.log(
       `🌍 Starting Google Earth video capture at location: ${location}`,
     );
 
     try {
-      // 1️⃣ Capture Google Earth video
-      outputFile = await captureGoogleEarth(location);
-      console.log(`📽️ Video created: ${outputFile}`);
+      for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+        try {
+          outputFile = await captureGoogleEarth(location, zoom);
 
-      // Extract file name from path (compatible with both Windows and Linux)
-      const fileNameVideoPath = path.basename(outputFile?.videoPath);
-      const fileNameVideoZoomPath = path.basename(outputFile?.videoZoomPath);
+          // Check video size
+          if (outputFile?.size?.megabytes < MIN_VIDEO_SIZE_MB) {
+            console.warn(
+              `⚠️ Attempt ${attempt}: Video size too small (${outputFile.size.megabytes}MB < ${MIN_VIDEO_SIZE_MB}MB)`,
+            );
 
-      if (!fileNameVideoPath || !fileNameVideoZoomPath) {
-        throw new Error('Unable to determine video file name.');
+            if (attempt < MAX_RETRIES) {
+              console.log(`🔄 Retrying capture...`);
+              this.deleteFile(outputFile.videoPath);
+              continue;
+            } else {
+              console.error(
+                '❌ Failed to capture video of sufficient size after all attempts',
+              );
+              return null;
+            }
+          }
+
+          console.log(`✅ Video captured successfully:`, {
+            path: outputFile.videoPath,
+            size: `${outputFile.size.megabytes}MB`,
+            duration: `${outputFile.duration}s`,
+            frames: outputFile.frameCount,
+          });
+
+          const fileNameVideoPath = path.basename(outputFile.videoPath);
+
+          const minioDir = process.env.MINIO_PATH_DIR || '3d-video-360';
+
+          const minioPath = `${minioDir}/${fileNameVideoPath}`;
+
+          console.log(`📤 Uploading video to MinIO at: ${minioPath}`);
+
+          const videoUrl = await this.minioService.uploadFile({
+            objectName: minioPath,
+            filePath: outputFile.videoPath,
+            pathDir: minioDir,
+            bucketName: '3d-tour-outside',
+          });
+
+          if (!videoUrl) {
+            console.error('❌ MinIO upload failed');
+            return null;
+          }
+
+          return videoUrl;
+        } catch (captureError) {
+          if (attempt === MAX_RETRIES) {
+            console.error(
+              `❌ All capture attempts failed: ${captureError.message}`,
+            );
+            return null;
+          }
+          console.warn(`⚠️ Attempt ${attempt} failed, retrying...`);
+        }
       }
 
-      console.log(`📂 Video file name: ${fileNameVideoPath}`);
-      console.log(`📂 Video file zoom name: ${fileNameVideoZoomPath}`);
-
-      // Ensure files exist before uploading
-      if (!fs.existsSync(outputFile.videoPath)) {
-        throw new Error(`File does not exist: ${outputFile.videoPath}`);
-      }
-
-      if (!fs.existsSync(outputFile.videoZoomPath)) {
-        throw new Error(`File does not exist: ${outputFile.videoZoomPath}`);
-      }
-
-      // 2️⃣ Upload file to MinIO
-      const minioDir = process.env.MINIO_PATH_DIR || '3d-video-360';
-
-      const minioPath = `${minioDir}/${fileNameVideoPath}`;
-
-      const minioPathZoom = `${minioDir}/${fileNameVideoZoomPath}`;
-
-      console.log(`📤 Uploading video to MinIO at: ${minioPath}`);
-
-      const videoUrl = await this.minioService.uploadFile({
-        objectName: minioPath,
-        filePath: outputFile?.videoPath,
-        pathDir: minioDir,
-        bucketName: '3d-tour-outside',
-      });
-
-      const videoZoomUrl = await this.minioService.uploadFile({
-        objectName: minioPathZoom,
-        filePath: outputFile?.videoZoomPath,
-        pathDir: minioDir,
-        bucketName: '3d-tour-outside',
-      });
-
-      if (!videoUrl || !videoZoomUrl) {
-        throw new Error('❌ Error uploading video to MinIO');
-      }
-
-      console.log(
-        `✅ Video successfully uploaded to MinIO! URL: ${videoZoomUrl} ${videoUrl}`,
-      );
-
-      this.deleteFile(outputFile?.videoPath);
-      this.deleteFile(outputFile?.videoZoomPath);
-
-      const response = {
-        message: '✅ Capture and upload process completed successfully',
-        videoUrl,
-        videoZoomUrl,
-      };
-
-      console.log('📤 Returning response:', response);
-
-      return response;
+      return null;
     } catch (error) {
       console.error(`❌ Error during processing: ${error.message}`);
-
-      if (outputFile) {
-        this.deleteFile(outputFile?.videoPath);
-        this.deleteFile(outputFile?.videoZoomPath);
+      return null;
+    } finally {
+      if (outputFile?.videoPath && !outputFile?.videoPath) {
+        this.deleteFile(outputFile.videoPath);
       }
-
-      throw new InternalServerErrorException(
-        `❌ Error processing video: ${error.message}`,
-      );
     }
   }
 }
