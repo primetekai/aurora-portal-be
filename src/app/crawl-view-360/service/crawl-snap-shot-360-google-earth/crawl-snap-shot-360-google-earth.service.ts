@@ -13,46 +13,24 @@ export const captureGoogleEarth = async (
   zoom?: number,
 ): Promise<string> => {
   const browser = await puppeteer.launch({
-    executablePath: '/usr/bin/google-chrome',
+    executablePath: '/usr/bin/chromium-browser',
     // executablePath:
     //   '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
-    headless: true,
+    headless: false,
     defaultViewport: {
       width: 1920,
       height: 1080,
     },
     args: [
-      // '--no-sandbox',
-      // '--disable-setuid-sandbox',
-      // '--disable-dev-shm-usage',
-      // '--disable-web-security',
-      // '--disable-features=IsolateOrigins',
-      // '--ignore-certificate-errors',
-      //dev
       '--no-sandbox',
       '--disable-setuid-sandbox',
-      // '--disable-dev-shm-usage',
-      // '--disable-gpu',
-      // '--no-first-run',
-      // '--no-zygote',
-      // dev
-      // '--disable-accelerated-2d-canvas',
-      // '--disable-features=site-per-process',
-      // '--disable-background-networking',
-      // '--disable-breakpad',
-      // '--disable-client-side-phishing-detection',
-      // '--disable-default-apps',
-      // '--disable-extensions',
-      // '--disable-hang-monitor',
-      // '--disable-popup-blocking',
-      // '--disable-prompt-on-repost',
-      // '--disable-sync',
-      // '--metrics-recording-only',
-      // '--mute-audio',
-      // '--no-first-run',
-      // '--safebrowsing-disable-auto-update',
-      // '--enable-automation',
+      '--disable-gpu',
+      '--ozone-platform=wayland',
     ],
+    env: {
+      DISPLAY: ':0',
+      WAYLAND_DISPLAY: 'wayland-0',
+    },
   });
 
   const page = await browser.newPage();
