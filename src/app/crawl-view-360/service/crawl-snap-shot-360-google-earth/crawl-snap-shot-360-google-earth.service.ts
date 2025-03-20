@@ -30,6 +30,7 @@ export const captureGoogleEarth = async (
     env: {
       DISPLAY: ':0',
       WAYLAND_DISPLAY: 'wayland-0',
+      XDG_SESSION_TYPE: 'wayland',
     },
   });
 
