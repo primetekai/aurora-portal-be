@@ -13,7 +13,7 @@ export const captureGoogleEarth = async (
   zoom?: number,
 ): Promise<string> => {
   const browser = await puppeteer.launch({
-    executablePath: '/usr/bin/chromium-browser',
+    executablePath: '/usr/bin/google-chrome',
     // executablePath:
     //   '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
     headless: false,
@@ -24,7 +24,7 @@ export const captureGoogleEarth = async (
     args: [
       '--no-sandbox',
       '--disable-setuid-sandbox',
-      '--disable-gpu',
+      // '--disable-gpu',
       '--ozone-platform=wayland',
     ],
     env: {
