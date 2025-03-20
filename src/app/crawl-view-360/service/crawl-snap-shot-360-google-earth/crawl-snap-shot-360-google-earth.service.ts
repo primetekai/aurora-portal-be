@@ -31,10 +31,10 @@ export const captureGoogleEarth = async (
       //dev
       '--no-sandbox',
       '--disable-setuid-sandbox',
-      '--disable-dev-shm-usage',
-      '--disable-gpu',
-      '--no-first-run',
-      '--no-zygote',
+      // '--disable-dev-shm-usage',
+      // '--disable-gpu',
+      // '--no-first-run',
+      // '--no-zygote',
       // dev
       // '--disable-accelerated-2d-canvas',
       // '--disable-features=site-per-process',
