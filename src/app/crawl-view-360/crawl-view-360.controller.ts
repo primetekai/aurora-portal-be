@@ -111,10 +111,7 @@ export class CrawlController {
       console.log(`✅ Video successfully uploaded to MinIO: ${result}`);
 
       res.set({ 'Content-Type': 'application/json' });
-      return res.json({
-        message: '✅ Success!',
-        downloadUrl: result,
-      });
+      return res.json(result);
     } catch (error) {
       console.error('❌ Error capturing Google Earth 360 image:', error);
       throw new HttpException(

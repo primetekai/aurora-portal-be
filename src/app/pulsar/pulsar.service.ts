@@ -53,8 +53,7 @@ export class PulsarService implements OnModuleInit, OnModuleDestroy {
       const res = JSON.parse(rawData);
       this.logger.log(`✅ Parsed message: ${JSON.stringify(res)}`);
 
-      const { propertyId, data } = res;
-
+      const { propertyId, data, attempts = 0 } = res;
       const { longitude, latitude, zoom } = data;
 
       if (!longitude || !latitude) {
@@ -62,8 +61,17 @@ export class PulsarService implements OnModuleInit, OnModuleDestroy {
         return;
       }
 
+      // Don't process if max attempts reached
+      if (attempts >= 2) {
+        this.logger.warn(
+          `⚠️ Max attempts (${attempts}) reached for propertyId: ${propertyId}`,
+        );
+        consumer.acknowledge(msg);
+        return;
+      }
+
       this.logger.log(
-        `🌍 Crawling video for location: (${latitude}, ${longitude})`,
+        `🌍 Crawling video for location: (${latitude}, ${longitude}), attempt: ${attempts + 1}`,
       );
       const location = `${latitude} ${longitude}`;
       const result = await this.crawlService.crawlCaptureGoogleEarth(
@@ -71,28 +79,49 @@ export class PulsarService implements OnModuleInit, OnModuleDestroy {
         zoom,
       );
 
-      if (!result || !result) {
-        this.logger.error('❌ Failed to get download URL');
-        return;
+      let responseMessage;
+
+      if (!result) {
+        // Handle failure case
+        responseMessage = {
+          eventType: 'CATURED_FAILED',
+          timestamp: new Date().toISOString(),
+          propertyId,
+          attempts: attempts + 1,
+          data: {
+            zoom,
+            videoUrl: null,
+          },
+        };
+
+        this.logger.warn(
+          `⚠️ Capture failed for propertyId: ${propertyId}, attempt: ${attempts + 1}`,
+        );
+      } else {
+        // Handle success case
+        responseMessage = {
+          eventType: 'PROPERTY_COMPLETED',
+          timestamp: new Date().toISOString(),
+          propertyId,
+          attempts: attempts + 1,
+          data: {
+            zoom,
+            videoUrl: result,
+          },
+        };
+
+        this.logger.log(`✅ Capture successful for propertyId: ${propertyId}`);
       }
 
-      const responseMessage = {
-        eventType: 'PROPERTY_COMPLETED',
-        timestamp: new Date().toISOString(),
-        propertyId,
-        data: {
-          videoUrl: result,
-          zoom,
-        },
-      };
+      // Only send message if we haven't reached max attempts
+      if (attempts < 2) {
+        await this.producer.send({
+          data: Buffer.from(JSON.stringify(responseMessage)),
+        });
 
-      await this.producer.send({
-        data: Buffer.from(JSON.stringify(responseMessage)),
-      });
+        this.logger.log(`📤 Sent message: ${JSON.stringify(responseMessage)}`);
+      }
 
-      this.logger.log(
-        `✅ Sent processed message: ${JSON.stringify(responseMessage)}`,
-      );
       consumer.acknowledge(msg);
     } catch (error) {
       this.logger.error(`❌ Error processing message: ${error.message}`);
