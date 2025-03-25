@@ -14,10 +14,12 @@ export const captureGoogleEarth = async (
   zoom?: number,
 ): Promise<IVideoMetadata> => {
   const browser = await puppeteer.launch({
-    executablePath: '/usr/bin/chromium-browser',
+    // executablePath: puppeteer.executablePath(), // ✅ Lấy đúng path tự động
+    // executablePath: '/usr/bin/chromium-browser',
+    executablePath: '/usr/bin/google-chrome',
     // executablePath:
     //   '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
-    headless: false,
+    headless: true,
     defaultViewport: {
       width: 1920,
       height: 1080,
@@ -26,13 +28,13 @@ export const captureGoogleEarth = async (
       '--no-sandbox',
       '--disable-setuid-sandbox',
       // '--disable-gpu',
-      '--ozone-platform=wayland',
+      // '--ozone-platform=wayland',
     ],
-    env: {
-      DISPLAY: ':0',
-      WAYLAND_DISPLAY: 'wayland-0',
-      XDG_SESSION_TYPE: 'wayland',
-    },
+    // env: {
+    //   DISPLAY: ':0',
+    //   WAYLAND_DISPLAY: 'wayland-0',
+    //   XDG_SESSION_TYPE: 'wayland',
+    // },
   });
 
   const page = await browser.newPage();
