@@ -17,7 +17,7 @@ export const captureGoogleEarth = async (
     executablePath: '/usr/bin/chromium-browser',
     // executablePath:
     //   '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
-    headless: false,
+    headless: true,
     defaultViewport: {
       width: 1920,
       height: 1080,
