@@ -17,7 +17,7 @@ export const captureGoogleEarth = async (
     executablePath: '/usr/bin/chromium-browser',
     // executablePath:
     //   '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
-    headless: true,
+    headless: false,
     defaultViewport: {
       width: 1920,
       height: 1080,
@@ -115,16 +115,22 @@ const captureFrames = async (page: Page, duration: number): Promise<string> => {
   const frameRate = 10; // Capture 5 frames per second
   const totalFrames = duration * frameRate;
 
-  for (let i = 0; i < totalFrames; i++) {
-    const filePath = path.join(
-      framesDir,
-      `frame-${String(i).padStart(4, '0')}.jpg`,
-    );
-
-    await page.screenshot({ path: filePath, type: 'jpeg' });
-
-    await delay(1000 / frameRate); // Wait before capturing the next frame
+  console.log(`Starting to capture ${totalFrames} frames.`);
+  try {
+    for (let i = 0; i < totalFrames; i++) {
+      const filePath = path.join(
+        framesDir,
+        `frame-${String(i).padStart(4, '0')}.jpg`,
+      );
+      await page.screenshot({ path: filePath, type: 'jpeg' });
+      console.log(`Captured frame ${i + 1}/${totalFrames}`);
+      await delay(1000 / frameRate); // Wait before capturing the next frame
+    }
+  } catch (error) {
+    console.error('Error during frame capture:', error);
+    throw error;
   }
+  console.log('All frames captured successfully.');
 
   return framesDir;
 };
