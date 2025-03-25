@@ -25,12 +25,17 @@ export class PulsarService implements OnModuleInit, OnModuleDestroy {
       serviceUrl: 'pulsar://160.191.164.16:6650',
     });
 
-    this.consumer = await this.client.subscribe({
-      topic: 'persistent://public/default/property-capture-request',
-      subscription: 'persistent-property-capture-request-subscription',
-      subscriptionType: 'Shared',
-      listener: this.handleMessage.bind(this),
-    });
+    try {
+      this.consumer = await this.client.subscribe({
+        topic: 'persistent://public/default/property-capture-request',
+        subscription: 'persistent-property-capture-request-subscription',
+        subscriptionType: 'Shared',
+        listener: this.handleMessage.bind(this),
+      });
+    } catch (err) {
+      this.logger.error(`❌ Failed to create consumer: ${err.message}`);
+      throw err;
+    }
 
     this.producer = await this.client.createProducer({
       topic: 'persistent://public/default/property-capture-completed',
