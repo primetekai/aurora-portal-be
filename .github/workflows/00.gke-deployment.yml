@@ -101,7 +101,13 @@ jobs:
             podman pull $HARBOR_URL/$HARBOR_USERNAME/$IMAGE:$GITHUB_SHA &&
             podman stop $IMAGE || true &&
             podman rm $IMAGE || true &&
-            podman run -d -p ${PORT}:4000 \
+            podman run --rm -it \
+              --gpus all \
+              -e DISPLAY=$DISPLAY \
+              -v /tmp/.X11-unix:/tmp/.X11-unix \
               -v /home/primetek/resource-web/cdn:/home/ubuntu/cdn \
-              --name $IMAGE $HARBOR_URL/$HARBOR_USERNAME/$IMAGE:$GITHUB_SHA
+              -p ${PORT}:4000 \
+              --name $IMAGE \
+              $HARBOR_URL/$HARBOR_USERNAME/$IMAGE:$GITHUB_SHA
+
           "

@@ -9,7 +9,7 @@ on:
 env:
   IMAGE: druce-portal-be
   DOT_ENV_FILE_NAME: .env.druce-portal
-  PORT: 5000
+  PORT: 5010
 jobs:
   variables:
     name: setup variable
