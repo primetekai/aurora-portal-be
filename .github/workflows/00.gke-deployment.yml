@@ -98,16 +98,18 @@ jobs:
       - name: Deploy
         run: |
           ssh -o StrictHostKeyChecking=no -p 775 $SERVER_USER@$SERVER_IP "
-            podman pull $HARBOR_URL/$HARBOR_USERNAME/$IMAGE:$GITHUB_SHA &&
-            podman stop $IMAGE || true &&
-            podman rm $IMAGE || true &&
-            podman run -d \
-              --gpus all \
+            docker pull $HARBOR_URL/$HARBOR_USERNAME/$IMAGE:$GITHUB_SHA &&
+            docker stop $IMAGE || true &&
+            docker rm $IMAGE || true &&
+            docker run -d \
+              --runtime=nvidia --gpus all \
+              -e NVIDIA_DRIVER_CAPABILITIES=all \
               -e DISPLAY=$DISPLAY \
               -v /tmp/.X11-unix:/tmp/.X11-unix \
               -v /home/primetek/resource-web/cdn:/home/ubuntu/cdn \
               -p ${PORT}:4000 \
               --name $IMAGE \
               $HARBOR_URL/$HARBOR_USERNAME/$IMAGE:$GITHUB_SHA
+
           "
 
