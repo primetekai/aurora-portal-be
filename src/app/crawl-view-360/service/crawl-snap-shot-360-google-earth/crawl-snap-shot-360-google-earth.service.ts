@@ -29,6 +29,9 @@ export const captureGoogleEarth = async (
       '--disable-setuid-sandbox',
       // '--disable-gpu',
       // '--ozone-platform=wayland',
+      '--use-gl=egl',
+      '--enable-webgl',
+      '--ignore-gpu-blocklist',
     ],
     // env: {
     //   DISPLAY: ':0',
