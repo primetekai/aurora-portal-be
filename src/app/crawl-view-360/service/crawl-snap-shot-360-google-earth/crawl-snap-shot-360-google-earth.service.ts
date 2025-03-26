@@ -195,25 +195,33 @@ const captureFramesWithDynamicRate = async (page: Page): Promise<string> => {
       const frameNumber = String(frameCount).padStart(6, '0');
       const filePath = path.join(framesDir, `frame-${frameNumber}.png`);
 
-      await page.screenshot({
-        path: filePath,
-        type: 'png',
-        fullPage: false,
-        optimizeForSpeed: false, // Prioritize quality over speed
-      });
+      console.log(`🖼️ Capturing frame ${frameCount} -> ${filePath}`);
 
-      frameCount++;
+      try {
+        await page.screenshot({
+          path: filePath,
+          type: 'png',
+          fullPage: false,
+          optimizeForSpeed: false, // Prioritize quality over speed
+        });
 
-      if (frameCount % 10 === 0) {
-        console.log(`📊 Captured ${frameCount} frames...`);
-      }
+        frameCount++;
 
-      const nextCaptureTime = startTime + (i + 1) * frameInterval;
-      const now = Date.now();
-      const waitTime = Math.max(0, nextCaptureTime - now);
+        if (frameCount % 10 === 0) {
+          console.log(`📊 Captured ${frameCount} frames...`);
+        }
 
-      if (waitTime > 0) {
-        await delay(waitTime);
+        const nextCaptureTime = startTime + (i + 1) * frameInterval;
+        const now = Date.now();
+        const waitTime = Math.max(0, nextCaptureTime - now);
+
+        if (waitTime > 0) {
+          await delay(waitTime);
+        }
+        console.log(`✅ Captured frame ${frameCount}`);
+      } catch (err) {
+        console.error(`❌ Failed to capture frame ${frameCount}:`, err);
+        throw err;
       }
     }
   }
