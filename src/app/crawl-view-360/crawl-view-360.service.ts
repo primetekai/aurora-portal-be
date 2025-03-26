@@ -47,6 +47,8 @@ export class CrawlService {
         try {
           outputFile = await captureGoogleEarth(location, zoom);
 
+          console.log('service output', outputFile);
+
           // Check video size
           if (outputFile?.size?.megabytes < MIN_VIDEO_SIZE_MB) {
             console.warn(
