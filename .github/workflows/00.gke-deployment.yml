@@ -98,9 +98,9 @@ jobs:
       - name: Deploy
         run: |
           ssh -o StrictHostKeyChecking=no -p 775 $SERVER_USER@$SERVER_IP "
-            docker pull $HARBOR_URL/$HARBOR_USERNAME/$IMAGE:$GITHUB_SHA &&
-            docker stop $IMAGE || true &&
-            docker rm $IMAGE || true &&
+            podman pull $HARBOR_URL/$HARBOR_USERNAME/$IMAGE:$GITHUB_SHA &&
+            podman stop $IMAGE || true &&
+            podman rm $IMAGE || true &&
             podman run -d \
               --hooks-dir=/usr/share/containers/oci/hooks.d \
               --device /dev/nvidia0 \
