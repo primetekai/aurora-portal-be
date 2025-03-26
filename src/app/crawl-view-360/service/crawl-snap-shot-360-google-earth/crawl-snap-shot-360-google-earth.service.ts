@@ -19,6 +19,10 @@ const getLaunchOptions = () => {
   const args = ['--no-sandbox', '--disable-setuid-sandbox'];
   let env = undefined;
 
+  console.log('platform: ', {
+    platform,
+  });
+
   if (platform === 'darwin') {
     return { args, env };
   }
@@ -32,6 +36,11 @@ const getLaunchOptions = () => {
       const distro = execSync('lsb_release -is', {
         encoding: 'utf-8',
       }).toLowerCase();
+
+      console.log('sysVendor=distro: ', {
+        sysVendor,
+        distro,
+      });
 
       if (sysVendor.includes('dell') && distro.includes('ubuntu')) {
         args.push('--ozone-platform=wayland');
