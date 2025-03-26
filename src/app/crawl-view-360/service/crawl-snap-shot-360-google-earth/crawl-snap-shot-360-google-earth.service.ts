@@ -1,14 +1,12 @@
 import puppeteer from 'puppeteer-extra';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 import fs from 'fs-extra';
-import { execSync } from 'child_process';
+import { execSync, exec, spawn } from 'child_process';
 import path from 'path';
 import type { Page } from 'puppeteer';
 import { v4 as uuidv4 } from 'uuid';
 import { IVideoMetadata } from './capture-google-earth.type';
-import * as ffmpeg from 'fluent-ffmpeg';
 import os from 'os';
-import { spawn } from 'child_process';
 
 puppeteer.use(StealthPlugin());
 
@@ -260,6 +258,22 @@ const captureFramesWithDynamicRate = async (page: Page): Promise<string> => {
 //   });
 // };
 
+const getVideoDuration = (videoPath: string): Promise<number> => {
+  return new Promise((resolve, reject) => {
+    exec(
+      `ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "${videoPath}"`,
+      (error, stdout, stderr) => {
+        if (error) {
+          console.error('❌ ffprobe error:', stderr);
+          return reject(error);
+        }
+        const duration = parseFloat(stdout.trim());
+        resolve(duration);
+      },
+    );
+  });
+};
+
 const convertToVideo = async (framesDir: string): Promise<IVideoMetadata> => {
   const videoPath = path.join(__dirname, `${uuidv4()}.mp4`);
 
@@ -317,12 +331,9 @@ const convertToVideo = async (framesDir: string): Promise<IVideoMetadata> => {
   const files = await fs.promises.readdir(framesDir);
   const frameCount = files.filter((file) => file.endsWith('.png')).length;
 
-  const duration = await new Promise<number>((resolve, reject) => {
-    ffmpeg.ffprobe(videoPath, (err, metadata) => {
-      if (err) return reject(err);
-      resolve(metadata.format.duration ?? 0);
-    });
-  });
+  console.log('🔍 Probing video metadata...');
+  const duration = await getVideoDuration(videoPath);
+  console.log('🧠 Got video duration:', duration);
 
   const metadata: IVideoMetadata = {
     videoPath,
