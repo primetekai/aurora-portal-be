@@ -69,6 +69,11 @@ export const captureGoogleEarth = async (
 
   const { args, env } = getLaunchOptions();
 
+  console.log('Config: ', {
+    args,
+    env,
+  });
+
   const browser = await puppeteer.launch({
     executablePath,
     headless: false,
@@ -129,8 +134,6 @@ export const captureGoogleEarth = async (
     await delay(1000);
 
     await clickMultipleTimes(page, 1750, 1010, 1);
-
-    await delay(1000);
 
     console.log('🎥 Starting high-quality video capture...');
 
