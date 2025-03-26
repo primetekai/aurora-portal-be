@@ -16,7 +16,7 @@ export const captureGoogleEarth = async (
   console.log('🖥️  DISPLAY =', process.env.DISPLAY);
 
   const browser = await puppeteer.connect({
-    browserWSEndpoint: process.env.BROWSERLESS_WS || 'ws://localhost:5011',
+    browserWSEndpoint: process.env.BROWSERLESS_WS || 'ws://127.0.0.1:5011',
   });
 
   // const browser = await puppeteer.launch({
