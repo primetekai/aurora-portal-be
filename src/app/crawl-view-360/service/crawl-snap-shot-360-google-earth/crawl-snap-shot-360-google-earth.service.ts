@@ -1,14 +1,18 @@
 import puppeteer from 'puppeteer-extra';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 import fs from 'fs-extra';
-import { execSync, exec, spawn } from 'child_process';
+import { exec, execSync } from 'child_process';
 import path from 'path';
 import type { Page } from 'puppeteer';
 import { v4 as uuidv4 } from 'uuid';
 import { IVideoMetadata } from './capture-google-earth.type';
+import { promisify } from 'util';
+import * as ffmpeg from 'fluent-ffmpeg';
 import os from 'os';
 
 puppeteer.use(StealthPlugin());
+
+const execAsync = promisify(exec);
 
 const getLaunchOptions = () => {
   const platform = os.platform();
@@ -148,7 +152,6 @@ export const captureGoogleEarth = async (
         console.warn('⚠️ Warning: Could not remove frames directory:', err),
       );
 
-    console.log('result', videoPath);
     await browser.close();
     return videoPath;
   } catch (error) {
@@ -259,82 +262,40 @@ const captureFramesWithDynamicRate = async (page: Page): Promise<string> => {
 //   });
 // };
 
-const getVideoDuration = (videoPath: string): Promise<number> => {
-  return new Promise((resolve, reject) => {
-    exec(
-      `ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "${videoPath}"`,
-      (error, stdout, stderr) => {
-        if (error) {
-          console.error('❌ ffprobe error:', stderr);
-          return reject(error);
-        }
-        const duration = parseFloat(stdout.trim());
-        resolve(duration);
-      },
-    );
-  });
-};
-
 const convertToVideo = async (framesDir: string): Promise<IVideoMetadata> => {
   const videoPath = path.join(__dirname, `${uuidv4()}.mp4`);
 
-  const ffmpegArgs = [
-    '-framerate',
-    '24',
-    '-i',
-    `${framesDir}/frame-%06d.png`,
-    '-c:v',
-    'libx264',
-    '-preset',
-    'slow',
-    '-crf',
-    '18',
-    '-profile:v',
-    'high',
-    '-tune',
-    'film',
-    '-movflags',
-    '+faststart',
-    '-pix_fmt',
-    'yuv420p',
-    '-vf',
-    'scale=1920:1080:flags=lanczos,fps=24',
-    '-y',
-    videoPath,
-  ];
+  const ffmpegCommand = `
+    ffmpeg -framerate 24 -i ${framesDir}/frame-%06d.png \
+    -c:v libx264 \
+    -preset slow \
+    -crf 18 \
+    -profile:v high \
+    -tune film \
+    -movflags +faststart \
+    -pix_fmt yuv420p \
+    -vf "scale=1920:1080:flags=lanczos,fps=24" \
+    -y ${videoPath}
+  `;
 
-  console.log('🎬 Converting frames to video using spawn...');
-
-  await new Promise<void>((resolve, reject) => {
-    const ffmpegProcess = spawn('ffmpeg', ffmpegArgs);
-
-    ffmpegProcess.stdout.on('data', (data) => {
-      console.log(`ffmpeg: ${data}`);
-    });
-
-    ffmpegProcess.stderr.on('data', (data) => {
-      console.log(`ffmpeg err: ${data}`);
-    });
-
-    ffmpegProcess.on('close', (code) => {
-      if (code === 0) {
-        resolve();
-      } else {
-        reject(new Error(`ffmpeg exited with code ${code}`));
-      }
-    });
-  });
+  console.log('🎬 Converting frames to video...');
+  await execAsync(ffmpegCommand);
 
   const stats = await fs.promises.stat(videoPath);
   const fileSizeInBytes = stats.size;
   const fileSizeInMB = fileSizeInBytes / (1024 * 1024);
 
+  // Đếm số frame
   const files = await fs.promises.readdir(framesDir);
   const frameCount = files.filter((file) => file.endsWith('.png')).length;
 
-  console.log('🔍 Probing video metadata...');
-  const duration = await getVideoDuration(videoPath);
-  console.log('🧠 Got video duration:', duration);
+  // Lấy thời lượng video
+  const duration = await new Promise<number>((resolve, reject) => {
+    ffmpeg.ffprobe(videoPath, (err, metadata) => {
+      if (err) return reject(err);
+      resolve(metadata.format.duration ?? 0);
+    });
+  });
 
   const metadata: IVideoMetadata = {
     videoPath,
