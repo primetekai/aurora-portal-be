@@ -137,5 +137,5 @@ jobs:
             #   -e SCREEN_WIDTH=1920 \
             #   -e SCREEN_HEIGHT=1080 \
             #   -e SCREEN_DEPTH=24 \
-            #   -p 5011:5011 \
+            #   -p 5011:3000 \
             #   browserless/chrome
