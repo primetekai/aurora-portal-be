@@ -143,6 +143,8 @@ const captureFrames = async (page: Page, duration: number): Promise<string> => {
       `frame-${String(i).padStart(4, '0')}.jpg`,
     );
 
+    await delay(2000); // Cho khung hình kịp render
+
     await page.screenshot({ path: filePath, type: 'jpeg' });
 
     await delay(1000 / frameRate); // Wait before capturing the next frame
