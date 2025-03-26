@@ -234,7 +234,12 @@ const clickSearchInput = async (page: Page) => {
 const clickButtonUI = async (page: Page, x: number, y: number) => {
   console.log(`🖱️ Clicking at (${x}, ${y})...`);
 
-  await page.mouse.click(x, y, { delay: 100 });
+  try {
+    await page.mouse.click(x, y, { delay: 100 });
+    await delay(1000);
+  } catch (err) {
+    console.error(`⚠️ Failed to click button at (${x}, ${y})...:`, err);
+  }
 };
 
 // Rotate
