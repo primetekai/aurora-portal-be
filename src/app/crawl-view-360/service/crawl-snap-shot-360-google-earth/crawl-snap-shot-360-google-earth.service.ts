@@ -140,6 +140,8 @@ export const captureGoogleEarth = async (
 
     await clickMultipleTimes(page, 1750, 1010, 1);
 
+    await delay(1000);
+
     console.log('🎥 Starting high-quality video capture...');
 
     const framesDir = await captureFramesWithDynamicRate(page);
