@@ -13,8 +13,6 @@ export const captureGoogleEarth = async (
   location: string,
   zoom?: number,
 ): Promise<IVideoMetadata> => {
-  console.log('🖥️  DISPLAY =', process.env.DISPLAY);
-
   const browser = await puppeteer.connect({
     browserWSEndpoint: process.env.BROWSERLESS_WS || 'ws://127.0.0.1:5011',
   });
@@ -64,13 +62,13 @@ export const captureGoogleEarth = async (
     console.log(`🔍 Opening Google Earth...`);
 
     await page.goto('https://earth.google.com/web/', {
-      waitUntil: 'networkidle2',
+      waitUntil: 'domcontentloaded',
       timeout: 0,
     });
 
     await delay(1000);
 
-    await page.reload({ waitUntil: 'networkidle2' });
+    await page.reload({ waitUntil: 'domcontentloaded' });
 
     await delay(5000);
 
@@ -84,7 +82,7 @@ export const captureGoogleEarth = async (
 
     await delay(10000);
 
-    await page.reload({ waitUntil: 'networkidle2' });
+    await page.reload({ waitUntil: 'domcontentloaded' });
 
     await delay(1000);
 
@@ -92,7 +90,7 @@ export const captureGoogleEarth = async (
 
     await clickButtonUI(page, 55, 150);
 
-    await page.reload({ waitUntil: 'networkidle2' });
+    await page.reload({ waitUntil: 'domcontentloaded' });
 
     await delay(1000);
 
