@@ -15,37 +15,46 @@ export const captureGoogleEarth = async (
 ): Promise<IVideoMetadata> => {
   console.log('🖥️  DISPLAY =', process.env.DISPLAY);
 
-  const browser = await puppeteer.launch({
-    // executablePath: puppeteer.executablePath(), // ✅ Lấy đúng path tự động
-    // executablePath: '/usr/bin/chromium-browser',
-    executablePath: '/usr/bin/google-chrome',
-    // executablePath:
-    //   '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
-    headless: false,
-    defaultViewport: {
-      width: 1920,
-      height: 1080,
-    },
-    args: [
-      '--no-sandbox',
-      '--disable-setuid-sandbox',
-      // '--disable-gpu',
-      // '--ozone-platform=wayland',
-      '--enable-webgl',
-      '--ignore-gpu-blocklist',
-      '--use-gl=egl',
-      '--enable-gpu-compositing',
-      '--enable-zero-copy',
-      '--window-size=1920,1080',
-    ],
-    // env: {
-    //   DISPLAY: ':0',
-    //   WAYLAND_DISPLAY: 'wayland-0',
-    //   XDG_SESSION_TYPE: 'wayland',
-    // },
+  const browser = await puppeteer.connect({
+    browserWSEndpoint: process.env.BROWSERLESS_WS || 'ws://localhost:5011',
   });
 
+  // const browser = await puppeteer.launch({
+  //   // executablePath: puppeteer.executablePath(), // ✅ Lấy đúng path tự động
+  //   // executablePath: '/usr/bin/chromium-browser',
+  //   executablePath: '/usr/bin/google-chrome',
+  //   // executablePath:
+  //   //   '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+  //   headless: false,
+  //   defaultViewport: {
+  //     width: 1920,
+  //     height: 1080,
+  //   },
+  //   args: [
+  //     '--no-sandbox',
+  //     '--disable-setuid-sandbox',
+  //     // '--disable-gpu',
+  //     // '--ozone-platform=wayland',
+  //     '--enable-webgl',
+  //     '--ignore-gpu-blocklist',
+  //     '--use-gl=egl',
+  //     '--enable-gpu-compositing',
+  //     '--enable-zero-copy',
+  //     '--window-size=1920,1080',
+  //   ],
+  //   // env: {
+  //   //   DISPLAY: ':0',
+  //   //   WAYLAND_DISPLAY: 'wayland-0',
+  //   //   XDG_SESSION_TYPE: 'wayland',
+  //   // },
+  // });
+
   const page = await browser.newPage();
+
+  await page.setViewport({
+    width: 1920,
+    height: 1080,
+  });
 
   await page.setUserAgent(
     'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',

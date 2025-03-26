@@ -128,3 +128,14 @@ jobs:
 
           "
 
+            # Run browserless/chrome
+            # docker run -d \
+            #   --name browserless \
+            #   --gpus all \
+            #   --runtime=nvidia \
+            #   -e NVIDIA_DRIVER_CAPABILITIES=all \
+            #   -e SCREEN_WIDTH=1920 \
+            #   -e SCREEN_HEIGHT=1080 \
+            #   -e SCREEN_DEPTH=24 \
+            #   -p 5011:5011 \
+            #   browserless/chrome
