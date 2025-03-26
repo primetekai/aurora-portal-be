@@ -13,6 +13,8 @@ export const captureGoogleEarth = async (
   location: string,
   zoom?: number,
 ): Promise<IVideoMetadata> => {
+  console.log('🖥️  DISPLAY =', process.env.DISPLAY);
+
   const browser = await puppeteer.launch({
     // executablePath: puppeteer.executablePath(), // ✅ Lấy đúng path tự động
     // executablePath: '/usr/bin/chromium-browser',
@@ -33,7 +35,7 @@ export const captureGoogleEarth = async (
       '--ignore-gpu-blocklist',
       '--use-gl=egl',
       '--enable-gpu-compositing',
-      // '--enable-zero-copy',
+      '--enable-zero-copy',
       '--window-size=1920,1080',
     ],
     // env: {
