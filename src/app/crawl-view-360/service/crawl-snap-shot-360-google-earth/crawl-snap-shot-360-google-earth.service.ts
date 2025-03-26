@@ -96,6 +96,7 @@ export const captureGoogleEarth = async (
 
     await page.goto('https://earth.google.com/web/', {
       waitUntil: 'networkidle2',
+      timeout: 0,
     });
 
     await delay(1000);
