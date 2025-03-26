@@ -1,32 +1,83 @@
 import puppeteer from 'puppeteer-extra';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 import fs from 'fs-extra';
-import { exec } from 'child_process';
+import { exec, execSync } from 'child_process';
 import path from 'path';
 import type { Page } from 'puppeteer';
 import { v4 as uuidv4 } from 'uuid';
 import { IVideoMetadata } from './capture-google-earth.type';
 import { promisify } from 'util';
 import * as ffmpeg from 'fluent-ffmpeg';
+import os from 'os';
 
 puppeteer.use(StealthPlugin());
 
 const execAsync = promisify(exec);
 
+const getLaunchOptions = () => {
+  const platform = os.platform();
+  const args = ['--no-sandbox', '--disable-setuid-sandbox'];
+  let env = undefined;
+
+  if (platform === 'darwin') {
+    return { args, env };
+  }
+
+  if (platform === 'linux') {
+    try {
+      const sysVendor = execSync('cat /sys/devices/virtual/dmi/id/sys_vendor', {
+        encoding: 'utf-8',
+      }).toLowerCase();
+
+      const distro = execSync('lsb_release -is', {
+        encoding: 'utf-8',
+      }).toLowerCase();
+
+      if (sysVendor.includes('dell') && distro.includes('ubuntu')) {
+        args.push('--ozone-platform=wayland');
+        env = {
+          DISPLAY: ':0',
+          WAYLAND_DISPLAY: 'wayland-0',
+          XDG_SESSION_TYPE: 'wayland',
+        };
+      }
+    } catch (e) {
+      console.warn(
+        '⚠️ Unable to detect the Linux system. Using default configuration.',
+      );
+    }
+  }
+
+  return { args, env };
+};
+
 export const captureGoogleEarth = async (
   location: string,
   zoom?: number,
 ): Promise<IVideoMetadata> => {
+  let executablePath;
+
+  if (os.platform() === 'darwin') {
+    executablePath =
+      '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
+  } else if (os.platform() === 'win32') {
+    executablePath =
+      'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
+  } else {
+    executablePath = '/usr/bin/chromium-browser';
+  }
+
+  const { args, env } = getLaunchOptions();
+
   const browser = await puppeteer.launch({
-    // executablePath: '/usr/bin/chromium-browser',
-    executablePath:
-      '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+    executablePath,
     headless: false,
     defaultViewport: {
       width: 1920,
       height: 1080,
     },
-    args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    args,
+    env,
   });
 
   const page = await browser.newPage();
