@@ -19,7 +19,7 @@ export const captureGoogleEarth = async (
     executablePath: '/usr/bin/google-chrome',
     // executablePath:
     //   '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
-    headless: true,
+    headless: false,
     defaultViewport: {
       width: 1920,
       height: 1080,
@@ -29,9 +29,12 @@ export const captureGoogleEarth = async (
       '--disable-setuid-sandbox',
       // '--disable-gpu',
       // '--ozone-platform=wayland',
-      '--use-gl=egl',
       '--enable-webgl',
       '--ignore-gpu-blocklist',
+      '--use-gl=egl',
+      '--enable-gpu-compositing',
+      '--enable-zero-copy',
+      '--window-size=1920,1080',
     ],
     // env: {
     //   DISPLAY: ':0',
