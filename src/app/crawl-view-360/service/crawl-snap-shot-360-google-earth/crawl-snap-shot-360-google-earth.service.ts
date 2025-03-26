@@ -29,20 +29,15 @@ const getLaunchOptions = () => {
 
   if (platform === 'linux') {
     try {
-      const sysVendor = execSync('cat /sys/devices/virtual/dmi/id/sys_vendor', {
-        encoding: 'utf-8',
-      }).toLowerCase();
-
       const distro = execSync('lsb_release -is', {
         encoding: 'utf-8',
       }).toLowerCase();
 
-      console.log('sysVendor=distro: ', {
-        sysVendor,
+      console.log('distro: ', {
         distro,
       });
 
-      if (sysVendor.includes('dell') && distro.includes('ubuntu')) {
+      if (distro.includes('ubuntu')) {
         args.push('--ozone-platform=wayland');
         env = {
           DISPLAY: ':0',
