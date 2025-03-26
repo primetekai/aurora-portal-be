@@ -66,7 +66,7 @@ export const captureGoogleEarth = async (
       timeout: 0,
     });
 
-    await delay(1000);
+    await delay(8000);
 
     await page.reload({ waitUntil: 'domcontentloaded' });
 
@@ -84,7 +84,7 @@ export const captureGoogleEarth = async (
 
     await page.reload({ waitUntil: 'domcontentloaded' });
 
-    await delay(1000);
+    await delay(5000);
 
     await clickButtonUI(page, 880, 1015);
 
@@ -92,7 +92,7 @@ export const captureGoogleEarth = async (
 
     await page.reload({ waitUntil: 'domcontentloaded' });
 
-    await delay(1000);
+    await delay(5000);
 
     await delay(1000);
 
