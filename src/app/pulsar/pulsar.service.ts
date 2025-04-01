@@ -19,18 +19,42 @@ export class PulsarService implements OnModuleInit, OnModuleDestroy {
   async onModuleInit() {
     this.logger.log('🚀 Initializing Pulsar Service...');
 
-    this.client = new Pulsar.Client({
-      // serviceUrl: 'pulsar://194.233.69.2:6650',
-      // serviceUrl: 'pulsar://103.78.3.71:6650',
+    const pulsarConfig = {
+      authentication: {
+        token:
+          'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkZXYifQ.MtdmVWF8Yr3Tp5M1gKSOOLHdsh1KsiVaJY2TtDi1sTw',
+        type: 'token',
+      },
+    };
+
+    const clientConfig: Pulsar.ClientConfig = {
       serviceUrl: 'pulsar://160.191.164.16:6650',
+      operationTimeoutSeconds: 10,
+    };
+
+    clientConfig.authentication = new Pulsar.AuthenticationToken({
+      token: pulsarConfig.authentication.token,
     });
 
-    this.consumer = await this.client.subscribe({
-      topic: 'persistent://public/default/property-capture-request',
-      subscription: 'persistent-property-capture-request-subscription',
-      subscriptionType: 'Shared',
-      listener: this.handleMessage.bind(this),
-    });
+    // this.client = new Pulsar.Client({
+    //   // serviceUrl: 'pulsar://194.233.69.2:6650',
+    //   // serviceUrl: 'pulsar://103.78.3.71:6650',
+    //   serviceUrl: 'pulsar://160.191.164.16:6650',
+    // });
+
+    this.client = new Pulsar.Client(clientConfig);
+
+    try {
+      this.consumer = await this.client.subscribe({
+        topic: 'persistent://public/default/property-capture-request',
+        subscription: 'persistent-property-capture-request-subscription',
+        subscriptionType: 'Shared',
+        listener: this.handleMessage.bind(this),
+      });
+      this.logger.log('🔵 Subscribed successfully to topic.');
+    } catch (err) {
+      this.logger.error(`❌ Failed to create consumer: ${err.message}`);
+    }
 
     this.producer = await this.client.createProducer({
       topic: 'persistent://public/default/property-capture-completed',
@@ -61,7 +85,6 @@ export class PulsarService implements OnModuleInit, OnModuleDestroy {
         return;
       }
 
-      // Don't process if max attempts reached
       if (attempts >= 2) {
         this.logger.warn(
           `⚠️ Max attempts (${attempts}) reached for propertyId: ${propertyId}`,
@@ -82,23 +105,11 @@ export class PulsarService implements OnModuleInit, OnModuleDestroy {
       let responseMessage;
 
       if (!result) {
-        // Handle failure case
-        responseMessage = {
-          eventType: 'CATURED_FAILED',
-          timestamp: new Date().toISOString(),
-          propertyId,
-          attempts: attempts + 1,
-          data: {
-            zoom,
-            videoUrl: null,
-          },
-        };
-
+        consumer.negativeAcknowledge(msg);
         this.logger.warn(
           `⚠️ Capture failed for propertyId: ${propertyId}, attempt: ${attempts + 1}`,
         );
       } else {
-        // Handle success case
         responseMessage = {
           eventType: 'PROPERTY_COMPLETED',
           timestamp: new Date().toISOString(),
@@ -113,7 +124,6 @@ export class PulsarService implements OnModuleInit, OnModuleDestroy {
         this.logger.log(`✅ Capture successful for propertyId: ${propertyId}`);
       }
 
-      // Only send message if we haven't reached max attempts
       if (attempts < 2) {
         await this.producer.send({
           data: Buffer.from(JSON.stringify(responseMessage)),
