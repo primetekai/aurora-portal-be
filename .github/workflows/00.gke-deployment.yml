@@ -105,7 +105,8 @@ jobs:
               -v /home/primetek/resource-web/cdn:/home/ubuntu/cdn \
               -p ${PORT}:4000 \
               --name $IMAGE \
-              $HARBOR_URL/$HARBOR_USERNAME/$IMAGE:$GITHUB_SHA
+              $HARBOR_URL/$HARBOR_USERNAME/$IMAGE:$GITHUB_SHA"
+              
 
 # docker run -d \
 #   --gpus all \
