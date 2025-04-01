@@ -17,36 +17,6 @@ export const captureGoogleEarth = async (
     browserWSEndpoint: process.env.BROWSERLESS_WS || 'ws://127.0.0.1:5011',
   });
 
-  // const browser = await puppeteer.launch({
-  //   // executablePath: puppeteer.executablePath(), // ✅ Lấy đúng path tự động
-  //   // executablePath: '/usr/bin/chromium-browser',
-  //   executablePath: '/usr/bin/google-chrome',
-  //   // executablePath:
-  //   //   '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
-  //   headless: false,
-  //   defaultViewport: {
-  //     width: 1920,
-  //     height: 1080,
-  //   },
-  //   args: [
-  //     '--no-sandbox',
-  //     '--disable-setuid-sandbox',
-  //     // '--disable-gpu',
-  //     // '--ozone-platform=wayland',
-  //     '--enable-webgl',
-  //     '--ignore-gpu-blocklist',
-  //     '--use-gl=egl',
-  //     '--enable-gpu-compositing',
-  //     '--enable-zero-copy',
-  //     '--window-size=1920,1080',
-  //   ],
-  //   // env: {
-  //   //   DISPLAY: ':0',
-  //   //   WAYLAND_DISPLAY: 'wayland-0',
-  //   //   XDG_SESSION_TYPE: 'wayland',
-  //   // },
-  // });
-
   const page = await browser.newPage();
 
   await page.setViewport({
@@ -62,15 +32,15 @@ export const captureGoogleEarth = async (
     console.log(`🔍 Opening Google Earth...`);
 
     await page.goto('https://earth.google.com/web/', {
-      waitUntil: 'domcontentloaded',
+      waitUntil: 'networkidle2',
       timeout: 0,
     });
 
-    await delay(8000);
+    await delay(10000);
 
-    await page.reload({ waitUntil: 'domcontentloaded' });
+    // await page.reload({ waitUntil: 'networkidle2' });
 
-    await delay(5000);
+    // await delay(5000);
 
     await clickSearchInput(page);
 
@@ -80,9 +50,9 @@ export const captureGoogleEarth = async (
 
     await page.keyboard.press('Enter');
 
-    await delay(10000);
+    await delay(12000);
 
-    await page.reload({ waitUntil: 'domcontentloaded' });
+    // await page.reload({ waitUntil: 'networkidle2' });
 
     await delay(5000);
 
@@ -90,9 +60,9 @@ export const captureGoogleEarth = async (
 
     await clickButtonUI(page, 55, 150);
 
-    await page.reload({ waitUntil: 'domcontentloaded' });
+    // await page.reload({ waitUntil: 'networkidle2' });
 
-    await delay(5000);
+    // await delay(5000);
 
     await delay(1000);
 
@@ -215,11 +185,6 @@ const convertImagesToVideo = async (
   });
 };
 
-const convertToBase64 = async (filePath: string): Promise<string> => {
-  const fileData = await fs.readFile(filePath);
-  return fileData.toString('base64');
-};
-
 const clickSearchInput = async (page: Page) => {
   console.log('🖱️ Clicking on the search input...');
 
@@ -239,20 +204,6 @@ const clickButtonUI = async (page: Page, x: number, y: number) => {
     await delay(1000);
   } catch (err) {
     console.error(`⚠️ Failed to click button at (${x}, ${y})...:`, err);
-  }
-};
-
-// Rotate
-const doubleClickButtonUI = async (page: Page, x: number, y: number) => {
-  console.log(`🖱️ Double clicking at (${x}, ${y})...`);
-
-  await page.mouse.click(x, y, { clickCount: 2, delay: 100 });
-};
-
-const zoomMap = async (page: Page, number: number) => {
-  for (let i = 0; i < number; i++) {
-    await page.mouse.wheel({ deltaY: 100 * number });
-    await delay(200);
   }
 };
 

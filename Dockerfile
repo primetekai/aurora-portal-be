@@ -9,7 +9,6 @@ RUN apt-get update && \
   curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
   apt-get install -y nodejs
 
-# Cài các thư viện cần thiết để chạy Puppeteer (Không cần Chrome)
 RUN apt-get update && apt-get install -y --no-install-recommends \
   wget ca-certificates \
   libx11-xcb1 libxcomposite1 libxdamage1 libxrandr2 libxss1 libnss3 \

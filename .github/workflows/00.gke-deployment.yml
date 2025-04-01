@@ -102,40 +102,18 @@ jobs:
             podman stop $IMAGE || true &&
             podman rm $IMAGE || true &&
             podman run -d \
-              --hooks-dir=/usr/share/containers/oci/hooks.d \
-              --device /dev/nvidia0 \
-              --device /dev/nvidiactl \
-              --device /dev/nvidia-uvm \
-              --device /dev/dri \
-              -e NVIDIA_VISIBLE_DEVICES=all \
-              -e NVIDIA_DRIVER_CAPABILITIES=all \
-              -e DISPLAY=$DISPLAY \
-              -v /tmp/.X11-unix:/tmp/.X11-unix \
               -v /home/primetek/resource-web/cdn:/home/ubuntu/cdn \
               -p ${PORT}:4000 \
               --name $IMAGE \
               $HARBOR_URL/$HARBOR_USERNAME/$IMAGE:$GITHUB_SHA
 
-            # docker run -d \
-            #   --runtime=nvidia --gpus all \
-            #   -e NVIDIA_DRIVER_CAPABILITIES=all \
-            #   -e DISPLAY=$DISPLAY \
-            #   -v /tmp/.X11-unix:/tmp/.X11-unix \
-            #   -v /home/primetek/resource-web/cdn:/home/ubuntu/cdn \
-            #   -p ${PORT}:4000 \
-            #   --name $IMAGE \
-            #   $HARBOR_URL/$HARBOR_USERNAME/$IMAGE:$GITHUB_SHA
-
-          "
-
-            # Run browserless/chrome
-            # docker run -d \
-            #   --name browserless \
-            #   --gpus all \
-            #   --runtime=nvidia \
-            #   -e NVIDIA_DRIVER_CAPABILITIES=all \
-            #   -e SCREEN_WIDTH=1920 \
-            #   -e SCREEN_HEIGHT=1080 \
-            #   -e SCREEN_DEPTH=24 \
-            #   -p 5011:3000 \
-            #   browserless/chrome
+# docker run -d \
+#   --gpus all \
+#   -e NVIDIA_DRIVER_CAPABILITIES=all \
+#   -e DISPLAY=$DISPLAY \
+#   -e CHROME_LAUNCH_ARGS="--enable-webgl --ignore-gpu-blocklist --use-gl=egl --enable-gpu-compositing --enable-zero-copy --disable-software-rasterizer --disable-features=WebGPU --window-size=1920,1080" \
+#   -v /tmp/.X11-unix:/tmp/.X11-unix \
+#   -v /dev/dri:/dev/dri \
+#   --device /dev/dri \
+#   -p 5011:3000 \
+#   browserless/chrome:latest
