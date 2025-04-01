@@ -99,7 +99,8 @@ export class PulsarService implements OnModuleInit, OnModuleDestroy {
       const location = `${latitude} ${longitude}`;
       const result = await this.crawlService.crawlCaptureGoogleEarth(
         location,
-        zoom === 20 ? 4 : zoom,
+        // zoom === 20 ? 4 : zoom,
+        zoom,
       );
 
       let responseMessage;
