@@ -1,5 +1,5 @@
-import puppeteer from 'puppeteer-extra';
-import StealthPlugin from 'puppeteer-extra-plugin-stealth';
+import puppeteer from 'puppeteer';
+// import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 import fs from 'fs-extra';
 import { exec } from 'child_process';
 import path from 'path';
@@ -7,7 +7,7 @@ import type { Page } from 'puppeteer';
 import { v4 as uuidv4 } from 'uuid';
 import { IVideoMetadata } from './capture-google-earth.type';
 
-puppeteer.use(StealthPlugin());
+// puppeteer.use(StealthPlugin());
 
 export const captureGoogleEarth = async (
   location: string,
@@ -62,7 +62,7 @@ export const captureGoogleEarth = async (
 
     // await page.reload({ waitUntil: 'networkidle2' });
 
-    // await delay(5000);
+    await delay(5000);
 
     await delay(1000);
 
