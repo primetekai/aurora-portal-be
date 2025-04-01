@@ -101,22 +101,20 @@ jobs:
             podman pull $HARBOR_URL/$HARBOR_USERNAME/$IMAGE:$GITHUB_SHA &&
             podman stop $IMAGE || true &&
             podman rm $IMAGE || true &&
-            podman run -d \
+            podman run -d -p ${PORT}:4000 \
               -v /home/primetek/resource-web/cdn:/home/ubuntu/cdn \
-              -p ${PORT}:4000 \
-              --name $IMAGE \
-              $HARBOR_URL/$HARBOR_USERNAME/$IMAGE:$GITHUB_SHA"
-              
+              --name $IMAGE $HARBOR_URL/$HARBOR_USERNAME/$IMAGE:$GITHUB_SHA
+          "
 
-# docker run -d \
-#   --gpus all \
-#   -e NVIDIA_DRIVER_CAPABILITIES=all \
-#   -e CONNECTION_TIMEOUT=600000 \
-#   -e DISPLAY=$DISPLAY \
-#   -e CHROME_LAUNCH_ARGS="--headless=new --enable-webgl --ignore-gpu-blocklist --use-gl=egl --enable-gpu-compositing --enable-zero-copy --disable-software-rasterizer --disable-features=WebGPU --window-size=1920,1080" \
-#   -v /tmp/.X11-unix:/tmp/.X11-unix \
-#   -v /dev/dri:/dev/dri \
-#   --device /dev/dri \
-#   --shm-size=2gb \
-#   -p 5011:3000 \
-#   browserless/chrome:latest
+            # docker run -d \
+            #   --gpus all \
+            #   -e NVIDIA_DRIVER_CAPABILITIES=all \
+            #   -e CONNECTION_TIMEOUT=600000 \
+            #   -e DISPLAY=$DISPLAY \
+            #   -e CHROME_LAUNCH_ARGS="--headless=new --enable-webgl --ignore-gpu-blocklist --use-gl=egl --enable-gpu-compositing --enable-zero-copy --disable-software-rasterizer --disable-features=WebGPU --window-size=1920,1080" \
+            #   -v /tmp/.X11-unix:/tmp/.X11-unix \
+            #   -v /dev/dri:/dev/dri \
+            #   --device /dev/dri \
+            #   --shm-size=2gb \
+            #   -p 5011:3000 \
+            #   browserless/chrome:latest
