@@ -9,6 +9,4 @@ export interface IVideoMetadata {
     bytes: number;
     megabytes: number;
   };
-  duration: number;
-  frameCount: number;
 }

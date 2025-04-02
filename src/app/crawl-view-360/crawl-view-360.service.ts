@@ -7,6 +7,7 @@ import {
 import { MinIOService } from '../k-splat/service';
 import * as fs from 'fs';
 import * as path from 'path';
+import { promisify } from 'util';
 
 @Injectable()
 export class CrawlService {
@@ -34,7 +35,7 @@ export class CrawlService {
     location: string,
     zoom?: number,
   ): Promise<string | null> {
-    let outputFile: IVideoMetadata | null = null;
+    const outputFile: IVideoMetadata | null = null;
     const MIN_VIDEO_SIZE_MB = 1;
     const MAX_RETRIES = 2;
 
@@ -45,7 +46,20 @@ export class CrawlService {
     try {
       for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
         try {
-          outputFile = await captureGoogleEarth(location, zoom);
+          const videoPath = await captureGoogleEarth(location, zoom);
+
+          const statAsync = promisify(fs.stat);
+          const stats = await statAsync(videoPath);
+          const sizeInBytes = stats.size;
+          const sizeInMB = sizeInBytes / (1024 * 1024);
+
+          const outputFile = {
+            videoPath,
+            size: {
+              bytes: sizeInBytes,
+              megabytes: parseFloat(sizeInMB.toFixed(2)),
+            },
+          };
 
           // Check video size
           if (outputFile?.size?.megabytes < MIN_VIDEO_SIZE_MB) {
@@ -68,8 +82,6 @@ export class CrawlService {
           console.log(`✅ Video captured successfully:`, {
             path: outputFile.videoPath,
             size: `${outputFile.size.megabytes}MB`,
-            duration: `${outputFile.duration}s`,
-            frames: outputFile.frameCount,
           });
 
           const fileNameVideoPath = path.basename(outputFile.videoPath);
