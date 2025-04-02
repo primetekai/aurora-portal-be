@@ -112,28 +112,72 @@ const captureFrames = async (page: Page, duration: number): Promise<string> => {
   const framesDir = path.join(__dirname, 'frames');
   await fs.ensureDir(framesDir);
 
-  const frameRate = 10; // Capture 5 frames per second
+  const frameRate = 10; // frames per second
   const totalFrames = duration * frameRate;
 
-  console.log(`Starting to capture ${totalFrames} frames.`);
+  console.log(`📸 Capturing ${totalFrames} frames...`);
+
   try {
     for (let i = 0; i < totalFrames; i++) {
       const filePath = path.join(
         framesDir,
         `frame-${String(i).padStart(4, '0')}.jpg`,
       );
+
       await page.screenshot({ path: filePath, type: 'jpeg' });
-      console.log(`Captured frame ${i + 1}/${totalFrames}`);
-      await delay(1000 / frameRate); // Wait before capturing the next frame
+
+      // 🧪 Kiểm tra kích thước ảnh đầu tiên
+      if (i === 0) {
+        const stat = await fs.stat(filePath);
+        if (stat.size < 50000) {
+          throw new Error(
+            `❌ First frame too small (${stat.size} bytes) — map may not be loaded.`,
+          );
+        }
+      }
+
+      // ✅ In log theo từng chục frame
+      if ((i + 1) % 10 === 0 || i === totalFrames - 1) {
+        console.log(`✅ Captured ${i + 1}/${totalFrames} frames`);
+      }
+
+      await delay(1000 / frameRate);
     }
   } catch (error) {
-    console.error('Error during frame capture:', error);
+    console.error('❌ Error during frame capture:', error);
     throw error;
   }
-  console.log('All frames captured successfully.');
 
+  console.log('🎉 All frames captured successfully.');
   return framesDir;
 };
+
+// const captureFrames = async (page: Page, duration: number): Promise<string> => {
+//   const framesDir = path.join(__dirname, 'frames');
+//   await fs.ensureDir(framesDir);
+
+//   const frameRate = 10; // Capture 5 frames per second
+//   const totalFrames = duration * frameRate;
+
+//   console.log(`Starting to capture ${totalFrames} frames.`);
+//   try {
+//     for (let i = 0; i < totalFrames; i++) {
+//       const filePath = path.join(
+//         framesDir,
+//         `frame-${String(i).padStart(4, '0')}.jpg`,
+//       );
+//       await page.screenshot({ path: filePath, type: 'jpeg' });
+//       console.log(`Captured frame ${i + 1}/${totalFrames}`);
+//       await delay(1000 / frameRate); // Wait before capturing the next frame
+//     }
+//   } catch (error) {
+//     console.error('Error during frame capture:', error);
+//     throw error;
+//   }
+//   console.log('All frames captured successfully.');
+
+//   return framesDir;
+// };
 
 // const convertImagesToVideo = async (
 //   framesDir: string,
