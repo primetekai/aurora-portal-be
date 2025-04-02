@@ -24,7 +24,6 @@ export const captureGoogleEarth = async (
     args: [
       '--no-sandbox',
       '--disable-setuid-sandbox',
-      // '--disable-gpu',
       '--ozone-platform=wayland',
     ],
     env: {
@@ -50,10 +49,6 @@ export const captureGoogleEarth = async (
 
     await delay(1000);
 
-    await page.reload({ waitUntil: 'networkidle2' });
-
-    await delay(5000);
-
     await clickSearchInput(page);
 
     await delay(1000);
@@ -64,17 +59,15 @@ export const captureGoogleEarth = async (
 
     await delay(10000);
 
-    await page.reload({ waitUntil: 'networkidle2' });
-
-    await delay(1000);
-
     await clickButtonUI(page, 880, 1015);
 
     await clickButtonUI(page, 55, 150);
 
-    await page.reload({ waitUntil: 'networkidle2' });
+    await clickButtonUI(page, 581, 32);
 
     await delay(1000);
+
+    await clickMultipleTimes(page, 1670, 1010, 1);
 
     await delay(1000);
 
@@ -139,7 +132,7 @@ const convertImagesToVideo = async (framesDir: string): Promise<string> => {
 
     const ffmpegCommand = `
     ffmpeg -framerate 5 -i ${framesDir}/frame-%04d.jpg \
-    -vf "crop=in_w:in_h*0.8:0:in_h*0.1" \
+    -vf "crop=in_w:in_h*0.7:0:in_h*0.2" \
     -c:v libx264 -pix_fmt yuv420p ${videoPath}
   `;
 
@@ -153,11 +146,6 @@ const convertImagesToVideo = async (framesDir: string): Promise<string> => {
       }
     });
   });
-};
-
-const convertToBase64 = async (filePath: string): Promise<string> => {
-  const fileData = await fs.readFile(filePath);
-  return fileData.toString('base64');
 };
 
 const clickSearchInput = async (page: Page) => {
@@ -175,20 +163,6 @@ const clickButtonUI = async (page: Page, x: number, y: number) => {
   console.log(`🖱️ Clicking at (${x}, ${y})...`);
 
   await page.mouse.click(x, y, { delay: 100 });
-};
-
-// Rotate
-const doubleClickButtonUI = async (page: Page, x: number, y: number) => {
-  console.log(`🖱️ Double clicking at (${x}, ${y})...`);
-
-  await page.mouse.click(x, y, { clickCount: 2, delay: 100 });
-};
-
-const zoomMap = async (page: Page, number: number) => {
-  for (let i = 0; i < number; i++) {
-    await page.mouse.wheel({ deltaY: 100 * number });
-    await delay(200);
-  }
 };
 
 //Zoom in
