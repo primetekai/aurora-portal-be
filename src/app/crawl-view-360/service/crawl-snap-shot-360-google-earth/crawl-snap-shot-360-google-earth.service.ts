@@ -17,6 +17,7 @@ export const captureGoogleEarth = async (
     executablePath: '/usr/bin/chromium-browser',
     // executablePath:
     //   '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+    protocolTimeout: 60000, // ⬅️ THÊM DÒNG NÀY
     headless: false,
     defaultViewport: {
       width: 1920,
@@ -124,15 +125,31 @@ const captureFrames = async (page: Page, duration: number): Promise<string> => {
         `frame-${String(i).padStart(4, '0')}.jpg`,
       );
 
-      await page.screenshot({ path: filePath, type: 'jpeg' });
+      let retries = 0;
+      const maxRetries = 2;
 
-      // 🧪 Kiểm tra kích thước ảnh đầu tiên
-      if (i === 0) {
-        const stat = await fs.stat(filePath);
-        if (stat.size < 50000) {
-          throw new Error(
-            `❌ First frame too small (${stat.size} bytes) — map may not be loaded.`,
+      while (retries <= maxRetries) {
+        try {
+          await page.screenshot({ path: filePath, type: 'jpeg' });
+
+          // 🧪 Optional: kiểm tra frame đầu tiên có hợp lệ không
+          if (i === 0) {
+            const stat = await fs.stat(filePath);
+            if (stat.size < 50000) {
+              throw new Error(
+                `❌ First frame too small (${stat.size} bytes). Google Earth chưa load xong.`,
+              );
+            }
+          }
+
+          break; // success
+        } catch (err) {
+          retries++;
+          console.warn(
+            `⚠️ Screenshot failed at frame ${i} (retry ${retries}/${maxRetries})`,
           );
+          await delay(500);
+          if (retries > maxRetries) throw err;
         }
       }
 
@@ -141,7 +158,7 @@ const captureFrames = async (page: Page, duration: number): Promise<string> => {
         console.log(`✅ Captured ${i + 1}/${totalFrames} frames`);
       }
 
-      await delay(1000 / frameRate);
+      await delay(200); // tăng delay giúp ổn định hơn
     }
   } catch (error) {
     console.error('❌ Error during frame capture:', error);
