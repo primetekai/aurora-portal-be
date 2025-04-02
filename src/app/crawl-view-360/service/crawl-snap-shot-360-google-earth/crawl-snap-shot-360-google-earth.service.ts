@@ -1,11 +1,11 @@
 import puppeteer from 'puppeteer-extra';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 import fs from 'fs-extra';
-import { exec } from 'child_process';
 import path from 'path';
 import type { Page } from 'puppeteer';
 import { v4 as uuidv4 } from 'uuid';
 import { IVideoMetadata } from './capture-google-earth.type';
+import { spawn } from 'child_process';
 
 puppeteer.use(StealthPlugin());
 
@@ -135,33 +135,115 @@ const captureFrames = async (page: Page, duration: number): Promise<string> => {
   return framesDir;
 };
 
+// const convertImagesToVideo = async (
+//   framesDir: string,
+// ): Promise<IVideoMetadata> => {
+//   const videoFileName = `${uuidv4()}.mp4`;
+//   const videoPath = path.join(__dirname, videoFileName);
+
+//   // Calculate duration and frames from the directory
+//   const files = await fs.readdir(framesDir);
+//   const totalFrames = files.length;
+//   const duration = Math.ceil(totalFrames / 5); // assuming 5 fps
+
+//   return new Promise((resolve, reject) => {
+//     const ffmpegCommand = `
+//     ffmpeg -framerate 5 -i ${framesDir}/frame-%04d.jpg \
+//     -vf "crop=in_w:in_h*0.8:0:in_h*0.1" \
+//     -c:v libx264 -pix_fmt yuv420p ${videoPath}
+//     `;
+
+//     exec(ffmpegCommand, async (error, stdout, stderr) => {
+//       if (error) {
+//         console.error(`❌ FFmpeg error: ${stderr}`);
+//         reject(error);
+//         return;
+//       }
+
+//       try {
+//         // Get video file stats
+//         const stats = await fs.stat(videoPath);
+//         const fileSizeInBytes = stats.size;
+//         const fileSizeInMB = Number(
+//           (fileSizeInBytes / (1024 * 1024)).toFixed(2),
+//         );
+
+//         const metadata: IVideoMetadata = {
+//           videoPath,
+//           size: {
+//             bytes: fileSizeInBytes,
+//             megabytes: fileSizeInMB,
+//           },
+//           duration,
+//           frameCount: totalFrames,
+//         };
+
+//         console.log(`✅ Video created successfully:`);
+//         console.log(`📍 Path: ${metadata.videoPath}`);
+//         console.log(`📊 Size: ${metadata.size.megabytes} MB`);
+//         console.log(`⏱️ Duration: ${metadata.duration} seconds`);
+//         console.log(`🎞️ Frame count: ${metadata.frameCount}`);
+
+//         // Check if file size is reasonable
+//         if (fileSizeInBytes === 0) {
+//           throw new Error('Generated video file is empty');
+//         }
+
+//         resolve(metadata);
+//       } catch (statError) {
+//         console.error('❌ Error checking video file:', statError);
+//         reject(statError);
+//       }
+//     });
+//   });
+// };
+
 const convertImagesToVideo = async (
   framesDir: string,
 ): Promise<IVideoMetadata> => {
   const videoFileName = `${uuidv4()}.mp4`;
   const videoPath = path.join(__dirname, videoFileName);
 
-  // Calculate duration and frames from the directory
   const files = await fs.readdir(framesDir);
   const totalFrames = files.length;
   const duration = Math.ceil(totalFrames / 5); // assuming 5 fps
 
   return new Promise((resolve, reject) => {
-    const ffmpegCommand = `
-    ffmpeg -framerate 5 -i ${framesDir}/frame-%04d.jpg \
-    -vf "crop=in_w:in_h*0.8:0:in_h*0.1" \
-    -c:v libx264 -pix_fmt yuv420p ${videoPath}
-    `;
+    const ffmpegArgs = [
+      '-framerate',
+      '5',
+      '-i',
+      `${framesDir}/frame-%04d.jpg`,
+      '-vf',
+      'crop=in_w:in_h*0.8:0:in_h*0.1',
+      '-c:v',
+      'libx264',
+      '-pix_fmt',
+      'yuv420p',
+      videoPath,
+    ];
 
-    exec(ffmpegCommand, async (error, stdout, stderr) => {
-      if (error) {
-        console.error(`❌ FFmpeg error: ${stderr}`);
-        reject(error);
-        return;
+    const ffmpeg = spawn('ffmpeg', ffmpegArgs);
+
+    // ffmpeg.stdout.on('data', (data) => {
+    //   console.log(`[FFmpeg stdout]: ${data}`);
+    // });
+
+    // ffmpeg.stderr.on('data', (data) => {
+    //   console.error(`[FFmpeg stderr]: ${data}`);
+    // });
+
+    ffmpeg.on('error', (error) => {
+      console.error(`❌ FFmpeg spawn error: ${error}`);
+      reject(error);
+    });
+
+    ffmpeg.on('close', async (code) => {
+      if (code !== 0) {
+        return reject(new Error(`FFmpeg exited with code ${code}`));
       }
 
       try {
-        // Get video file stats
         const stats = await fs.stat(videoPath);
         const fileSizeInBytes = stats.size;
         const fileSizeInMB = Number(
@@ -184,7 +266,6 @@ const convertImagesToVideo = async (
         console.log(`⏱️ Duration: ${metadata.duration} seconds`);
         console.log(`🎞️ Frame count: ${metadata.frameCount}`);
 
-        // Check if file size is reasonable
         if (fileSizeInBytes === 0) {
           throw new Error('Generated video file is empty');
         }
