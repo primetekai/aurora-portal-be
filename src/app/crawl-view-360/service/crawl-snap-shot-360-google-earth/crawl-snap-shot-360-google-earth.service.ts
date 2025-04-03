@@ -3,7 +3,7 @@ import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 import fs from 'fs-extra';
 import { exec } from 'child_process';
 import path from 'path';
-import type { Browser, Page } from 'puppeteer';
+import type { Page } from 'puppeteer';
 import { v4 as uuidv4 } from 'uuid';
 // import { spawn } from 'child_process';
 
@@ -17,7 +17,7 @@ export const captureGoogleEarth = async (
     executablePath: '/usr/bin/chromium-browser',
     // executablePath:
     //   '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
-    headless: false,
+    headless: true,
     defaultViewport: {
       width: 1920,
       height: 1080,
