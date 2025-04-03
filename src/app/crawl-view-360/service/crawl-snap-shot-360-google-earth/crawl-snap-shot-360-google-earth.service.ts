@@ -3,7 +3,7 @@ import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 import fs from 'fs-extra';
 // import { exec } from 'child_process';
 import path from 'path';
-import type { Page } from 'puppeteer';
+import type { Browser, Page } from 'puppeteer';
 import { v4 as uuidv4 } from 'uuid';
 import { spawn } from 'child_process';
 
@@ -103,7 +103,8 @@ export const captureGoogleEarth = async (
 
     await delay(1000);
 
-    await browser.disconnect();
+    // await browser.disconnect();
+    await safeClose(browser);
 
     console.log('✅ Browser disconnect.');
 
@@ -113,6 +114,14 @@ export const captureGoogleEarth = async (
     await browser.close();
     throw error;
   }
+};
+
+const safeClose = async (browser: Browser) => {
+  const timeout = new Promise((_, reject) =>
+    setTimeout(() => reject(new Error('❌ browser.close() timeout')), 5000),
+  );
+
+  return Promise.race([browser.close(), timeout]);
 };
 
 const captureFrames = async (page: Page, duration: number): Promise<string> => {
