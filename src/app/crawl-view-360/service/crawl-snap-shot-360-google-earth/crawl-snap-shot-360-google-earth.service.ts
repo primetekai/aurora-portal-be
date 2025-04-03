@@ -104,7 +104,7 @@ export const captureGoogleEarth = async (
     await delay(1000);
 
     // await browser.disconnect();
-    await safeClose(browser);
+    await safeClose();
 
     console.log('✅ Browser disconnect.');
 
@@ -116,12 +116,14 @@ export const captureGoogleEarth = async (
   }
 };
 
-const safeClose = async (browser: Browser) => {
-  const timeout = new Promise((_, reject) =>
-    setTimeout(() => reject(new Error('❌ browser.close() timeout')), 5000),
-  );
-
-  return Promise.race([browser.close(), timeout]);
+const safeClose = async () => {
+  exec("pkill -f 'chromium-browser'", (err) => {
+    if (err) {
+      console.error('❌ Error killing chromium-browser:', err);
+    } else {
+      console.log('✅ Killed all chromium-browser processes');
+    }
+  });
 };
 
 const captureFrames = async (page: Page, duration: number): Promise<string> => {
