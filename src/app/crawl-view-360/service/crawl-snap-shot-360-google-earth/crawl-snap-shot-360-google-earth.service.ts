@@ -103,9 +103,9 @@ export const captureGoogleEarth = async (
 
     await delay(1000);
 
-    await browser.close();
+    await browser.disconnect();
 
-    console.log('✅ Browser closed.');
+    console.log('✅ Browser disconnect.');
 
     return videoPath;
   } catch (error) {
