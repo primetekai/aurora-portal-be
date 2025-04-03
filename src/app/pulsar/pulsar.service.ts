@@ -54,22 +54,42 @@ export class PulsarService implements OnModuleInit, OnModuleDestroy {
   private async subscribeToTopic(
     topic: string,
     subscription: string,
-    listener: (msg: Pulsar.Message, consumer: Pulsar.Consumer) => void,
+    listener: (msg: Pulsar.Message, consumer: Pulsar.Consumer) => Promise<void>,
   ) {
-    try {
-      const consumer = await this.client.subscribe({
-        topic,
-        subscription,
-        subscriptionType: 'Shared',
-        listener,
-      });
+    const consumer = await this.client.subscribe({
+      topic,
+      subscription,
+      subscriptionType: 'Shared',
+      listener: (msg, consumer) => {
+        listener(msg, consumer).catch((err) => {
+          this.logger.error(`Listener error: ${err.message}`);
+        });
+      },
+    });
 
-      this.consumers.push(consumer);
-      this.logger.log(`✅ Subscribed to ${topic}`);
-    } catch (err) {
-      this.logger.error(`❌ Failed to subscribe to ${topic}: ${err.message}`);
-    }
+    this.consumers.push(consumer);
+    this.logger.log(`✅ Subscribed to ${topic}`);
   }
+
+  // private async subscribeToTopic(
+  //   topic: string,
+  //   subscription: string,
+  //   listener: (msg: Pulsar.Message, consumer: Pulsar.Consumer) => void,
+  // ) {
+  //   try {
+  //     const consumer = await this.client.subscribe({
+  //       topic,
+  //       subscription,
+  //       subscriptionType: 'Shared',
+  //       listener,
+  //     });
+
+  //     this.consumers.push(consumer);
+  //     this.logger.log(`✅ Subscribed to ${topic}`);
+  //   } catch (err) {
+  //     this.logger.error(`❌ Failed to subscribe to ${topic}: ${err.message}`);
+  //   }
+  // }
 
   private async handleCaptureRequest(
     msg: Pulsar.Message,
