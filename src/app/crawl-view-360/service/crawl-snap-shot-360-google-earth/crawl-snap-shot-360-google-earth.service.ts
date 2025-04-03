@@ -17,32 +17,24 @@ export const captureGoogleEarth = async (
     // executablePath: '/usr/bin/chromium-browser',
     // executablePath:
     //   '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
-    headless: true,
+    headless: false,
     defaultViewport: {
       width: 1920,
       height: 1080,
     },
     args: [
-      // '--no-sandbox',
-      // '--disable-setuid-sandbox',
-      // '--ozone-platform=wayland',
       '--no-sandbox',
       '--disable-setuid-sandbox',
-      '--disable-gpu',
-      '--disable-dev-shm-usage',
-      '--disable-software-rasterizer',
-      '--window-size=1920,1080',
+      '--ozone-platform=wayland',
     ],
     env: {
       DISPLAY: ':0',
       WAYLAND_DISPLAY: 'wayland-0',
       XDG_SESSION_TYPE: 'wayland',
+      HOME: '/tmp',
+      TMPDIR: '/tmp',
+      XDG_RUNTIME_DIR: '/tmp',
     },
-    // env: {
-    //   HOME: '/tmp',
-    //   TMPDIR: '/tmp',
-    //   XDG_RUNTIME_DIR: '/tmp',
-    // },
     userDataDir: '/tmp/chrome-profile',
   });
 
