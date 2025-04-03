@@ -23,16 +23,23 @@ export const captureGoogleEarth = async (
       height: 1080,
     },
     args: [
+      // '--no-sandbox',
+      // '--disable-setuid-sandbox',
+      // '--ozone-platform=wayland',
+      // '--enable-features=UseOzonePlatform',
+      // '--enable-features=VaapiVideoDecoder',
+
       '--no-sandbox',
       '--disable-setuid-sandbox',
-      '--ozone-platform=wayland',
-      '--enable-features=UseOzonePlatform',
+      '--enable-webgl',
+      '--ignore-gpu-blocklist',
+      '--use-gl=egl',
       '--enable-features=VaapiVideoDecoder',
     ],
     env: {
       // DISPLAY: ':0',
-      WAYLAND_DISPLAY: 'wayland-0',
-      XDG_SESSION_TYPE: 'wayland',
+      // WAYLAND_DISPLAY: 'wayland-0',
+      // XDG_SESSION_TYPE: 'wayland',
     },
   });
 
