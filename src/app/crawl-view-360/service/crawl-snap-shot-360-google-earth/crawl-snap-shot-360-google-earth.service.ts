@@ -1,10 +1,11 @@
 import puppeteer from 'puppeteer-extra';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 import fs from 'fs-extra';
-import { exec } from 'child_process';
+// import { exec } from 'child_process';
 import path from 'path';
 import type { Page } from 'puppeteer';
 import { v4 as uuidv4 } from 'uuid';
+import { spawn } from 'child_process';
 
 puppeteer.use(StealthPlugin());
 
@@ -125,28 +126,75 @@ const captureFrames = async (page: Page, duration: number): Promise<string> => {
   return framesDir;
 };
 
-const convertImagesToVideo = async (framesDir: string): Promise<string> => {
-  const videoFileName = `${uuidv4()}.mp4`; // 🔹 Generate a random video file name
+// const convertImagesToVideo = async (framesDir: string): Promise<string> => {
+//   const videoFileName = `${uuidv4()}.mp4`; // 🔹 Generate a random video file name
 
+//   const videoPath = path.join(__dirname, videoFileName);
+
+//   return new Promise((resolve, reject) => {
+//     // const ffmpegCommand = `ffmpeg -framerate 5 -i ${framesDir}/frame-%04d.jpg -c:v libx264 -pix_fmt yuv420p ${videoPath}`;
+//     // 👇 Crop video: keep 80% of the height, cutting 10% from the top and 10% from the bottom
+
+//     const ffmpegCommand = `
+//     ffmpeg -framerate 5 -i ${framesDir}/frame-%04d.jpg \
+//     -vf "crop=in_w:in_h*0.7:0:in_h*0.2" \
+//     -c:v libx264 -pix_fmt yuv420p ${videoPath}
+//   `;
+
+//     exec(ffmpegCommand, (error, stdout, stderr) => {
+//       if (error) {
+//         console.error(`❌ FFmpeg error: ${stderr}`);
+//         reject(error);
+//       } else {
+//         console.log(`✅ Video created successfully: ${videoPath}`);
+//         resolve(videoPath);
+//       }
+//     });
+//   });
+// };
+
+const convertImagesToVideo = async (framesDir: string): Promise<string> => {
+  const videoFileName = `${uuidv4()}.mp4`;
   const videoPath = path.join(__dirname, videoFileName);
 
   return new Promise((resolve, reject) => {
-    // const ffmpegCommand = `ffmpeg -framerate 5 -i ${framesDir}/frame-%04d.jpg -c:v libx264 -pix_fmt yuv420p ${videoPath}`;
-    // 👇 Crop video: keep 80% of the height, cutting 10% from the top and 10% from the bottom
+    const args = [
+      '-framerate',
+      '5',
+      '-i',
+      `${framesDir}/frame-%04d.jpg`,
+      '-vf',
+      'crop=in_w:in_h*0.7:0:in_h*0.2',
+      '-c:v',
+      'libx264',
+      '-pix_fmt',
+      'yuv420p',
+      videoPath,
+    ];
 
-    const ffmpegCommand = `
-    ffmpeg -framerate 5 -i ${framesDir}/frame-%04d.jpg \
-    -vf "crop=in_w:in_h*0.7:0:in_h*0.2" \
-    -c:v libx264 -pix_fmt yuv420p ${videoPath}
-  `;
+    console.log('🚀 Running FFmpeg with args:', args);
 
-    exec(ffmpegCommand, (error, stdout, stderr) => {
-      if (error) {
-        console.error(`❌ FFmpeg error: ${stderr}`);
-        reject(error);
-      } else {
+    const ffmpeg = spawn('ffmpeg', args);
+
+    ffmpeg.stdout.on('data', (data) => {
+      console.log(`📤 FFmpeg stdout: ${data}`);
+    });
+
+    ffmpeg.stderr.on('data', (data) => {
+      console.error(`⚠️ FFmpeg stderr: ${data}`);
+    });
+
+    ffmpeg.on('error', (err) => {
+      console.error(`❌ FFmpeg spawn error: ${err.message}`);
+      reject(err);
+    });
+
+    ffmpeg.on('close', (code) => {
+      if (code === 0) {
         console.log(`✅ Video created successfully: ${videoPath}`);
         resolve(videoPath);
+      } else {
+        reject(new Error(`FFmpeg exited with code ${code}`));
       }
     });
   });
