@@ -95,7 +95,17 @@ export const captureGoogleEarth = async (
 
     await delay(1000);
 
+    console.log('🛑 Closing page and browser...');
+
+    await page.close();
+
+    console.log('✅ Page closed.');
+
+    await delay(1000);
+
     await browser.close();
+
+    console.log('✅ Browser closed.');
 
     return videoPath;
   } catch (error) {
