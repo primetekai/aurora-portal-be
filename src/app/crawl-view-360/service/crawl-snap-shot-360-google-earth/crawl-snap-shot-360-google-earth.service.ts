@@ -34,12 +34,13 @@ export const captureGoogleEarth = async (
       '--enable-webgl',
       '--ignore-gpu-blocklist',
       '--use-gl=egl',
+      '--ozone-platform=wayland',
       '--enable-features=VaapiVideoDecoder',
     ],
     env: {
       // DISPLAY: ':0',
-      // WAYLAND_DISPLAY: 'wayland-0',
-      // XDG_SESSION_TYPE: 'wayland',
+      WAYLAND_DISPLAY: 'wayland-0',
+      XDG_SESSION_TYPE: 'wayland',
     },
   });
 
