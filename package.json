@@ -34,6 +34,7 @@
     "@types/multer": "^1.4.11",
     "@types/passport-facebook": "^3.0.3",
     "@types/passport-google-oauth20": "^2.0.16",
+    "async-mutex": "^0.5.0",
     "aws-sdk": "^2.1599.0",
     "axios": "^1.7.7",
     "bcrypt": "^5.1.1",
