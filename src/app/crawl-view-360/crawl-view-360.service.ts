@@ -35,7 +35,7 @@ export class CrawlService {
     location: string,
     zoom?: number,
   ): Promise<string | null> {
-    const outputFile: IVideoMetadata | null = null;
+    let outputFile: IVideoMetadata | null = null;
     const MIN_VIDEO_SIZE_MB = 1;
     const MAX_RETRIES = 2;
 
@@ -53,7 +53,7 @@ export class CrawlService {
           const sizeInBytes = stats.size;
           const sizeInMB = sizeInBytes / (1024 * 1024);
 
-          const outputFile = {
+          outputFile = {
             videoPath,
             size: {
               bytes: sizeInBytes,
