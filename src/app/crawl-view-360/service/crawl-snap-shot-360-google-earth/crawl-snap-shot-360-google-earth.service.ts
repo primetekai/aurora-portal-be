@@ -23,22 +23,13 @@ export const captureGoogleEarth = async (
       height: 1080,
     },
     args: [
-      // '--no-sandbox',
-      // '--disable-setuid-sandbox',
-      // '--ozone-platform=wayland',
-      // '--enable-features=UseOzonePlatform',
-      // '--enable-features=VaapiVideoDecoder',
-
       '--no-sandbox',
       '--disable-setuid-sandbox',
-      '--enable-webgl',
-      '--ignore-gpu-blocklist',
-      '--use-gl=egl',
       '--ozone-platform=wayland',
+      '--enable-features=UseOzonePlatform',
       '--enable-features=VaapiVideoDecoder',
     ],
     env: {
-      // DISPLAY: ':0',
       WAYLAND_DISPLAY: 'wayland-0',
       XDG_SESSION_TYPE: 'wayland',
     },
@@ -60,7 +51,21 @@ export const captureGoogleEarth = async (
 
     await page.reload({ waitUntil: 'networkidle2' });
 
-    await delay(5000);
+    await delay(3000);
+
+    await page.mouse.move(100, 100);
+    await page.mouse.move(200, 200);
+    await page.mouse.click(500, 500);
+
+    await page.waitForFunction(
+      () => {
+        const canvas = document.querySelector('canvas');
+        return canvas && canvas.clientHeight > 0 && canvas.clientWidth > 0;
+      },
+      { timeout: 20000 },
+    );
+
+    console.log('🌍 Google Earth canvas ready!');
 
     await clickSearchInput(page);
 
