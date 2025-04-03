@@ -14,7 +14,7 @@ export class PulsarService implements OnModuleInit, OnModuleDestroy {
   private client: Pulsar.Client;
   private consumers: Pulsar.Consumer[] = [];
   private producer: Pulsar.Producer;
-  private readonly semaphore = new Semaphore(3); // 👈 chỉ cho phép 3 job chạy song song
+  private readonly semaphore = new Semaphore(3); // Cho phép 3 job chạy song song
 
   constructor(private readonly crawlService: CrawlService) {}
 
@@ -38,12 +38,7 @@ export class PulsarService implements OnModuleInit, OnModuleDestroy {
     });
 
     for (let i = 0; i < this.numThreads; i++) {
-      await this.subscribeToTopic(
-        'persistent://public/default/property-capture-request',
-        'property-capture-request-subscription',
-        this.handleCaptureRequest.bind(this),
-        i + 1, // 👈 consumerId
-      );
+      await this.createConsumerWorker(i + 1);
       this.logger.log(`🧵 Started consumer thread #${i + 1}`);
     }
 
@@ -54,31 +49,35 @@ export class PulsarService implements OnModuleInit, OnModuleDestroy {
     this.logger.log('🔵 Pulsar service initialized.');
   }
 
-  private async subscribeToTopic(
-    topic: string,
-    subscription: string,
-    listener: (
-      msg: Pulsar.Message,
-      consumer: Pulsar.Consumer,
-      consumerId: number,
-    ) => Promise<void>,
-    consumerId: number,
-  ) {
+  private async createConsumerWorker(consumerId: number) {
     const consumer = await this.client.subscribe({
-      topic,
-      subscription,
+      topic: 'persistent://public/default/property-capture-request',
+      subscription: 'property-capture-request-subscription',
       subscriptionType: 'Shared',
-      listener: (msg, consumer) => {
-        listener(msg, consumer, consumerId).catch((err) => {
-          this.logger.error(
-            `Listener error (Consumer #${consumerId}): ${err.message}`,
-          );
-        });
-      },
+      receiverQueueSize: 100, // đẩy sẵn nhiều message
     });
 
     this.consumers.push(consumer);
-    this.logger.log(`✅ Subscribed (Consumer #${consumerId}) to ${topic}`);
+    this.logger.log(`✅ Subscribed (Consumer #${consumerId})`);
+
+    const loop = async () => {
+      while (true) {
+        try {
+          const msg = await consumer.receive();
+          this.handleCaptureRequest(msg, consumer, consumerId).catch((err) => {
+            this.logger.error(
+              `[Consumer #${consumerId}] Error: ${err.message}`,
+            );
+          });
+        } catch (err) {
+          this.logger.error(
+            `[Consumer #${consumerId}] Receive error: ${err.message}`,
+          );
+        }
+      }
+    };
+
+    loop();
   }
 
   private async handleCaptureRequest(
@@ -86,7 +85,7 @@ export class PulsarService implements OnModuleInit, OnModuleDestroy {
     consumer: Pulsar.Consumer,
     consumerId: number,
   ) {
-    const [_, release] = await this.semaphore.acquire(); // 👈 giới hạn job đồng thời
+    const [_, release] = await this.semaphore.acquire(); // giới hạn job đồng thời
     try {
       const rawData = msg.getData().toString();
       this.logger.log(`📩 [Consumer #${consumerId}] Received: ${rawData}`);
@@ -148,7 +147,7 @@ export class PulsarService implements OnModuleInit, OnModuleDestroy {
     } catch (err) {
       this.logger.error(`[Consumer #${consumerId}] Error: ${err.message}`);
     } finally {
-      release(); // 👈 luôn release slot của semaphore
+      release(); // luôn release slot của semaphore
     }
   }
 
