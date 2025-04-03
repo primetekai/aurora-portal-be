@@ -14,7 +14,7 @@ export class PulsarService implements OnModuleInit, OnModuleDestroy {
   private client: Pulsar.Client;
   private consumers: Pulsar.Consumer[] = [];
   private producer: Pulsar.Producer;
-  private readonly semaphore = new Semaphore(3); // Cho phép 3 job chạy song song
+  private readonly semaphore = new Semaphore(3); // Giới hạn 3 job chạy cùng lúc
 
   constructor(private readonly crawlService: CrawlService) {}
 
@@ -54,7 +54,7 @@ export class PulsarService implements OnModuleInit, OnModuleDestroy {
       topic: 'persistent://public/default/property-capture-request',
       subscription: 'property-capture-request-subscription',
       subscriptionType: 'Shared',
-      receiverQueueSize: 100, // đẩy sẵn nhiều message
+      receiverQueueSize: 100,
     });
 
     this.consumers.push(consumer);
@@ -66,12 +66,12 @@ export class PulsarService implements OnModuleInit, OnModuleDestroy {
           const msg = await consumer.receive();
           this.handleCaptureRequest(msg, consumer, consumerId).catch((err) => {
             this.logger.error(
-              `[Consumer #${consumerId}] Error: ${err.message}`,
+              `[Consumer #${consumerId}] ❌ Error in message handling: ${err.message}`,
             );
           });
         } catch (err) {
           this.logger.error(
-            `[Consumer #${consumerId}] Receive error: ${err.message}`,
+            `[Consumer #${consumerId}] ❌ Receive failed: ${err.message}`,
           );
         }
       }
@@ -85,32 +85,41 @@ export class PulsarService implements OnModuleInit, OnModuleDestroy {
     consumer: Pulsar.Consumer,
     consumerId: number,
   ) {
-    const [_, release] = await this.semaphore.acquire(); // giới hạn job đồng thời
+    const [_, release] = await this.semaphore.acquire();
+    const messageId = msg.getMessageId().toString();
+
     try {
       const rawData = msg.getData().toString();
-      this.logger.log(`📩 [Consumer #${consumerId}] Received: ${rawData}`);
+      this.logger.log(
+        `📩 [Consumer #${consumerId}] Received (MessageID: ${messageId}): ${rawData}`,
+      );
 
       if (!rawData.startsWith('{')) {
-        this.logger.error(`[Consumer #${consumerId}] Invalid JSON: ${rawData}`);
-        consumer.acknowledge(msg);
+        this.logger.error(`[Consumer #${consumerId}] ❗ Invalid JSON`);
+        await consumer.acknowledge(msg);
         return;
       }
 
-      const res = JSON.parse(rawData);
-      const { propertyId, data, attempts = 0 } = res;
-      const { longitude, latitude, zoom } = data;
+      const parsed = JSON.parse(rawData);
+      const propertyId = parsed.property_id ?? parsed.propertyId;
+      const longitude = parsed.longitude ?? parsed.data?.longitude;
+      const latitude = parsed.latitude ?? parsed.data?.latitude;
+      const zoom = parsed.zoom ?? parsed.data?.zoom ?? 18;
+      const attempts = parsed.attempts ?? 0;
 
-      if (!longitude || !latitude) {
-        this.logger.warn(`[Consumer #${consumerId}] Missing coordinates`);
-        consumer.acknowledge(msg);
+      if (!propertyId || !longitude || !latitude) {
+        this.logger.warn(
+          `[Consumer #${consumerId}] ⚠️ Missing coordinates or propertyId`,
+        );
+        await consumer.acknowledge(msg);
         return;
       }
 
       if (attempts >= 2) {
         this.logger.warn(
-          `[Consumer #${consumerId}] Max attempts (${attempts}) for propertyId: ${propertyId}`,
+          `[Consumer #${consumerId}] ⛔ Max attempts (${attempts}) for propertyId: ${propertyId}`,
         );
-        consumer.acknowledge(msg);
+        await consumer.acknowledge(msg);
         return;
       }
 
@@ -121,10 +130,10 @@ export class PulsarService implements OnModuleInit, OnModuleDestroy {
       );
 
       if (!result) {
-        consumer.negativeAcknowledge(msg);
         this.logger.warn(
-          `[Consumer #${consumerId}] Capture failed for propertyId: ${propertyId}`,
+          `[Consumer #${consumerId}] ❌ Capture failed for propertyId: ${propertyId}`,
         );
+        await consumer.negativeAcknowledge(msg); // Re-deliver if failed
         return;
       }
 
@@ -141,13 +150,17 @@ export class PulsarService implements OnModuleInit, OnModuleDestroy {
       });
 
       this.logger.log(
-        `[Consumer #${consumerId}] Sent: ${JSON.stringify(responseMessage)}`,
+        `✅ [Consumer #${consumerId}] Sent for propertyId: ${propertyId}`,
       );
-      consumer.acknowledge(msg);
+
+      await consumer.acknowledge(msg);
     } catch (err) {
-      this.logger.error(`[Consumer #${consumerId}] Error: ${err.message}`);
+      this.logger.error(
+        `[Consumer #${consumerId}] ❌ Error: ${err.message} (MessageID: ${messageId})`,
+      );
+      await consumer.negativeAcknowledge(msg);
     } finally {
-      release(); // luôn release slot của semaphore
+      release();
     }
   }
 
