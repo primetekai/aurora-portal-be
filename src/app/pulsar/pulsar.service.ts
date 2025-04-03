@@ -14,7 +14,7 @@ export class PulsarService implements OnModuleInit, OnModuleDestroy {
   private client: Pulsar.Client;
   private consumers: Pulsar.Consumer[] = [];
   private producer: Pulsar.Producer;
-  private readonly semaphore = new Semaphore(3); // Giới hạn 3 job chạy cùng lúc
+  private readonly semaphore = new Semaphore(1); // Giới hạn 3 job chạy cùng lúc
 
   constructor(private readonly crawlService: CrawlService) {}
 
