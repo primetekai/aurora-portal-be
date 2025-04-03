@@ -17,7 +17,7 @@ export const captureGoogleEarth = async (
     // executablePath: '/usr/bin/chromium-browser',
     // executablePath:
     //   '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
-    headless: false,
+    headless: true,
     defaultViewport: {
       width: 1920,
       height: 1080,
@@ -33,7 +33,7 @@ export const captureGoogleEarth = async (
       '--window-size=1920,1080',
     ],
     env: {
-      DISPLAY: ':0',
+      // DISPLAY: ':0',
       // WAYLAND_DISPLAY: 'wayland-0',
       // XDG_SESSION_TYPE: 'wayland',
       HOME: '/tmp',
