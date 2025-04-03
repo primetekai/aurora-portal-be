@@ -23,15 +23,27 @@ export const captureGoogleEarth = async (
       height: 1080,
     },
     args: [
+      // '--no-sandbox',
+      // '--disable-setuid-sandbox',
+      // '--ozone-platform=wayland',
       '--no-sandbox',
       '--disable-setuid-sandbox',
-      '--ozone-platform=wayland',
+      '--disable-gpu',
+      '--disable-dev-shm-usage',
+      '--disable-software-rasterizer',
+      '--window-size=1920,1080',
     ],
+    // env: {
+    //   DISPLAY: ':0',
+    //   WAYLAND_DISPLAY: 'wayland-0',
+    //   XDG_SESSION_TYPE: 'wayland',
+    // },
     env: {
-      DISPLAY: ':0',
-      WAYLAND_DISPLAY: 'wayland-0',
-      XDG_SESSION_TYPE: 'wayland',
+      HOME: '/tmp',
+      TMPDIR: '/tmp',
+      XDG_RUNTIME_DIR: '/tmp',
     },
+    userDataDir: '/tmp/chrome-profile',
   });
 
   const page = await browser.newPage();
