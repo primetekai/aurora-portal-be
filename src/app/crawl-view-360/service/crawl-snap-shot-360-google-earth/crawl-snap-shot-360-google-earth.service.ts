@@ -13,7 +13,8 @@ export const captureGoogleEarth = async (
   zoom?: number,
 ): Promise<string> => {
   const browser = await puppeteer.launch({
-    executablePath: '/usr/bin/chromium-browser',
+    executablePath: '/usr/bin/google-chrome',
+    // executablePath: '/usr/bin/chromium-browser',
     // executablePath:
     //   '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
     headless: false,
