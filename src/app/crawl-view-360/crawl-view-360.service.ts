@@ -48,6 +48,8 @@ export class CrawlService {
         try {
           const videoPath = await captureGoogleEarth(location, zoom);
 
+          console.log('Video path service: ', videoPath);
+
           const statAsync = promisify(fs.stat);
           const stats = await statAsync(videoPath);
           const sizeInBytes = stats.size;
