@@ -89,25 +89,41 @@ export const captureGoogleEarth = async (
 
     // await clickMultipleTimes(page, 1670, 1010, 1);
 
+    // await page.evaluate(() => {
+    //   const icon = document.createElement('div');
+    //   icon.id = 'location-icon';
+    //   icon.innerHTML = `
+    //     <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="red">
+    //       <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0
+    //         9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5
+    //         2.5-2.5 2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/>
+    //     </svg>
+    //   `;
+    //   icon.style.position = 'fixed';
+    //   icon.style.top = '50%';
+    //   icon.style.left = '50%';
+    //   icon.style.transform = 'translate(-50%, -50%)';
+    //   icon.style.zIndex = '999999';
+    //   icon.style.pointerEvents = 'none';
+    //   document.body.appendChild(icon);
+    // });
+    // console.log('📍 Added simple location icon at center');
+
     await page.evaluate(() => {
-      const icon = document.createElement('div');
-      icon.id = 'location-icon';
-      icon.innerHTML = `
-        <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="red">
-          <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 
-            9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 
-            2.5-2.5 2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/>
-        </svg>
-      `;
-      icon.style.position = 'fixed';
-      icon.style.top = '50%';
-      icon.style.left = '50%';
-      icon.style.transform = 'translate(-50%, -50%)';
-      icon.style.zIndex = '999999';
-      icon.style.pointerEvents = 'none';
-      document.body.appendChild(icon);
+      const dot = document.createElement('div');
+      dot.id = 'red-dot';
+      dot.style.position = 'fixed';
+      dot.style.top = '50%';
+      dot.style.left = '50%';
+      dot.style.width = '10px';
+      dot.style.height = '10px';
+      dot.style.backgroundColor = 'red';
+      dot.style.borderRadius = '50%';
+      dot.style.zIndex = '999999';
+      dot.style.transform = 'translate(-50%, -50%)';
+      document.body.appendChild(dot);
     });
-    console.log('📍 Added simple location icon at center');
+    console.log('🔴 Added red dot in the center of screen');
 
     await delay(1000);
 
