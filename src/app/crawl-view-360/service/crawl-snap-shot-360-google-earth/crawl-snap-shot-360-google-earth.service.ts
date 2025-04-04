@@ -14,9 +14,9 @@ export const captureGoogleEarth = async (
   zoom?: number,
 ): Promise<string> => {
   const browser = await puppeteer.launch({
-    executablePath: '/usr/bin/chromium-browser',
-    // executablePath:
-    //   '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+    // executablePath: '/usr/bin/chromium-browser',
+    executablePath:
+      '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
     headless: false,
     defaultViewport: {
       width: 1920,
@@ -83,9 +83,31 @@ export const captureGoogleEarth = async (
 
     await clickButtonUI(page, 581, 32);
 
+    await clickButtonUI(page, 1880, 102);
+
     await delay(1000);
 
-    await clickMultipleTimes(page, 1670, 1010, 1);
+    // await clickMultipleTimes(page, 1670, 1010, 1);
+
+    await page.evaluate(() => {
+      const icon = document.createElement('div');
+      icon.id = 'location-icon';
+      icon.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="red">
+          <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 
+            9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 
+            2.5-2.5 2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/>
+        </svg>
+      `;
+      icon.style.position = 'fixed';
+      icon.style.top = '50%';
+      icon.style.left = '50%';
+      icon.style.transform = 'translate(-50%, -50%)';
+      icon.style.zIndex = '999999';
+      icon.style.pointerEvents = 'none';
+      document.body.appendChild(icon);
+    });
+    console.log('📍 Added simple location icon at center');
 
     await delay(1000);
 
@@ -164,7 +186,7 @@ const convertImagesToVideo = async (framesDir: string): Promise<string> => {
 
     const ffmpegCommand = `
     ffmpeg -framerate 5 -i ${framesDir}/frame-%04d.jpg \
-    -vf "crop=in_w:in_h*0.7:0:in_h*0.2" \
+    -vf "crop=in_w:in_h*0.8:0:in_h*0.1" \
     -c:v libx264 -pix_fmt yuv420p ${videoPath}
   `;
 
