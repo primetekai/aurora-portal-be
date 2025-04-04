@@ -14,9 +14,9 @@ export const captureGoogleEarth = async (
   zoom?: number,
 ): Promise<string> => {
   const browser = await puppeteer.launch({
-    executablePath: '/usr/bin/chromium-browser',
-    // executablePath:
-    //   '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+    // executablePath: '/usr/bin/chromium-browser',
+    executablePath:
+      '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
     headless: false,
     defaultViewport: {
       width: 1920,
@@ -112,17 +112,23 @@ export const captureGoogleEarth = async (
     await page.evaluate(() => {
       const dot = document.createElement('div');
       dot.id = 'red-dot';
+
       dot.style.position = 'fixed';
       dot.style.top = '50%';
       dot.style.left = '50%';
-      dot.style.width = '10px';
-      dot.style.height = '10px';
+
+      dot.style.width = '20px';
+      dot.style.height = '20px';
+
       dot.style.backgroundColor = 'red';
       dot.style.borderRadius = '50%';
+
       dot.style.zIndex = '999999';
       dot.style.transform = 'translate(-50%, -50%)';
+
       document.body.appendChild(dot);
     });
+
     console.log('🔴 Added red dot in the center of screen');
 
     await delay(1000);
