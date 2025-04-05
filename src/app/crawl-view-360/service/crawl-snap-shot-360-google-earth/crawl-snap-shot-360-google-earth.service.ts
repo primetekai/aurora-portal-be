@@ -81,13 +81,13 @@ export const captureGoogleEarth = async (
 
     await clickButtonUI(page, 55, 150);
 
-    await clickButtonUI(page, 581, 32);
+    await clickButtonUI(page, 581, 32); // click hidden header
 
-    await clickButtonUI(page, 1880, 102);
+    // await clickButtonUI(page, 1880, 102); // click remote notification location
 
     await delay(1000);
 
-    // await clickMultipleTimes(page, 1670, 1010, 1);
+    // await clickMultipleTimes(page, 1670, 1010, 1); // click street view
 
     // await page.evaluate(() => {
     //   const icon = document.createElement('div');
@@ -109,36 +109,36 @@ export const captureGoogleEarth = async (
     // });
     // console.log('📍 Added simple location icon at center');
 
-    await page.evaluate(() => {
-      const dot = document.createElement('div');
-      dot.id = 'red-dot';
+    // await page.evaluate(() => {
+    //   const dot = document.createElement('div');
+    //   dot.id = 'red-dot';
 
-      dot.style.position = 'fixed';
-      dot.style.top = '50%';
-      dot.style.left = '50%';
+    //   dot.style.position = 'fixed';
+    //   dot.style.top = '50%';
+    //   dot.style.left = '50%';
 
-      dot.style.width = '20px';
-      dot.style.height = '20px';
+    //   dot.style.width = '20px';
+    //   dot.style.height = '20px';
 
-      dot.style.backgroundColor = 'red';
-      dot.style.borderRadius = '50%';
+    //   dot.style.backgroundColor = 'red';
+    //   dot.style.borderRadius = '50%';
 
-      dot.style.zIndex = '999999';
-      dot.style.transform = 'translate(-50%, -50%)';
+    //   dot.style.zIndex = '999999';
+    //   dot.style.transform = 'translate(-50%, -50%)';
 
-      document.body.appendChild(dot);
-    });
+    //   document.body.appendChild(dot);
+    // });
 
-    console.log('🔴 Added red dot in the center of screen');
+    // console.log('🔴 Added red dot in the center of screen');
 
     await delay(1000);
 
     //Zoom in
-    await clickMultipleTimes(page, 1884, 1014, zoom);
+    await clickMultipleTimes(page, 1884, 1014, zoom); // click zoom
 
     await delay(1000);
 
-    await clickMultipleTimes(page, 1750, 1010, 1);
+    await clickMultipleTimes(page, 1750, 1010, 1); // click rotate
 
     await delay(1000);
 
@@ -208,7 +208,7 @@ const convertImagesToVideo = async (framesDir: string): Promise<string> => {
 
     const ffmpegCommand = `
     ffmpeg -framerate 5 -i ${framesDir}/frame-%04d.jpg \
-    -vf "crop=in_w:in_h*0.8:0:in_h*0.1" \
+    -vf "crop=in_w:in_h*0.65:0:in_h*0.25" \
     -c:v libx264 -pix_fmt yuv420p ${videoPath}
   `;
 
