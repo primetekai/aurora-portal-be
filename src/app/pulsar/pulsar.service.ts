@@ -22,8 +22,7 @@ export class PulsarService implements OnModuleInit, OnModuleDestroy {
     const pulsarConfig = {
       authentication: {
         token:
-          'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwcm9kIn0.8rJ53NPm-Giau4qIls9aOc1D6VXJY7b_mjqURPnABy0',
-        // 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkZXYifQ.MtdmVWF8Yr3Tp5M1gKSOOLHdsh1KsiVaJY2TtDi1sTw',
+          'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwcm9kIn0.g6gc1rka9gxFX8f8Hhj3yKHUv2IfKC7sYa8MdH5HDeE',
         type: 'token',
       },
     };
