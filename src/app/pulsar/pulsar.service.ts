@@ -28,7 +28,7 @@ export class PulsarService implements OnModuleInit, OnModuleDestroy {
     };
 
     const clientConfig: Pulsar.ClientConfig = {
-      serviceUrl: 'pulsar://103.78.3.70:6650',
+      serviceUrl: 'pulsar://103.78.3.71:6650',
       // serviceUrl: 'pulsar://160.191.164.16:6650',
       operationTimeoutSeconds: 10,
     };
