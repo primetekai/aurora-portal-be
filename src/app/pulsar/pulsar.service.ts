@@ -78,7 +78,7 @@ export class PulsarService implements OnModuleInit, OnModuleDestroy {
       const res = JSON.parse(rawData);
       this.logger.log(`✅ Parsed message: ${JSON.stringify(res)}`);
 
-      const { propertyId, data, attempts = 0 } = res;
+      const { propertyId, data, attempts = 0, app } = res;
       const { longitude, latitude, zoom } = data;
 
       if (!longitude || !latitude) {
@@ -116,6 +116,7 @@ export class PulsarService implements OnModuleInit, OnModuleDestroy {
           timestamp: new Date().toISOString(),
           propertyId,
           attempts: attempts + 1,
+          app,
           data: {
             zoom,
             videoUrl: result,
