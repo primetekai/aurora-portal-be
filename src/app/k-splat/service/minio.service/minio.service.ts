@@ -84,7 +84,7 @@ export class MinIOService {
         filePath,
       );
 
-      const fileUrl = `http://s3-dev.aurora-tech.com/${bucketName}/${fullObjectName}`;
+      const fileUrl = `https://s3-dev.aurora-tech.com/${bucketName}/${fullObjectName}`;
       // const fileUrl = `http://${this.minioClient.host}:${this.minioClient.port}/${this.bucketName}/${fullObjectName}`;
       console.log(`✅ Upload successful! File URL: ${fileUrl}`);
 
