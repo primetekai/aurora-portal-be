@@ -12,11 +12,11 @@ export class MinIOService {
 
   constructor() {
     this.minioClient = new Client({
-      endPoint: 's3-dev.aurora-tech.com',
+      endPoint: 's3.aurora-tech.com',
       port: 443,
       useSSL: true,
-      accessKey: 'lstlJnqwAcr9lqNe4B3O',
-      secretKey: 'H440qEqcXqMZq2X9SU4bJriZODF5lMZm10hcoDih',
+      accessKey: 'EiCFhonsMsVoYpyQ2aWl',
+      secretKey: 'MFS2Judqjj1MTykRCK0hM9GZMx38kmIdSOTSsIOo',
       // endPoint: process.env.MINIO_URL || 's3-dev.aurora-tech.com',
       // port: parseInt(process.env.MINIO_PORT) || 80,
       // useSSL: process.env.MINIO_SSL === 'true',
@@ -84,7 +84,7 @@ export class MinIOService {
         filePath,
       );
 
-      const fileUrl = `https://s3-dev.aurora-tech.com/${bucketName}/${fullObjectName}`;
+      const fileUrl = `https://s3.aurora-tech.com/${bucketName}/${fullObjectName}`;
       // const fileUrl = `https://${this.minioClient.host}:${this.minioClient.port}/${this.bucketName}/${fullObjectName}`;
       console.log(`✅ Upload successful! File URL: ${fileUrl}`);
 
