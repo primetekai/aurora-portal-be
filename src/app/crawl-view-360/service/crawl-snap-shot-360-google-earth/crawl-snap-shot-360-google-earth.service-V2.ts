@@ -18,7 +18,6 @@ export const captureGoogleEarth = async (
     // executablePath:
     //   '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
     headless: false,
-    protocolTimeout: 120_000,
     defaultViewport: {
       width: 1920,
       height: 1080,
@@ -37,10 +36,6 @@ export const captureGoogleEarth = async (
   });
 
   const page = await browser.newPage();
-
-  page.setDefaultTimeout(120_000);
-
-  page.setDefaultNavigationTimeout(120_000);
 
   await page.setUserAgent(
     'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
