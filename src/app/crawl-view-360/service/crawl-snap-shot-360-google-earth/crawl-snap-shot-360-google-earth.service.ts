@@ -74,8 +74,10 @@ export const captureGoogleEarth = async (
     await delay(1_000);
 
     // Zoom in
-    await clickMultiple(page, 1884, 1014, zoom);
-    await delay(1_000);
+    if (zoom !== 1) {
+      await clickMultiple(page, 1884, 1014, zoom);
+      await delay(1_000);
+    }
 
     // Rotate
     await clickMultiple(page, 1750, 1010, 1);
