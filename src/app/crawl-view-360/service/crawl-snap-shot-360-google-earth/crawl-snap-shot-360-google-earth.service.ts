@@ -24,6 +24,7 @@ export const captureGoogleEarth = async (
       '--disable-setuid-sandbox',
       '--ozone-platform=wayland',
       '--enable-features=UseOzonePlatform,VaapiVideoDecoder',
+      '--window-size=1920,1080',
     ],
     env: {
       WAYLAND_DISPLAY: 'wayland-0',
@@ -32,6 +33,13 @@ export const captureGoogleEarth = async (
   });
 
   const page = await browser.newPage();
+
+  const [width, height] = await page.evaluate(() => {
+    const canvas = document.querySelector('canvas');
+    return [canvas?.width, canvas?.height];
+  });
+  console.log('🖼️ Canvas size:', width, height);
+
   page.setDefaultTimeout(120_000);
   page.setDefaultNavigationTimeout(120_000);
 
