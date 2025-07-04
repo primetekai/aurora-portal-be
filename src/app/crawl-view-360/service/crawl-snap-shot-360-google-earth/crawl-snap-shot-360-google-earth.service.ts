@@ -148,8 +148,35 @@ async function captureFramesWithScreencast(
   return framesDir;
 }
 
+const convertImagesToVideo = async (framesDir: string): Promise<string> => {
+  const videoFileName = `${uuidv4()}.mp4`; // 🔹 Generate a random video file name
+
+  const videoPath = path.join(__dirname, videoFileName);
+
+  return new Promise((resolve, reject) => {
+    // const ffmpegCommand = `ffmpeg -framerate 5 -i ${framesDir}/frame-%04d.jpg -c:v libx264 -pix_fmt yuv420p ${videoPath}`;
+    // 👇 Crop video: keep 80% of the height, cutting 10% from the top and 10% from the bottom
+
+    const ffmpegCommand = `
+    ffmpeg -framerate 5 -i ${framesDir}/frame-%04d.jpg \
+    -vf "crop=in_w:in_h*0.7:0:in_h*0.2" \
+    -c:v libx264 -pix_fmt yuv420p ${videoPath}
+  `;
+
+    exec(ffmpegCommand, (error, stdout, stderr) => {
+      if (error) {
+        console.error(`❌ FFmpeg error: ${stderr}`);
+        reject(error);
+      } else {
+        console.log(`✅ Video created successfully: ${videoPath}`);
+        resolve(videoPath);
+      }
+    });
+  });
+};
+
 // Chuyển frames thành video bằng ffmpeg
-function convertImagesToVideo(framesDir: string): Promise<string> {
+function convertImagesToVideoV1(framesDir: string): Promise<string> {
   const fileName = `${uuidv4()}.mp4`;
   const videoPath = path.join(__dirname, fileName);
 
