@@ -22,7 +22,7 @@ export const captureGoogleEarth = async (
     args: [
       '--no-sandbox',
       '--disable-setuid-sandbox',
-      '--disable-gpu',
+      // '--disable-gpu',
       '--ozone-platform=wayland',
       '--enable-features=UseOzonePlatform,VaapiVideoDecoder',
       '--window-size=1920,1080',
