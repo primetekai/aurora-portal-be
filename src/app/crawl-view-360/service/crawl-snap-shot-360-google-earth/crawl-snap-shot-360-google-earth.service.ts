@@ -22,6 +22,7 @@ export const captureGoogleEarth = async (
     args: [
       '--no-sandbox',
       '--disable-setuid-sandbox',
+      '--disable-gpu',
       '--ozone-platform=wayland',
       '--enable-features=UseOzonePlatform,VaapiVideoDecoder',
       '--window-size=1920,1080',
@@ -62,16 +63,14 @@ export const captureGoogleEarth = async (
     });
     console.log('🖼️ Canvas size:', canvasWidth, canvasHeight);
 
-    // Tắt animation/transition để ổn định khung hình
+    // Tắt animation/transition để khung hình ổn định
     await page.addStyleTag({
       content: `* { animation: none !important; transition: none !important; }`,
     });
 
-    // Click vào ô search
+    // Click vào ô search và nhập địa điểm
     await clickXY(page, 185, 32);
     await delay(1_000);
-
-    // Nhập location
     await page.keyboard.type(location, { delay: 100 });
     await page.keyboard.press('Enter');
     await delay(10_000);
@@ -85,7 +84,6 @@ export const captureGoogleEarth = async (
     // Zoom thêm nếu cần
     await clickMultiple(page, 1884, 1014, zoom);
     await delay(1_000);
-
     await clickMultiple(page, 1750, 1010, 1);
     await delay(2_000);
 
@@ -119,6 +117,7 @@ async function captureFramesWithScreencast(
   let frameCount = 0;
   const totalFrames = durationSec * fps;
 
+  // Thiết lập listener, chỉ ack và ghi file
   client.on('Page.screencastFrame', async ({ data, sessionId }) => {
     if (frameCount < totalFrames) {
       const img = Buffer.from(data, 'base64');
@@ -128,21 +127,33 @@ async function captureFramesWithScreencast(
       );
       await fs.writeFile(filePath, img);
       frameCount++;
-      await client.send('Page.screencastFrameAck', { sessionId });
-    } else {
-      await client.send('Page.stopScreencast');
+
+      // Bọc ACK trong try/catch để ignore nếu target đã đóng
+      try {
+        await client.send('Page.screencastFrameAck', { sessionId });
+      } catch (e) {
+        // ignore
+      }
     }
   });
 
+  // Bắt đầu screencast
   await client.send('Page.startScreencast', {
     format: 'jpeg',
-    quality: 95, // ✅ Chất lượng cao
+    quality: 95,
     maxWidth: 1920,
     maxHeight: 1080,
     everyNthFrame: Math.max(1, Math.floor(60 / fps)),
   });
 
+  // Chờ đủ duration rồi mới stop
   await delay(durationSec * 1000);
+  try {
+    await client.send('Page.stopScreencast');
+  } catch (e) {
+    // ignore nếu target đã đóng trước
+  }
+
   return framesDir;
 }
 
@@ -158,7 +169,6 @@ function convertImagesToVideo(framesDir: string): Promise<string> {
       '-i',
       `${framesDir}/frame-%04d.jpg`,
       '-vf',
-      // 'scale=1920:1080',
       'crop=in_w:in_h*0.55:0:in_h*0.30',
       '-c:v',
       'libx264',
