@@ -78,16 +78,15 @@ export const captureGoogleEarth = async (
     await delay(1_000);
 
     // Zoom in
-    if (zoom !== 1) {
-      await clickMultiple(page, 1884, 1014, zoom);
-      await delay(1_000);
-    }
+    await clickMultiple(page, 1884, 1014, zoom);
+    await delay(1_000);
+
     // Rotate
     await clickMultiple(page, 1750, 1010, 1);
-    await delay(2_000);
+    await delay(500);
 
     console.log('🎥 Recording frames for 20s at 10fps...');
-    const framesDir = await captureFramesWithScreencast(page, 20, 10);
+    const framesDir = await captureFramesWithScreencast(page, 30, 10);
 
     console.log('🎞 Converting to video...');
     const videoPath = await convertImagesToVideo(framesDir);
@@ -161,7 +160,8 @@ function convertImagesToVideo(framesDir: string): Promise<string> {
       '-i',
       `${framesDir}/frame-%04d.jpg`,
       '-vf',
-      'crop=in_w:in_h*0.65:0:in_h*0.25',
+      // 'crop=in_w:in_h*0.65:0:in_h*0.25',
+      'crop=in_w:in_h*0.55:0:in_h*0.30',
       '-c:v',
       'libx264',
       '-pix_fmt',
