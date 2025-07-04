@@ -160,12 +160,11 @@ function convertImagesToVideo(framesDir: string): Promise<string> {
       '-i',
       `${framesDir}/frame-%04d.jpg`,
       '-vf',
-      // 'scale=1920:1080',
-      'crop=in_w:in_h*0.55:0:in_h*0.30',
+      'scale=1920:1080', // ✅ Không crop
       '-c:v',
       'libx264',
       '-crf',
-      '18',
+      '18', // ✅ Chất lượng cao
       '-preset',
       'veryfast',
       '-pix_fmt',
