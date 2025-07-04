@@ -86,7 +86,7 @@ export const captureGoogleEarth = async (
     await delay(500);
 
     console.log('🎥 Recording frames for 20s at 10fps...');
-    const framesDir = await captureFramesWithScreencast(page, 30, 10);
+    const framesDir = await captureFramesWithScreencast(page, 20, 10);
 
     console.log('🎞 Converting to video...');
     const videoPath = await convertImagesToVideo(framesDir);
@@ -153,9 +153,6 @@ function convertImagesToVideo(framesDir: string): Promise<string> {
   const videoPath = path.join(__dirname, fileName);
 
   return new Promise((resolve, reject) => {
-    const vf = `"crop=in_w:in_h*0.65:0:in_h*0.25"`;
-    // const vf = `"crop=in_w:in_h*0.55:0:in_h*0.30"`;
-
     const cmd = [
       'ffmpeg',
       '-framerate',
@@ -163,7 +160,8 @@ function convertImagesToVideo(framesDir: string): Promise<string> {
       '-i',
       `${framesDir}/frame-%04d.jpg`,
       '-vf',
-      vf,
+      // 'crop=in_w:in_h*0.65:0:in_h*0.25',
+      'crop=in_w:in_h*0.55:0:in_h*0.30',
       '-c:v',
       'libx264',
       '-pix_fmt',
