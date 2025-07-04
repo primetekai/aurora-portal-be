@@ -153,6 +153,9 @@ function convertImagesToVideo(framesDir: string): Promise<string> {
   const videoPath = path.join(__dirname, fileName);
 
   return new Promise((resolve, reject) => {
+    const vf = `"crop=in_w:in_h*0.65:0:in_h*0.25"`;
+    // const vf = `"crop=in_w:in_h*0.55:0:in_h*0.30"`;
+
     const cmd = [
       'ffmpeg',
       '-framerate',
@@ -160,8 +163,7 @@ function convertImagesToVideo(framesDir: string): Promise<string> {
       '-i',
       `${framesDir}/frame-%04d.jpg`,
       '-vf',
-      // 'crop=in_w:in_h*0.65:0:in_h*0.25',
-      'crop=in_w:in_h*0.55:0:in_h*0.30',
+      vf,
       '-c:v',
       'libx264',
       '-pix_fmt',
