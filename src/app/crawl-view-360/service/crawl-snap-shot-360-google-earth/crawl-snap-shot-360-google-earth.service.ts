@@ -156,7 +156,7 @@ async function captureFramesWithScreencast(
   return framesDir;
 }
 
-const convertImagesToVideo = async (framesDir: string): Promise<string> => {
+const convertImagesToVideoV1 = async (framesDir: string): Promise<string> => {
   const videoFileName = `${uuidv4()}.mp4`; // 🔹 Generate a random video file name
 
   const videoPath = path.join(__dirname, videoFileName);
@@ -184,7 +184,7 @@ const convertImagesToVideo = async (framesDir: string): Promise<string> => {
 };
 
 // Chuyển frames thành video bằng ffmpeg
-function convertImagesToVideoV1(framesDir: string): Promise<string> {
+function convertImagesToVideo(framesDir: string): Promise<string> {
   const fileName = `${uuidv4()}.mp4`;
   const videoPath = path.join(__dirname, fileName);
 
@@ -196,7 +196,7 @@ function convertImagesToVideoV1(framesDir: string): Promise<string> {
       '-i',
       `${framesDir}/frame-%04d.jpg`,
       '-vf',
-      'crop=in_w:in_h*0.65:0:in_h*0.25',
+      'crop=in_w:in_h*0.55:0:in_h*0.30',
       '-c:v',
       'libx264',
       '-pix_fmt',
