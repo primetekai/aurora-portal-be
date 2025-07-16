@@ -84,6 +84,11 @@ export const captureGoogleEarth = async (
     // Zoom thêm nếu cần
     await clickMultiple(page, 1884, 1014, zoom);
     await delay(1_000);
+
+    // Click close modal
+    await clickXY(page, 1260, 856);
+    await delay(1_000);
+
     await clickMultiple(page, 1750, 1010, 1);
     await delay(2_000);
 
