@@ -13,9 +13,9 @@ export const captureGoogleEarth = async (
   zoom: number = 2,
 ): Promise<string> => {
   const browser = await puppeteer.launch({
-    executablePath: '/usr/bin/chromium-browser',
-    // executablePath:
-    //   '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+    // executablePath: '/usr/bin/chromium-browser',
+    executablePath:
+      '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
     headless: false,
     protocolTimeout: 120_000,
     defaultViewport: { width: 1920, height: 1080 },
@@ -84,6 +84,11 @@ export const captureGoogleEarth = async (
     // Zoom thêm nếu cần
     await clickMultiple(page, 1884, 1014, zoom);
     await delay(1_000);
+
+    //Click close modal
+    await clickXY(page, 1260, 856);
+    await delay(1_000);
+
     await clickMultiple(page, 1750, 1010, 1);
     await delay(2_000);
 
