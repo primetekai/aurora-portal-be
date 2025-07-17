@@ -5,170 +5,144 @@ import {
   Logger,
 } from '@nestjs/common';
 import * as Pulsar from 'pulsar-client';
-import { Semaphore } from 'async-mutex';
 import { CrawlService } from '../crawl-view-360';
 
 @Injectable()
 export class PulsarService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(PulsarService.name);
   private client: Pulsar.Client;
-  private consumers: Pulsar.Consumer[] = [];
+  private consumer: Pulsar.Consumer;
   private producer: Pulsar.Producer;
-  private readonly semaphore = new Semaphore(1); // Giới hạn 3 job chạy cùng lúc
 
   constructor(private readonly crawlService: CrawlService) {}
-
-  private readonly numThreads = 3;
-
-  private pulsarConfig = {
-    serviceUrl: 'pulsar://160.191.164.16:6650',
-    token:
-      'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkZXYifQ.MtdmVWF8Yr3Tp5M1gKSOOLHdsh1KsiVaJY2TtDi1sTw',
-  };
 
   async onModuleInit() {
     this.logger.log('🚀 Initializing Pulsar Service...');
 
-    this.client = new Pulsar.Client({
-      serviceUrl: this.pulsarConfig.serviceUrl,
+    const pulsarConfig = {
+      authentication: {
+        token:
+          'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkZXYifQ.4J50b6GlDDMB8TTLbQusLvEGaHQ4Yypj5zyN5RX4j2E',
+        type: 'token',
+      },
+    };
+
+    const clientConfig: Pulsar.ClientConfig = {
+      // serviceUrl: 'pulsar://103.78.3.70:6650',
+      serviceUrl: 'pulsar://160.191.164.16:6650',
       operationTimeoutSeconds: 10,
-      authentication: new Pulsar.AuthenticationToken({
-        token: this.pulsarConfig.token,
-      }),
+    };
+
+    clientConfig.authentication = new Pulsar.AuthenticationToken({
+      token: pulsarConfig.authentication.token,
     });
 
-    for (let i = 0; i < this.numThreads; i++) {
-      await this.createConsumerWorker(i + 1);
-      this.logger.log(`🧵 Started consumer thread #${i + 1}`);
+    // this.client = new Pulsar.Client({
+    //   // serviceUrl: 'pulsar://194.233.69.2:6650',
+    //   // serviceUrl: 'pulsar://103.78.3.71:6650',
+    //   serviceUrl: 'pulsar://160.191.164.16:6650',
+    // });
+
+    this.client = new Pulsar.Client(clientConfig);
+
+    try {
+      this.consumer = await this.client.subscribe({
+        topic: 'persistent://public/default/property-capture-request',
+        subscription: 'persistent-property-capture-request-subscription',
+        subscriptionType: 'Shared',
+        listener: this.handleMessage.bind(this),
+      });
+      this.logger.log('🔵 Subscribed successfully to topic.');
+    } catch (err) {
+      this.logger.error(`❌ Failed to create consumer: ${err.message}`);
     }
 
     this.producer = await this.client.createProducer({
       topic: 'persistent://public/default/property-capture-completed',
     });
 
-    this.logger.log('🔵 Pulsar service initialized.');
+    this.logger.log('🔵 Pulsar service started and listening...');
   }
 
-  private async createConsumerWorker(consumerId: number) {
-    const consumer = await this.client.subscribe({
-      topic: 'persistent://public/default/property-capture-request',
-      subscription: 'property-capture-request-subscription',
-      subscriptionType: 'Shared',
-      receiverQueueSize: 100,
-    });
-
-    this.consumers.push(consumer);
-    this.logger.log(`✅ Subscribed (Consumer #${consumerId})`);
-
-    const loop = async () => {
-      while (true) {
-        try {
-          const msg = await consumer.receive();
-          this.handleCaptureRequest(msg, consumer, consumerId).catch((err) => {
-            this.logger.error(
-              `[Consumer #${consumerId}] ❌ Error in message handling: ${err.message}`,
-            );
-          });
-        } catch (err) {
-          this.logger.error(
-            `[Consumer #${consumerId}] ❌ Receive failed: ${err.message}`,
-          );
-        }
-      }
-    };
-
-    loop();
-  }
-
-  private async handleCaptureRequest(
-    msg: Pulsar.Message,
-    consumer: Pulsar.Consumer,
-    consumerId: number,
-  ) {
-    const [_, release] = await this.semaphore.acquire();
-    const messageId = msg.getMessageId().toString();
-
+  private async handleMessage(msg: Pulsar.Message, consumer: Pulsar.Consumer) {
     try {
       const rawData = msg.getData().toString();
-      this.logger.log(
-        `📩 [Consumer #${consumerId}] Received (MessageID: ${messageId}): ${rawData}`,
-      );
+      this.logger.log(`📩 Raw message data: ${rawData}`);
 
       if (!rawData.startsWith('{')) {
-        this.logger.error(`[Consumer #${consumerId}] ❗ Invalid JSON`);
-        await consumer.acknowledge(msg);
+        this.logger.error(`❌ Received invalid JSON message: ${rawData}`);
+        consumer.acknowledge(msg);
         return;
       }
 
-      const parsed = JSON.parse(rawData);
-      const propertyId = parsed.property_id ?? parsed.propertyId;
-      const longitude = parsed.longitude ?? parsed.data?.longitude;
-      const latitude = parsed.latitude ?? parsed.data?.latitude;
-      const zoom = parsed.zoom ?? parsed.data?.zoom ?? 18;
-      const attempts = parsed.attempts ?? 0;
+      const res = JSON.parse(rawData);
+      this.logger.log(`✅ Parsed message: ${JSON.stringify(res)}`);
 
-      if (!propertyId || !longitude || !latitude) {
-        this.logger.warn(
-          `[Consumer #${consumerId}] ⚠️ Missing coordinates or propertyId`,
-        );
-        await consumer.acknowledge(msg);
+      const { propertyId, data, attempts = 0, app } = res;
+      const { longitude, latitude, zoom } = data;
+
+      if (!longitude || !latitude) {
+        this.logger.warn('⚠️ Missing longitude or latitude');
         return;
       }
 
       if (attempts >= 2) {
         this.logger.warn(
-          `[Consumer #${consumerId}] ⛔ Max attempts (${attempts}) for propertyId: ${propertyId}`,
+          `⚠️ Max attempts (${attempts}) reached for propertyId: ${propertyId}`,
         );
-        await consumer.acknowledge(msg);
+        consumer.acknowledge(msg);
         return;
       }
 
+      this.logger.log(
+        `🌍 Crawling video for location: (${latitude}, ${longitude}), attempt: ${attempts + 1}`,
+      );
       const location = `${latitude} ${longitude}`;
       const result = await this.crawlService.crawlCaptureGoogleEarth(
         location,
         zoom === 20 ? 4 : zoom,
       );
 
+      let responseMessage;
+
       if (!result) {
+        consumer.negativeAcknowledge(msg);
         this.logger.warn(
-          `[Consumer #${consumerId}] ❌ Capture failed for propertyId: ${propertyId}`,
+          `⚠️ Capture failed for propertyId: ${propertyId}, attempt: ${attempts + 1}`,
         );
-        await consumer.negativeAcknowledge(msg); // Re-deliver if failed
-        return;
+      } else {
+        responseMessage = {
+          eventType: 'PROPERTY_COMPLETED',
+          timestamp: new Date().toISOString(),
+          propertyId,
+          attempts: attempts + 1,
+          app,
+          data: {
+            zoom,
+            videoUrl: result,
+          },
+        };
+
+        this.logger.log(`✅ Capture successful for propertyId: ${propertyId}`);
       }
 
-      const responseMessage = {
-        eventType: 'PROPERTY_COMPLETED',
-        timestamp: new Date().toISOString(),
-        propertyId,
-        attempts: attempts + 1,
-        data: { zoom, videoUrl: result },
-      };
+      if (attempts < 2) {
+        await this.producer.send({
+          data: Buffer.from(JSON.stringify(responseMessage)),
+        });
 
-      await this.producer.send({
-        data: Buffer.from(JSON.stringify(responseMessage)),
-      });
+        this.logger.log(`📤 Sent message: ${JSON.stringify(responseMessage)}`);
+      }
 
-      this.logger.log(
-        `✅ [Consumer #${consumerId}] Sent for propertyId: ${propertyId}`,
-      );
-
-      await consumer.acknowledge(msg);
-    } catch (err) {
-      this.logger.error(
-        `[Consumer #${consumerId}] ❌ Error: ${err.message} (MessageID: ${messageId})`,
-      );
-      await consumer.negativeAcknowledge(msg);
-    } finally {
-      release();
+      consumer.acknowledge(msg);
+    } catch (error) {
+      this.logger.error(`❌ Error processing message: ${error.message}`);
     }
   }
 
   async onModuleDestroy() {
     this.logger.warn('🛑 Closing Pulsar client...');
-    for (const consumer of this.consumers) {
-      await consumer.close();
-    }
+    await this.consumer.close();
     await this.producer.close();
     await this.client.close();
   }
