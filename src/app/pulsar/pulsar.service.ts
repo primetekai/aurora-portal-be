@@ -22,13 +22,13 @@ export class PulsarService implements OnModuleInit, OnModuleDestroy {
     const pulsarConfig = {
       authentication: {
         token:
-          'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwcm9kIn0.g6gc1rka9gxFX8f8Hhj3yKHUv2IfKC7sYa8MdH5HDeE',
+          'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwcm9kIn0.SqIqh79FV5I0AV17toHE9NYI1leK22EIGwaLdQhK9jc',
         type: 'token',
       },
     };
 
     const clientConfig: Pulsar.ClientConfig = {
-      serviceUrl: 'pulsar://103.78.3.71:6650',
+      serviceUrl: 'pulsar://103.78.3.75:6651',
       // serviceUrl: 'pulsar://160.191.164.16:6650',
       operationTimeoutSeconds: 10,
     };
