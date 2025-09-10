@@ -69,7 +69,7 @@ export const captureGoogleEarth = async (
     });
 
     // Click vào ô search và nhập địa điểm
-    await clickXY(page, 185, 32);
+    await clickXY(page, 185, 58);
     await delay(1_000);
     await page.keyboard.type(location, { delay: 100 });
     await page.keyboard.press('Enter');
