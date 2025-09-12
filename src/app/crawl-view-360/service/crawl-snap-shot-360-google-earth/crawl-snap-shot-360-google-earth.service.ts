@@ -85,6 +85,10 @@ export const captureGoogleEarth = async (
     await clickMultiple(page, 1884, 1014, zoom);
     await delay(1_000);
 
+    // Click map pin
+    await clickMultiple(page, 1882, 126, 1); //Click close map pin
+    await delay(1_000);
+
     // Click close modal
     await clickXY(page, 1260, 856);
     await delay(1_000);
