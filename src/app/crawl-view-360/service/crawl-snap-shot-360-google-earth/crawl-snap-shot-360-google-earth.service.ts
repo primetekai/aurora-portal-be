@@ -68,8 +68,11 @@ export const captureGoogleEarth = async (
       content: `* { animation: none !important; transition: none !important; }`,
     });
 
+    //Click close modal
+    await clickXY(page, 1163, 318);
+
     // Click vào ô search và nhập địa điểm
-    await clickXY(page, 185, 58);
+    await clickMultiple(page, 200, 56, 2);
     await delay(1_000);
     await page.keyboard.type(location, { delay: 100 });
     await page.keyboard.press('Enter');
@@ -169,27 +172,16 @@ async function captureFramesWithScreencast(
 function convertImagesToVideo(framesDir: string): Promise<string> {
   const fileName = `${uuidv4()}.mp4`;
   const videoPath = path.join(__dirname, fileName);
+  const vf = 'crop=iw:floor(ih*0.8/2)*2:0:floor(ih*0.1/2)*2';
+
+  const cmd =
+    `ffmpeg -framerate 10 ` +
+    `-i "${path.join(framesDir, 'frame-%04d.jpg')}" ` +
+    `-vf "${vf}" ` +
+    `-c:v libx264 -crf 18 -preset veryfast -pix_fmt yuv420p ` +
+    `"${videoPath}"`;
 
   return new Promise((resolve, reject) => {
-    const cmd = [
-      'ffmpeg',
-      '-framerate',
-      '10',
-      '-i',
-      `${framesDir}/frame-%04d.jpg`,
-      '-vf',
-      'crop=in_w:in_h*0.55:0:in_h*0.30',
-      '-c:v',
-      'libx264',
-      '-crf',
-      '18',
-      '-preset',
-      'veryfast',
-      '-pix_fmt',
-      'yuv420p',
-      videoPath,
-    ].join(' ');
-
     exec(cmd, (err, _stdout, stderr) => {
       if (err) {
         console.error('❌ FFmpeg error:', stderr);
