@@ -70,6 +70,9 @@ export const captureGoogleEarth = async (
 
     //Click close modal
     await clickXY(page, 1163, 318);
+    await delay(1_000);
+    await clickMultiple(page, 1886, 30, 2);
+    await delay(1_000);
 
     // Click vào ô search và nhập địa điểm
     await clickMultiple(page, 200, 56, 2);
