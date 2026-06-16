@@ -1,63 +1,29 @@
 import 'dotenv/config';
 
-const NODE_ENV = process.env.NODE_ENV ?? 'production';
-const PORT = process.env.NODE_APP_PORT ?? '3000';
-const HOST_NAME = process.env.NODE_APP_HOST_NAME ?? 'localhost';
-const DB_HOSTNAME = process.env.NODE_APP_DB_HOSTNAME ?? 'localhost';
-const DB_PORT = Number(process.env.NODE_APP_DB_PORT) ?? 5434;
-const DB_TYPE = process.env.NODE_APP_DB_TYPE ?? 'postgres';
-const DB_USERNAME = process.env.NODE_APP_DB_USERNAME ?? 'postgres';
-const DB_PASSWORD = process.env.NODE_APP_DB_PASSWORD ?? '123123';
-const DB_NAME = process.env.NODE_APP_DB_NAME ?? 'postgres';
-const TYPEORM_SYNC = Boolean(process.env?.NODE_APP_TYPEORM_SYNC || false);
-const JWT_SECRET = process.env.NODE_APP_JWT_SECRET ?? 'topSecret51';
-const EXPIRES_IN = process.env.NODE_APP_EXPIRES_IN ?? '10d';
-const SWAGGER = Boolean(process.env.NODE_APP_SWAGGER || false);
-const TYPE_IMAGE_FILE = process.env.NODE_APP_TYPE_IMAGE_FILE ?? [
-  'image/jpeg',
-  'image/png',
-  'image/gif',
-];
-const TYPE_VIDEO_FILE = process.env.NODE_APP_TYPE_VIDEO_FILE ?? [
-  'video/mp4',
-  'video/avi',
-  'video/mkv',
-];
-const TYPE_FILE_FILE = process.env.NODE_APP_TYPE_FILE_FILE ?? [
-  'application/pdf',
-  'application/msword',
-  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-  'application/zip',
-];
-
-const MAX_SIZE_OF_IMAGE_FILE =
-  process.env.NODE_APP_MAX_SIZE_OF_IMAGE_FILE ?? 2097152;
-const UPLOAD_FILE_PATH = process.env.NODE_APP_MAX_UPLOAD_FILE_PATH;
-const MAX_SIZE_OF_VIDEO_FILE =
-  process.env.NODE_APP_MAX_SIZE_OF_VIDEO_FILE ?? 104857600;
-const MAX_SIZE_OF_FILE_FILE = 20971520;
-const OPENAI_API_KEY = process.env.NODE_APP_OPENAI_API_KEY;
+const NODE_ENV = process.env.NODE_ENV;
+const PORT = process.env.NODE_APP_PORT;
+const SWAGGER = process.env.NODE_APP_SWAGGER === 'true';
+const MINIO_URL = process.env.NODE_APP_MINIO_URL || '';
+const MINIO_PORT = process.env.NODE_APP_MINIO_PORT || '';
+const MINIO_SSL = process.env.NODE_APP_MINIO_SSL || '';
+const MINIO_ACCESS_KEY = process.env.NODE_APP_MINIO_ACCESS_KEY || '';
+const MINIO_SECRET_KEY = process.env.NODE_APP_MINIO_SECRET_KEY || '';
+const MINIO_BUCKET = process.env.NODE_APP_MINIO_BUCKET || '';
+const MINIO_PATH_DIR = process.env.NODE_APP_MINIO_PATH_DIR || '';
+const PURSAL_URL = process.env.NODE_APP_PURSAL_URL || '';
+const PURSAL_TOKEN = process.env.NODE_APP_PURSAL_TOKEN || '';
 
 export {
   NODE_ENV,
   PORT,
-  HOST_NAME,
-  DB_HOSTNAME,
-  DB_PORT,
-  DB_TYPE,
-  DB_USERNAME,
-  DB_PASSWORD,
-  DB_NAME,
-  TYPEORM_SYNC,
-  JWT_SECRET,
-  EXPIRES_IN,
   SWAGGER,
-  TYPE_IMAGE_FILE,
-  TYPE_FILE_FILE,
-  MAX_SIZE_OF_IMAGE_FILE,
-  UPLOAD_FILE_PATH,
-  MAX_SIZE_OF_VIDEO_FILE,
-  TYPE_VIDEO_FILE,
-  MAX_SIZE_OF_FILE_FILE,
-  OPENAI_API_KEY,
+  MINIO_URL,
+  MINIO_PORT,
+  MINIO_SSL,
+  MINIO_ACCESS_KEY,
+  MINIO_SECRET_KEY,
+  MINIO_BUCKET,
+  MINIO_PATH_DIR,
+  PURSAL_URL,
+  PURSAL_TOKEN,
 };

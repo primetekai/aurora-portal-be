@@ -2,6 +2,15 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Client } from 'minio';
 import * as fs from 'fs';
 import { IMinioUploadFile } from './minio.type';
+import {
+  MINIO_URL,
+  MINIO_PORT,
+  MINIO_SSL,
+  MINIO_ACCESS_KEY,
+  MINIO_SECRET_KEY,
+  MINIO_BUCKET,
+  MINIO_PATH_DIR,
+} from 'src/config';
 
 @Injectable()
 export class MinIOService {
@@ -12,22 +21,15 @@ export class MinIOService {
 
   constructor() {
     this.minioClient = new Client({
-      endPoint: 's3.aurora-tech.com',
-      port: 443,
-      useSSL: true,
-      accessKey: 'EiCFhonsMsVoYpyQ2aWl',
-      secretKey: 'MFS2Judqjj1MTykRCK0hM9GZMx38kmIdSOTSsIOo',
-      // endPoint: process.env.MINIO_URL || 's3-dev.aurora-tech.com',
-      // port: parseInt(process.env.MINIO_PORT) || 80,
-      // useSSL: process.env.MINIO_SSL === 'true',
-      // accessKey: process.env.MINIO_ACCESS_KEY || 'lstlJnqwAcr9lqNe4B3O',
-      // secretKey:
-      //   process.env.MINIO_SECRET_KEY ||
-      //   'H440qEqcXqMZq2X9SU4bJriZODF5lMZm10hcoDih',
+      endPoint: MINIO_URL || '',
+      port: parseInt(MINIO_PORT) || 80,
+      useSSL: MINIO_SSL === 'true',
+      accessKey: MINIO_ACCESS_KEY || '',
+      secretKey: MINIO_SECRET_KEY || '',
     });
 
-    this.bucketName = process.env.MINIO_BUCKET || '3d-tour-outside';
-    this.pathDir = process.env.MINIO_PATH_DIR || '3gs_service';
+    this.bucketName = MINIO_BUCKET || '3d-tour-outside';
+    this.pathDir = MINIO_PATH_DIR || '3gs_service';
 
     this.testMinioConnection();
   }
@@ -84,7 +86,7 @@ export class MinIOService {
         filePath,
       );
 
-      const fileUrl = `https://s3.aurora-tech.com/${bucketName}/${fullObjectName}`;
+      const fileUrl = `https://${MINIO_URL}/${bucketName}/${fullObjectName}`;
       // const fileUrl = `https://${this.minioClient.host}:${this.minioClient.port}/${this.bucketName}/${fullObjectName}`;
       console.log(`✅ Upload successful! File URL: ${fileUrl}`);
 
