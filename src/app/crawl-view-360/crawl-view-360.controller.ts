@@ -19,46 +19,6 @@ export class CrawlController {
 
   constructor(private crawlService: CrawlService) {}
 
-  @Get('generate-image')
-  @ApiQuery({
-    name: 'url',
-    required: true,
-    description: 'URL of the webpage to capture',
-  })
-  @ApiQuery({
-    name: 'source',
-    required: true,
-    description: 'Source of the webpage (e.g., Facebook, Google)',
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'Returns the screenshot of the webpage',
-  })
-  @ApiResponse({
-    status: 400,
-    description: 'Invalid URL or source',
-  })
-  async generateImage(
-    @Query('url') url: string,
-    @Query('source') source: string,
-    @Res() res: Response,
-  ) {
-    try {
-      const base64Image = await this.crawlService.crawlSnapShotScreenWeb(
-        url,
-        source,
-      );
-      res.set({ 'Content-Type': 'application/json' });
-      return res.json({ base64: `data:image/png;base64,${base64Image}` });
-    } catch (error) {
-      console.error('❌ Error generating screenshot:', error);
-      throw new HttpException(
-        'Unable to generate screenshot',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
-  }
-
   @Get('generate-image-view-360')
   @ApiQuery({
     name: 'location',

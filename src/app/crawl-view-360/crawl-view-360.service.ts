@@ -1,9 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import {
-  captureGoogleEarth,
-  crawlSnapShotScreenWebService,
-  IVideoMetadata,
-} from './service';
+import { captureGoogleEarth, IVideoMetadata } from './service';
 import { MinIOService } from '../k-splat/service';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -12,10 +8,6 @@ import { promisify } from 'util';
 @Injectable()
 export class CrawlService {
   constructor(private readonly minioService: MinIOService) {}
-
-  async crawlSnapShotScreenWeb(phoneNumber, source): Promise<any> {
-    return crawlSnapShotScreenWebService(phoneNumber, source);
-  }
 
   // 🗑️ Function to delete temporary files to avoid clutter
   private deleteFile(filePath: string) {

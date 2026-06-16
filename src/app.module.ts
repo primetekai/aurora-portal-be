@@ -1,30 +1,11 @@
 import { LoggingInterceptor } from './app/interceptor/logging.interceptor';
 import { Module } from '@nestjs/common';
-// import { typeOrmConfig } from './config/typeorm.config';
-// import { TypeOrmModule } from '@nestjs/typeorm';
 import { APP_INTERCEPTOR } from '@nestjs/core';
-import {
-  // AuthModule,
-  // LanguagesModule,
-  // AdminSectionsModule,
-  // SectionsModule,
-  // UserModule,
-  CrawlModule,
-  KSplatModule,
-  PulsarModule,
-} from './app';
+import { CrawlModule, KSplatModule, PulsarModule } from './app';
 import { NODE_ENV } from './config';
 
 @Module({
   imports: [
-    // TypeOrmModule.forRoot(typeOrmConfig),
-    // AuthModule,
-    // UserModule,
-    // LanguagesModule,
-    // AdminSectionsModule,
-    // SectionsModule,
-    // UploadModule,
-    // SpeedToTextModule,
     KSplatModule,
     ...(NODE_ENV === 'development' ? [CrawlModule] : []),
     ...(NODE_ENV === 'development' ? [PulsarModule] : []),
